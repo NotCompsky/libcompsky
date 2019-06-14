@@ -24,10 +24,15 @@ endif()
 
 # BEGIN: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
-add_library(compsky_mysql SHARED "${SRC_DIR}/mysql.cpp")
-target_link_libraries(compsky_mysql PRIVATE mysqlclient compsky_asciify compsky_security)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    add_library(compsky_mysql STATIC "${SRC_DIR}/mysql.cpp")
+    add_library(compsky_mysql_create_config STATIC "${SRC_DIR}/create_config.cpp")
+else()
+    add_library(compsky_mysql SHARED "${SRC_DIR}/mysql.cpp")
+    add_library(compsky_mysql_create_config SHARED "${SRC_DIR}/create_config.cpp")
+endif()
 
-add_library(compsky_mysql_create_config SHARED "${SRC_DIR}/create_config.cpp")
+target_link_libraries(compsky_mysql PRIVATE mysqlclient compsky_asciify compsky_security)
 target_link_libraries(compsky_mysql_create_config PRIVATE compsky_asciify compsky_mysql)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -60,6 +65,23 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND NOT ${CMAKE_HOST_SYSTEM_NAME} STR
 endif()
 
 
+
+if("${NO_SECOND_DEFINES} " STREQUAL " ")
+    # Works fine with and without this definition on my Ubuntu machine using GCC, fails without it on Windows using VC.
+    target_compile_definitions(compsky_mysql_create_config PRIVATE SECOND_DEFINES)
+endif()
+
+if(EXISTS "/usr/include/mysql/mysql.h" AND NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    set(MYSQL_UNDER_DIR "True")
+elseif(EXISTS "${WIN_MYSQL_DIR}/include/mysql/mysql.h")
+    # NOTE: MySQL_DIR == MySQL_DIR-NOTFOUND on Ubuntu - despite compiling fine - so cannot test the converse.
+    set(MYSQL_UNDER_DIR)
+endif()
+configure_file("${INC_DIR}/compsky/mysql/mysql.h.in" "${INC_DIR}/compsky/mysql/mysql.h")
+
+
+
+return()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
         install(
@@ -75,18 +97,3 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         )
     endif()
 endif()
-
-
-
-if("${NO_SECOND_DEFINES} " STREQUAL " ")
-    # Works fine with and without this definition on my Ubuntu machine using GCC, fails without it on Windows using VC.
-    target_compile_definitions(compsky_mysql_create_config PRIVATE SECOND_DEFINES)
-endif()
-
-if(EXISTS "/usr/include/mysql/mysql.h" AND NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(MYSQL_UNDER_DIR "True")
-elseif(EXISTS "${WIN_MYSQL_DIR}/include/mysql/mysql.h")
-    # NOTE: MySQL_DIR == MySQL_DIR-NOTFOUND on Ubuntu - despite compiling fine - so cannot test the converse.
-    set(MYSQL_UNDER_DIR)
-endif()
-configure_file("${INC_DIR}/compsky/mysql/mysql.h.in" "${INC_DIR}/compsky/mysql/mysql.h")

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR) # CONTRIBUTIONS WELCOME: Tests of previous/future versions which work or not
 
-project(Compsky CXX)
+project(Compsky CXX) # Important that it is set before find_package is called
 
 set(COMPSKY_MAJOR_VERSION 0)
 set(COMPSKY_MINOR_VERSION 1)

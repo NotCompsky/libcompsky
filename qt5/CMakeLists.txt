@@ -22,7 +22,12 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # BEGIN: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
-add_library(compsky_qt5 SHARED ${SRC_DIR}/tagdialog.cpp)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    add_library(compsky_qt5 STATIC ${SRC_DIR}/tagdialog.cpp)
+else()
+    add_library(compsky_qt5 SHARED ${SRC_DIR}/tagdialog.cpp)
+endif()
+
 target_link_libraries(compsky_qt5 PRIVATE Qt5::Widgets)
 
 set_target_properties(compsky_qt5 PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/qt5/tagdialog.hpp")
@@ -40,6 +45,7 @@ install(
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
+return()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
         install(

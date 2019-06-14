@@ -4,7 +4,11 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # BEGIN: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
-add_library(compsky_security SHARED ${SRC_DIR}/memset.cpp)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    add_library(compsky_security STATIC ${SRC_DIR}/memset.cpp)
+else()
+    add_library(compsky_security SHARED ${SRC_DIR}/memset.cpp)
+endif()
 
 set_target_properties(compsky_security PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/security/memset.hpp")
 set_property(TARGET compsky_security PROPERTY CXX_STANDARD 17)
@@ -23,6 +27,7 @@ install(
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
+return()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
         install(

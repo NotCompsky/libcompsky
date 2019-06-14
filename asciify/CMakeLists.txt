@@ -4,7 +4,12 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # BEGIN: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
-add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    add_library(compsky_asciify STATIC "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+else()
+    add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+endif()
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -36,6 +41,7 @@ install(
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
+return()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
         install(
