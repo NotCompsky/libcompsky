@@ -2,13 +2,13 @@
 
 This package is just a collection of a few bits and bobs used in various projects of mine.
 
-## mysql
+# mysql
 
 This is the main feature of the library. It is a wrapper around `libmysqlclient` that - in my opinion - has a far simpler syntax. And presumably far fewer features, although of course you still have access to the underlying `libmysqlclient` functions.
 
 It uses `asciify` (another part of this project) to format the strings sent to the MySQL server.
 
-### Usage Examples
+## Usage Examples
 
     #include <compsky/mysql/query.hpp>
     
