@@ -22,7 +22,7 @@ Using [libfmt's benchmark](https://github.com/fmtlib/format-benchmark) patched t
 
 This benchmark is just to satisfy curiosity. I don't think `compsky::asciify` is particularly useful to anyone - if you look at the output, you can see that the floats are not printed exactly, with `1.2339999999` instead of `1.2340000000` and (more worryingly) `3.12` instead of `+3.13`. Perhaps this is something that can be fixed, but I would expect many other flaws exist, and suggest that `compsky::asciify` is only useful where both a *nearly* correct answer is acceptable and performance is critical and you have a relatively new compiler (i.e. almost never).
 
-You can test it yourself using the patch under `3rdparty/patches/format-benchmark`, and applying it in the `format-benchmark` directory with `git am < /PATH/TO/0001-Added-compsky-asciify.patch`).
+You can test it yourself using [the patch](3rdparty/patches/format-benchmark/0001-Added-compsky-asciify.patch) and applying it in the `format-benchmark` directory with `git am < /PATH/TO/0001-Added-compsky-asciify.patch`).
 
 # Building
 
