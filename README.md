@@ -17,7 +17,6 @@ Using [libfmt's benchmark](https://github.com/fmtlib/format-benchmark) patched t
 | tinyformat | 2.17 | 2.16 |
 | boost | 6.19 | 6.18 |
 | compsky::asciify | 0.32 | 0.31 |
-| none | 0.05 | 0.04 |
 | folly | N/A | N/A |
 | stb_sprintf | 0.68 | 0.68 |
 
@@ -31,11 +30,11 @@ You can test it yourself using the patch under `3rdparty/patches/format-benchmar
 
 Packages required for GUI:
 
-    * libqt5
+* libqt5
 
 Packages required for MySQL:
 
-    * libmysqlclient
+* libmysqlclient
 
 ## Building
 
