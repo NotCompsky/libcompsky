@@ -43,10 +43,10 @@ Packages required for MySQL:
 
 Navigate to this project's root directory and run:
 
-    `mkdir build`
-    `cd build`
-    `cmake ..`
-    `sudo cmake install`
+    mkdir build
+    cd build
+    cmake ..
+    sudo cmake install
 
 ### Windows
 
@@ -56,26 +56,26 @@ The recommended way of building for Windows is using `MXE` on a Unix system. I h
 
 You must use MXE, as the standard MinGW tools on Ubuntu do not include things such as libmysqlclient. If you haven't installed it already, allocate an hour or so (and ~3GB) for it to download and build all dependencies.
     
-    `cd ..`
-    `git clone https://github.com/mxe/mxe`
-    `cd mxe`
-    `make MXE_TARGETS=x86_64-w64-mingw32.static`
-    `make qtbase libmysqlclient`
+    cd ..
+    git clone https://github.com/mxe/mxe
+    cd mxe
+    make MXE_TARGETS=x86_64-w64-mingw32.static
+    make qtbase libmysqlclient
 
 Ensure MXE's `/usr/bin` is in your `PATH`:
 
-    `export PATH="$PATH:$PWD/usr/bin"`
+    export PATH="$PATH:$PWD/usr/bin"
 
 Now build libcompsky:
 
-    `cd ..`
-    `git clone https://github.com/compsky/libcompsky`
-    `cd libcompsky`
-    `mkdir build`
-    `cd build`
-    `x86_64-w64-mingw32.static-cmake ..`
-    `make`
-    `sudo make install`
+    cd ..
+    git clone https://github.com/compsky/libcompsky
+    cd libcompsky
+    mkdir build
+    cd build
+    x86_64-w64-mingw32.static-cmake ..
+    make
+    sudo make install
 
 #### Native
 
@@ -85,10 +85,10 @@ Now build libcompsky:
 
 Right click on the `Command Prompt for VS` and run as admin.
 
-    `mkdir build`
-    `cd build`
-    `cmake --config Release -G "Visual Studio 15 2017 Win64" ..`
-    `cmake --build . --config Release --target INSTALL`
+    mkdir build
+    cd build
+    cmake --config Release -G "Visual Studio 15 2017 Win64" ..
+    cmake --build . --config Release --target INSTALL
 
 ###### If things go wrong
 
