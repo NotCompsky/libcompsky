@@ -1,10 +1,34 @@
-# Usage
+# Description
 
-See `docs` directory for how to use each of the tools.
+This package is just a collection of a few bits and bobs used in various projects of mine.
 
-# Benchmarks
+## mysql
 
-## asciify
+This is the main feature of the library. It is a wrapper around `libmysqlclient` that - in my opinion - has a far simpler syntax. And presumably far fewer features, although of course you still have access to the underlying `libmysqlclient` functions.
+
+It uses `asciify` (another part of this project) to format the strings sent to the MySQL server.
+
+### Usage Examples
+
+    #include <compsky/mysql/query.hpp>
+    
+    MYSQL_RES* RES;
+    MYSQL_ROW ROW;
+    
+    compsky::mysql::init("/path/to/file.cfg");
+    
+    compsky::mysql::query(&RES, "SELECT id, name FROM ",  table,  " WHERE id < ",  100);
+    
+    uint64_t id;
+    char* name;
+    while(compsky::mysql::assign_next_row(RES, &ROW, &id, &name))
+        std::cout << +id << ": " << name << std::endl;
+    
+    compsky::mysql::exit();
+
+# asciify
+
+## Benchmarks
 
 Using [libfmt's benchmark](https://github.com/fmtlib/format-benchmark) patched to include `compsky::asciify`, I get the following results on my machine (Intel Ubuntu 18.04):
 
