@@ -79,12 +79,16 @@ At the moment it is almost empty.
 
 Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that he released into the Public Domain. It is used to wipe `mysql` authentification details when `compsky::mysql::exit()` is called.
 
+# Installing
+
+To my knowledge, the pre-built binaries are not currently available in any repositories, so you will have to build from source.
+
 # Building
 
 ## Unix
 
-Navigate to this project's root directory and run:
-
+    git clone https://github.com/NotCompsky/libcompsky
+    cd libcompsky
     mkdir build
     cd build
     cmake ..
@@ -97,8 +101,7 @@ The recommended way of building for Windows is using `MXE` on a Unix system. I h
 ### Cross Compiling from Linux
 
 You must use MXE, as the standard MinGW tools on Ubuntu do not include things such as libmysqlclient. If you haven't installed it already, allocate an hour or so (and ~3GB) for it to download and build all dependencies.
-    
-    cd ..
+
     git clone https://github.com/mxe/mxe
     cd mxe
     make MXE_TARGETS=x86_64-w64-mingw32.static
