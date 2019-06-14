@@ -59,6 +59,9 @@ template<typename... Args>
 void assign_next_column(MYSQL_ROW row,  int* col,  char**& s,  Args... args);
 
 template<typename... Args>
+void assign_next_column(MYSQL_ROW row,  int* col,  float*& d,  Args... args);
+
+template<typename... Args>
 void assign_next_column(MYSQL_ROW row,  int* col,  double*& d,  Args... args);
 
 template<typename... Args>
@@ -214,8 +217,8 @@ void assign_next_column(MYSQL_ROW row,  int* col,  char**& s,  Args... args){
     assign_next_column(row,  col,  args...);
 };
 
-template<typename... Args>
-void assign_next_column(MYSQL_ROW row,  int* col,  double*& d,  Args... args){
+template<typename T,  typename... Args>
+void assign_next_column__floaty(MYSQL_ROW row,  int* col,  T d,  Args... args){
     char* s = row[(*col)++];
     *d = *s - '0';
     ++s;
@@ -236,6 +239,16 @@ void assign_next_column(MYSQL_ROW row,  int* col,  double*& d,  Args... args){
     *d /= (div_by+1);
     
     assign_next_column(row, col, args...);
+};
+
+template<typename... Args>
+void assign_next_column(MYSQL_ROW row,  int* col,  float*& d,  Args... args){
+    assign_next_column__floaty(row, col, d, args...);
+};
+
+template<typename... Args>
+void assign_next_column(MYSQL_ROW row,  int* col,  double*& d,  Args... args){
+    assign_next_column__floaty(row, col, d, args...);
 };
 
 template<typename... Args>

@@ -8,7 +8,7 @@ add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-set_target_properties(compsky_asciify PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/asciify/utils.hpp;${INC_DIR}/compsky/asciify/types.hpp;${INC_DIR}/compsky/asciify/flags.hpp;${INC_DIR}/compsky/asciify/core.hpp;${INC_DIR}/compsky/asciify/base.hpp;${INC_DIR}/compsky/asciify/asciify.hpp")
+set_target_properties(compsky_asciify PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/asciify/utils.hpp;${INC_DIR}/compsky/asciify/types.hpp;${INC_DIR}/compsky/asciify/flags.hpp;${INC_DIR}/compsky/asciify/core.hpp;${INC_DIR}/compsky/asciify/base.hpp;${INC_DIR}/compsky/asciify/asciify.hpp;${INC_DIR}/compsky/asciify/print.hpp")
 
 set_property(TARGET compsky_asciify PROPERTY CXX_STANDARD 17)
 
