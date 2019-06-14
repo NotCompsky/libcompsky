@@ -26,7 +26,9 @@ You can test it yourself using the patch under `3rdparty/patches/format-benchmar
 
 # Building
 
-## Prerequisites
+## Dependencies
+
+* C++17 standard compliant compiler
 
 Packages required for GUI:
 
