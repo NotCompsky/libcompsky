@@ -8,6 +8,10 @@ This is the main feature of the library. It is a wrapper around `libmysqlclient`
 
 It uses `asciify` (another part of this project) to format the strings sent to the MySQL server.
 
+## Dependencies
+
+* libmysqlclient
+
 ## Usage Examples
 
     #include <compsky/mysql/query.hpp>
@@ -48,23 +52,19 @@ This benchmark is just to satisfy curiosity. I don't think `compsky::asciify` is
 
 You can test it yourself using [the patch](3rdparty/patches/format-benchmark/0001-Added-compsky-asciify.patch) and applying it in the `format-benchmark` directory with `git am < /PATH/TO/0001-Added-compsky-asciify.patch`).
 
+# qt5
+
+An optional module that is only built if CMake can find the `Qt5Widgets` module (installed with `libqt5`).
+
+At the moment it is almost empty.
+
+# security
+
+Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that he released into the Public Domain. It is used to wipe `mysql` authentification details when `compsky::mysql::exit()` is called.
+
 # Building
 
-## Dependencies
-
-* C++17 standard compliant compiler
-
-Packages required for GUI:
-
-* libqt5
-
-Packages required for MySQL:
-
-* libmysqlclient
-
-## Building
-
-### Unix
+## Unix
 
 Navigate to this project's root directory and run:
 
@@ -73,11 +73,11 @@ Navigate to this project's root directory and run:
     cmake ..
     sudo cmake install
 
-### Windows
+## Windows
 
 The recommended way of building for Windows is using `MXE` on a Unix system. I have not successfully build it with Visual Studio Code 2015 on my Windows machine, though I spent a day trying and got close.
 
-### MXE
+## MXE
 
 You must use MXE, as the standard MinGW tools on Ubuntu do not include things such as libmysqlclient. If you haven't installed it already, allocate an hour or so (and ~3GB) for it to download and build all dependencies.
     
@@ -102,11 +102,11 @@ Now build libcompsky:
     make
     sudo make install
 
-#### Native
+### Native
 
-##### VS Code
+#### VS Code
 
-###### Actually Building It
+##### Actually Building It
 
 Right click on the `Command Prompt for VS` and run as admin.
 
@@ -115,7 +115,7 @@ Right click on the `Command Prompt for VS` and run as admin.
     cmake --config Release -G "Visual Studio 15 2017 Win64" ..
     cmake --build . --config Release --target INSTALL
 
-###### If things go wrong
+##### If things go wrong
 
 The expected output includes lots of warnings - `'fopen' is unsafe`, `conversion from 'size_t' to 'unsigned long'`, `format string requires an argument of 'unsigned long'` etc., which can all be safely ignored.
 
@@ -129,7 +129,7 @@ Note that `--config Release` must be used because `-DCMAKE_BUILD_TYPE` is ignore
 
 The directories must be explicitly stated because the find_package command does not find them, even if the FindMySQL.cmake file from the CMake community wiki is copied into the CMake Modules folder. 
 
-###### Rebuilding Libraries
+##### Rebuilding Libraries
 
 Despite forcing `lib` files to be built - compsky_mysql could not compile if we didn't - these `lib` files are deleted when CMake has finished building, and are not installed. Hence our libraries are unusable by other programs.
 
