@@ -1,0 +1,6 @@
+#cmakedefine MYSQL_UNDER_DIR
+#ifdef MYSQL_UNDER_DIR
+  #include <mysql/mysql.h>
+#else
+  #include <mysql.h>
+#endif

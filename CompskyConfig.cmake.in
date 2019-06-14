@@ -1,0 +1,17 @@
+# BEGIN: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
+
+get_filename_component(COMPSKY_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(COMPSKY_INCLUDE_DIRS "${COMPSKY_CMAKE_DIR}/../include")
+
+set(COMPSKY_BIN_DIRS "${COMPSKY_CMAKE_DIR}/../bin")
+set(COMPSKY_LIB_DIRS "${COMPSKY_CMAKE_DIR}/../lib")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET asciify AND NOT Compske_BINARY_DIR)
+  include("${COMPSKY_CMAKE_DIR}/CompskyTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by FooBarTargets.cmake
+set(COMPSKY_LIBRARIES asciify security mysql)
+
+# END: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file

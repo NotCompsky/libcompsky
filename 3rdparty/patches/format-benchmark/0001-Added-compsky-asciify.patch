@@ -1,0 +1,139 @@
+From 64f61cbbbe45c93601e2c9970e8982f7507b42cf Mon Sep 17 00:00:00 2001
+From: Compsky <adammarkgray@gmail.com>
+Date: Fri, 14 Jun 2019 07:42:01 +0100
+Subject: [PATCH] Added compsky::asciify
+
+---
+ CMakeLists.txt      | 17 +++++++++++++++++
+ bloat-test.py       | 15 +++++++++++++++
+ tinyformat_test.cpp | 30 ++++++++++++++++++++++++++++++
+ 3 files changed, 62 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0b2030a..0d71a04 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -58,6 +58,16 @@ if (CPP11_FLAG)
+     PROPERTIES COMPILE_FLAGS ${CPP11_FLAG})
+ endif ()
+ 
++find_package(Compsky COMPONENTS asciify)
++if (COMPSKY_INCLUDE_DIRS)
++    include_directories("${COMPSKY_INCLUDE_DIRS}")
++    link_directories("${COMPSKY_LIB_DIRS}")
++    target_compile_definitions(tinyformat_speed_test PRIVATE HAVE_COMPSKY_ASCIIFY=1)
++    target_link_libraries(tinyformat_speed_test compsky_asciify)
++else ()
++    message(WARNING "libcompsky not found")
++endif ()
++
+ if (WIN32)
+   add_custom_target(speed-test
+ 	COMMAND @echo running speed tests...
+@@ -77,8 +87,13 @@ if (WIN32)
+ 	COMMAND @echo boost timings: start %time%
+ 	COMMAND .\\tinyformat_speed_test.exe boost >NUL
+ 	COMMAND @echo stop %time%
++	COMMAND @echo compsky::asciify timings: start %time%
++	COMMAND .\\tinyformat_speed_test.exe compsky::asciify >NUL
++	COMMAND @echo stop %time%
+ 	COMMAND @echo stb_sprintf timings: start %time%
+ 	COMMAND .\\tinyformat_speed_test.exe stb_sprintf >NUL
++	COMMAND @echo compsky::asciify timings: start %time%
++	COMMAND .\\tinyformat_speed_test.exe asciify >NUL
+ 	COMMAND @echo stop %time%
+ 	DEPENDS tinyformat_speed_test)
+ else()
+@@ -96,6 +111,8 @@ else()
+ 	COMMAND @time -p ./tinyformat_speed_test tinyformat > /dev/null
+ 	COMMAND @echo boost timings:
+ 	COMMAND @time -p ./tinyformat_speed_test boost > /dev/null
++	COMMAND @echo compsky::asciify timings:
++	COMMAND @time -p ./tinyformat_speed_test compsky::asciify > /dev/null
+   COMMAND @echo folly timings:
+   COMMAND @time -p ./tinyformat_speed_test folly > /dev/null
+   COMMAND @echo stb_sprintf timings:
+diff --git a/bloat-test.py b/bloat-test.py
+index c62585b..d10cc4e 100755
+--- a/bloat-test.py
++++ b/bloat-test.py
+@@ -66,6 +66,20 @@ void doFormat_a() {
+   std::cout << "somefile.cpp:" << 42 << ':' << 1 << ':' << 2 << ":asdf" << "\n";
+ }
+ 
++#elif defined(USE_COMPSKY_ASCIIFY)
++
++#include <compsky/asciify/asciify.hpp>
++
++void doFormat_a() {
++  compsky::asciify::asciify("somefile.cpp", "\n");
++  compsky::asciify::asciify("somefile.cpp", "\n", 42);
++  compsky::asciify::asciify("somefile.cpp", "\n", 42, "asdf");
++  compsky::asciify::asciify("somefile.cpp", "\n", 42, 1, "asdf");
++  compsky::asciify::asciify("somefile.cpp", "\n", 42, 1, 2, "asdf");
++  compsky::asciify::BUF[compsky::asciify::BUF_INDX] = 0;
++  std::cout << compsky::asciify::BUF;
++}
++
+ #elif defined(USE_STB_SPRINTF)
+ 
+ #ifdef FIRST_FILE
+@@ -212,6 +226,7 @@ methods = [
+   ('Boost Format' , ['-DUSE_BOOST']),
+   ('Folly Format' , ['-DUSE_FOLLY', '-lfolly']),
+   ('stb_sprintf'  , ['-DUSE_STB_SPRINTF']),
++  ('compsky::asciify', ['-DUSE_COMPSKY_ASCIIFY']),
+ ]
+ 
+ def format_field(field, format = '', width = ''):
+diff --git a/tinyformat_test.cpp b/tinyformat_test.cpp
+index 1c444bd..f49d8aa 100644
+--- a/tinyformat_test.cpp
++++ b/tinyformat_test.cpp
+@@ -26,6 +26,12 @@ namespace std { class type_info; }
+ #include <stdio.h>
+ #endif
+ 
++#ifdef HAVE_COMPSKY_ASCIIFY
++# include <compsky/asciify/asciify.hpp>
++namespace compsky::asciify {
++    char* BUF = (char*)malloc(1024);
++}
++#endif
+ 
+ // Throw instead of abort() so we can test error conditions.
+ #define TINYFORMAT_ERROR(reason) \
+@@ -151,6 +157,30 @@ void speedTest(const std::string& which)
+         fprintf(stderr, "boost is not available\n");
+ #endif
+     }
++    else if(which == "compsky::asciify")
++    {
++#ifdef HAVE_COMPSKY_ASCIIFY
++        // asciify version
++        constexpr static const compsky::asciify::flag::FillWithLeadingZeros z;
++        constexpr static const compsky::asciify::fake_type::Infinity inf;
++        for(long i = 0; i < maxIter; ++i){
++            compsky::asciify::asciify(1.234, 10, ':', z, 4, 42, ':', /* Missing the PlusIfPositiveFlag */ 3.13, 2, ':', "str", ':', (void*)1000, ':', 'X', ":%\n");
++            std::cout << compsky::asciify::BUF;
++            compsky::asciify::BUF_INDX = 0;
++        }
++#else
++        fprintf(stderr, "asciify is not available\n");
++#endif
++    }
++    else if(which == "none")
++    {
++        // asciify version
++        constexpr static const compsky::asciify::flag::FillWithLeadingZeros z;
++        constexpr static const compsky::asciify::fake_type::Infinity inf;
++        for(long i = 0; i < maxIter; ++i){
++            std::cout << "1.2340000000:0042:+3.13:str:0x3e8:X:%\n";
++        }
++    }
+     else if(which == "stb_sprintf")
+     {
+         char buf[100];
+-- 
+2.17.1
+
