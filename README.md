@@ -30,6 +30,23 @@ It uses `asciify` (another part of this project) to format the strings sent to t
     
     compsky::mysql::exit();
 
+
+`init` and `exit` are a pair, and entirely optional - you can just connect directly via `libmysqlclient`. However, if used, the config file must have exactly the correct syntax.
+
+For convenience, `compsky_mysql_create_config` provides a way to make very simple programs to initialise the database, its tables, and its config file for you, for a given project:
+
+    #include <compsky/mysql/create_config.hpp>
+    
+    int main(){
+        compsky::mysql::create_config(
+            #include "init.sql"
+            , "PROJECT_MYSQL_CFG_PATH"
+        );
+        return 0;
+    }
+
+Here `init.sql` is a file next to the source file that only contains the SQL commands to create tables, in a raw string.
+
 # asciify
 
 ## Benchmarks
