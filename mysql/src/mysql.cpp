@@ -1,7 +1,7 @@
 #include "compsky/mysql/mysql.hpp"
 
 
-
+#include <stdlib.h> // for abort, exit
 #include <string.h> // for strlen
 #include <stdio.h> // for fopen, fread
 #ifdef MYSQL_UNDER_DIR

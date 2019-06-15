@@ -21,6 +21,8 @@ install(
         COMPONENT bin
     LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
         COMPONENT shlib
+    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
+        COMPONENT slib
     PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/security"
         COMPONENT dev
 )
