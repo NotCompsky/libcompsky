@@ -214,7 +214,7 @@ void create_config(const char* stmts,  const char* env_var){
     std::cout << "export " << env_var << "=" << cfg_pth << std::endl;
 #endif
     
-    exit();
+    exit_mysql();
 }
 
 } // END namespace compsky::mysql
