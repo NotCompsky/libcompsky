@@ -89,7 +89,7 @@ void init(const char* fp){
     login_from_auth();
 }
 
-void exit(){
+void exit_mysql(){
     mysql_close(&OBJ);
     
     compsky::security::memzero_secure(MYSQL_AUTH[0],  MYSQL_AUTH[5] - MYSQL_AUTH[0]); // Overwrite MySQL authorisation data 
