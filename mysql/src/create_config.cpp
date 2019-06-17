@@ -50,7 +50,7 @@ void ef_reed(){
 void create_config(const char* stmts,  const char* env_var){
     std::cout << "* MySQL Configuration *" << std::endl;
     
-    std::cout << "Absolute path to save the config file to: ";
+    std::cout << "Absolute file path to save the config file to: ";
     char cfg_pth[1024];
     {
     char c;
@@ -84,7 +84,8 @@ void create_config(const char* stmts,  const char* env_var){
         pclose(proc);
     } else {
   #endif
-        std::cout << "Path: ";
+        std::cout << "MySQL Server Path (if connecting via TCP or Unix socket): ";
+        // NOTE: We do not need to escape \\ in input strings
         ef_reed();
   #ifndef _WIN32
     }
@@ -94,7 +95,7 @@ void create_config(const char* stmts,  const char* env_var){
     AUTH_PTR += 7;
     MYSQL_AUTH[++i] = AUTH_PTR;
     
-    std::cout << "Username: ";
+    std::cout << "MySQL Username: ";
     ef_reed();
     AUTH_PTR_ENDS[i] = AUTH_PTR;
     memcpy(AUTH_PTR, "\nPWRD: ", 7);
@@ -119,7 +120,7 @@ void create_config(const char* stmts,  const char* env_var){
         *AUTH_PTR = '0';
         ++AUTH_PTR;
     } else {
-        std::cout << "Port number: ";
+        std::cout << "MySQL Server port number: ";
         ef_reed();
     }
     AUTH_PTR_ENDS[i] = AUTH_PTR;
