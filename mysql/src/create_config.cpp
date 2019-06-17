@@ -16,15 +16,16 @@
 namespace compsky {
 namespace asciify {
     char* BUF = (char*)malloc(1024);
-  #ifdef SECOND_DEFINES // for Visual Studio
     size_t BUF_INDX = 0;
-  #endif
 }
 
 
 namespace mysql {
 
-#ifdef SECOND_DEFINES
+#ifdef COMPILING_STATIC_LIB
+extern MYSQL OBJ;
+extern char* MYSQL_AUTH[6];
+#else
 MYSQL OBJ;
 char* MYSQL_AUTH[6];
 #endif

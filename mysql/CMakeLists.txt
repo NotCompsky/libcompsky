@@ -27,6 +27,7 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_library(compsky_mysql STATIC "${SRC_DIR}/mysql.cpp")
     add_library(compsky_mysql_create_config STATIC "${SRC_DIR}/create_config.cpp")
+    target_compile_definitions(compsky_mysql_create_config PRIVATE COMPILING_STATIC_LIB)
 else()
     add_library(compsky_mysql SHARED "${SRC_DIR}/mysql.cpp")
     add_library(compsky_mysql_create_config SHARED "${SRC_DIR}/create_config.cpp")
@@ -66,12 +67,6 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND NOT ${CMAKE_HOST_SYSTEM_NAME} STR
     target_link_libraries(compsky_mysql_create_config PRIVATE secur32 ws2_32)
 endif()
 
-
-
-if("${NO_SECOND_DEFINES} " STREQUAL " ")
-    # Works fine with and without this definition on my Ubuntu machine using GCC, fails without it on Windows using VC.
-    target_compile_definitions(compsky_mysql_create_config PRIVATE SECOND_DEFINES)
-endif()
 
 if(EXISTS "/usr/include/mysql/mysql.h" AND NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(MYSQL_UNDER_DIR "True")
