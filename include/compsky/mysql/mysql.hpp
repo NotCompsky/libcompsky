@@ -31,7 +31,7 @@ void init_auth(const char* fp);
 void login_from_auth();
 void init(const char* fp);
 
-void exit();
+void exit_mysql();
 
 
 
