@@ -6,6 +6,7 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_library(compsky_asciify STATIC "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+    target_compile_definitions(compsky_asciify PRIVATE COMPILING_STATIC_LIB)
 else()
     add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
 endif()
