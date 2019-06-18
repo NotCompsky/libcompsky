@@ -118,13 +118,9 @@ void create_config(const char* stmts,  const char* env_var){
     AUTH_PTR += 7;
     MYSQL_AUTH[++i] = AUTH_PTR;
     
-    if (is_localhost){
-        *AUTH_PTR = '0';
-        ++AUTH_PTR;
-    } else {
-        std::cout << "MySQL Server port number: ";
-        ef_reed();
-    }
+    std::cout << "MySQL Server port number (only if connecting via TCP/IP): ";
+    ef_reed();
+    
     AUTH_PTR_ENDS[i] = AUTH_PTR;
     *AUTH_PTR = '\n'; // Important that there is a trailing newline
     
