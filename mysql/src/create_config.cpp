@@ -95,14 +95,16 @@ void create_config(const char* stmts,  const char* env_var){
     AUTH_PTR += 7;
     MYSQL_AUTH[++i] = AUTH_PTR;
     
-    std::cout << "MySQL Username: ";
+    std::cout << "A user will be now created for RScraper to use, that will only have access to the one database it uses:" << std::endl;
+    
+    std::cout << "  Username: ";
     ef_reed();
     AUTH_PTR_ENDS[i] = AUTH_PTR;
     memcpy(AUTH_PTR, "\nPWRD: ", 7);
     AUTH_PTR += 7;
     MYSQL_AUTH[++i] = AUTH_PTR;
     
-    std::cout << "Corresponding password: ";
+    std::cout << "  Password: ";
     ef_reed();
     AUTH_PTR_ENDS[i] = AUTH_PTR;
     memcpy(AUTH_PTR, "\nDBNM: ", 7);
