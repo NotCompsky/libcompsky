@@ -23,15 +23,17 @@ namespace asciify {
 namespace mysql {
 
 #ifdef COMPILING_STATIC_LIB
-extern MYSQL OBJ;
+extern MYSQL* OBJ;
 extern char* MYSQL_AUTH[6];
 #else
-MYSQL OBJ;
+MYSQL* OBJ;
 char* MYSQL_AUTH[6];
 #endif
 
 MYSQL_RES* RES1;
 MYSQL_ROW ROW1;
+
+char* EMPTYSTR = {0};
 
 
 char* AUTH_PTR;
@@ -50,7 +52,7 @@ void ef_reed(){
 void create_config(const char* stmts,  const char* env_var){
     std::cout << "* MySQL Configuration *" << std::endl;
     
-    std::cout << "Absolute file path to save the config file to: ";
+    std::cout << "Absolute file path to save the config file to (will NOT create folders/directories for you): ";
     char cfg_pth[1024];
     {
     char c;
@@ -68,14 +70,14 @@ void create_config(const char* stmts,  const char* env_var){
     MYSQL_AUTH[0] = AUTH_PTR;
     auto i = 0;
     
-    std::cout << "Host (localhost if it is on this machine): ";
+    std::cout << "Host (127.0.0.1 if it is on this machine): "; // localhost might refer to IPv6 ::1:
     ef_reed();
     AUTH_PTR_ENDS[i] = AUTH_PTR;
     memcpy(AUTH_PTR, "\nPATH: ", 7);
     AUTH_PTR += 7;
     MYSQL_AUTH[++i] = AUTH_PTR;
     
-    bool is_localhost = (strncmp(MYSQL_AUTH[i-1], "localhost", strlen("localhost")) == 0);
+    bool is_localhost = (strncmp(MYSQL_AUTH[i-1], "localhost", strlen("localhost")) == 0)  ||  (strncmp(MYSQL_AUTH[i-1], "127.0.0.1", strlen("127.0.0.1")) == 0);
     
   #ifndef _WIN32
     if (is_localhost){
@@ -84,7 +86,7 @@ void create_config(const char* stmts,  const char* env_var){
         pclose(proc);
     } else {
   #endif
-        std::cout << "MySQL Server Path (if connecting via TCP or Unix socket): ";
+        std::cout << "Socket file path or named pipe name (blank if not used): ";
         // NOTE: We do not need to escape \\ in input strings
         ef_reed();
   #ifndef _WIN32
@@ -118,11 +120,10 @@ void create_config(const char* stmts,  const char* env_var){
     AUTH_PTR += 7;
     MYSQL_AUTH[++i] = AUTH_PTR;
     
-    std::cout << "MySQL Server port number (only if connecting via TCP/IP): ";
+    std::cout << "MySQL Server port number (blank if not connecting via TCP/IP): ";
     ef_reed();
-    
     AUTH_PTR_ENDS[i] = AUTH_PTR;
-    *AUTH_PTR = '\n'; // Important that there is a trailing newline
+    *AUTH_PTR = '\n'; // Terminate port number calculation
     
     FILE* cfg = fopen(cfg_pth, "wb");
     fwrite(auth,  1,  (uintptr_t)AUTH_PTR + 1 - (uintptr_t)auth,  cfg);
@@ -138,30 +139,29 @@ void create_config(const char* stmts,  const char* env_var){
     const char* username = MYSQL_AUTH[2]; // User to grant permissions to
     const char* password = MYSQL_AUTH[3]; // His password
     
+    MYSQL_AUTH[2] = AUTH_PTR;
     std::cout << "MySQL admin username: ";
     ef_reed();
-    MYSQL_AUTH[2] = AUTH_PTR;
-    
-    const uintptr_t AUTH_PTR_before = (uintptr_t)AUTH_PTR;
     *AUTH_PTR = 0; // So we can write it out here:
+    ++AUTH_PTR;
+    
+    MYSQL_AUTH[3] = AUTH_PTR;
     std::cout << "MySQL admin password (leave blank to use system socket authentication - i.e. if you can login to MySQL as `" << MYSQL_AUTH[2] << "` without a password): ";
     ef_reed();
-    if (AUTH_PTR_before == (uintptr_t)AUTH_PTR)
-        MYSQL_AUTH[3] = nullptr;
-    else
-        MYSQL_AUTH[3] = AUTH_PTR;
+    *AUTH_PTR = 0;
     
     const char* db_name = MYSQL_AUTH[4];
-    MYSQL_AUTH[4] = nullptr; // Haven't created the database yet
+    
+    MYSQL_AUTH[4] = EMPTYSTR; // We haven't created the database yet, so cannot connect to it
     
     
     login_from_auth();
     
     exec("CREATE DATABASE IF NOT EXISTS `", db_name, "`");
     
-    mysql_select_db(&OBJ, db_name); // Set as current database
+    mysql_select_db(OBJ, db_name); // Set as current database
     
-    /* The following is an alternative to using `mysql_set_server_option(&OBJ, MYSQL_OPTION_MULTI_STATEMENTS_ON);`
+    /* The following is an alternative to using `mysql_set_server_option(OBJ, MYSQL_OPTION_MULTI_STATEMENTS_ON);`
      * The reason it is used is that it is easier to debug the SQL commands individually
      */
     char* stmt = const_cast<char*>(stmts);

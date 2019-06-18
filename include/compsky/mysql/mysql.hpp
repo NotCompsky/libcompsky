@@ -24,7 +24,7 @@ extern char AUTH[AUTH_SZ];
 #endif
 extern char* MYSQL_AUTH[6];
 
-extern MYSQL OBJ;
+extern MYSQL* OBJ;
 
 
 void init_auth(const char* fp);

@@ -40,7 +40,7 @@ char AUTH[AUTH_SZ];
 #endif
 char* MYSQL_AUTH[6] ; // Declared as volatile to forbid compiler from optimising overwrites away
 
-MYSQL OBJ;
+MYSQL* OBJ;
 
 
 void init_auth(const char* fp){
@@ -66,20 +66,27 @@ void login_from_auth(){
     const char* pwrd = MYSQL_AUTH[3];
     const char* dbnm = MYSQL_AUTH[4];
     
-    int port_n = 0;
+    if (path[0] == 0)
+        path = NULL;
+    
+    unsigned int port_n = 0;
     char* itr = MYSQL_AUTH[5];
-    while (*itr != '\n'){
+    while (*itr >= '0'  &&  *itr <= '9'){
         port_n *= 10;
         port_n += *itr - '0'; // Integers are continuous in every realistic character encoding
         ++itr;
     }
     
-    unsigned long client_flag = CLIENT_FOUND_ROWS; // Return number of matched rows rather than number of changed rows (accessed with mysql_affected_rows(&OBJ)
+    auto client_flag = CLIENT_FOUND_ROWS; // Return number of matched rows rather than number of changed rows (accessed with mysql_affected_rows(OBJ)
     
-    mysql_init(&OBJ);
+    OBJ = mysql_init(NULL);
+    if (!OBJ){
+        fprintf(stderr, "mysql_init failed: Out of memory\n");
+        abort();
+    }
     
-    if (!mysql_real_connect(&OBJ, host, user, pwrd, dbnm, port_n, path, client_flag)){
-        fprintf(stderr, "Failed to conenct to MySQL server at %s:%s@%s:%d%s with flag %lu\n", user, pwrd, host, port_n, path, client_flag);
+    if (!mysql_real_connect(OBJ, host, user, pwrd, dbnm, port_n, path, client_flag)){
+        fprintf(stderr, "Failed to conenct to MySQL server at %s:%s@%s:%ld%s with flag %lu\n", user, pwrd, host, port_n, path, client_flag);
         abort();
     }
 }
@@ -90,7 +97,7 @@ void init(const char* fp){
 }
 
 void exit_mysql(){
-    mysql_close(&OBJ);
+    mysql_close(OBJ);
     
     compsky::security::memzero_secure(MYSQL_AUTH[0],  MYSQL_AUTH[5] - MYSQL_AUTH[0]); // Overwrite MySQL authorisation data 
   #ifndef _WIN32
@@ -102,7 +109,7 @@ void exit_mysql(){
 
 
 void exec_buffer(const char* s,  const size_t sz){
-    if (mysql_real_query(&OBJ, s, sz) == 0)
+    if (mysql_real_query(OBJ, s, sz) == 0)
         return;
     fprintf(stderr, "Error executing [%lu] %.*s\n", sz, (int)sz, s);
     abort();
@@ -117,8 +124,8 @@ void query_buffer(MYSQL_RES** res,  const char* s,  const size_t sz){
   #ifdef DEBUG
     printf("Query [%lu]: %.*s\n", sz, (int)sz, s);
   #endif
-    if (mysql_real_query(&OBJ, s, sz) == 0){
-        *res = mysql_store_result(&OBJ);
+    if (mysql_real_query(OBJ, s, sz) == 0){
+        *res = mysql_store_result(OBJ);
         return;
     }
     fprintf(stderr, "Error executing query [%lu] %.*s\n", sz, (int)sz, s);
