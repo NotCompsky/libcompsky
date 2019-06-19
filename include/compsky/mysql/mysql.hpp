@@ -1,11 +1,7 @@
 #ifndef __COMPSKY_MYMYSQL__
 #define __COMPSKY_MYMYSQL__
 
-
 #include "compsky/mysql/mysql.h" // for mysql.h
-
-#include <stdio.h> // for fopen, fread
-
 
 
 namespace compsky {
