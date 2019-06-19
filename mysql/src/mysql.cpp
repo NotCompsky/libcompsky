@@ -68,6 +68,8 @@ void login_from_auth(){
     
     if (path[0] == 0)
         path = NULL;
+    if (pwrd[0] == 0)
+        pwrd = NULL;
     
     unsigned int port_n = 0;
     char* itr = MYSQL_AUTH[5];
