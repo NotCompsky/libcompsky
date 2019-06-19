@@ -75,22 +75,3 @@ elseif(EXISTS "${WIN_MYSQL_DIR}/include/mysql/mysql.h")
     set(MYSQL_UNDER_DIR)
 endif()
 configure_file("${INC_DIR}/compsky/mysql/mysql.h.in" "${INC_DIR}/compsky/mysql/mysql.h")
-
-
-
-return()
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
-        install(
-            # For Windows - install the lib files
-            FILES "${CMAKE_BINARY_DIR}/mysql/Release/compsky_mysql.lib"
-            DESTINATION "${INSTALL_LIB_DIR}"
-        )
-    else()
-        install(
-            # For Windows - install the lib files
-            FILES "${CMAKE_BINARY_DIR}/mysql/libcompsky_mysql.dll.a"
-            DESTINATION "${INSTALL_LIB_DIR}"
-        )
-    endif()
-endif()
