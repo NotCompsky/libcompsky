@@ -70,7 +70,11 @@ void create_config(const char* stmts,  const char* env_var){
     MYSQL_AUTH[0] = AUTH_PTR;
     auto i = 0;
     
+  #ifdef _WIN32
     std::cout << "Host (127.0.0.1 if it is on this machine): "; // localhost might refer to IPv6 ::1:
+  #else
+    std::cout << "Host (localhost if it is on this machine): "; // 127.0.0.1 causes issue with Unix socket // TODO: Check if this is also the issue with Windows named socket
+  #endif
     ef_reed();
     AUTH_PTR_ENDS[i] = AUTH_PTR;
     memcpy(AUTH_PTR, "\nPATH: ", 7);
