@@ -79,16 +79,14 @@ void login_from_auth(){
         ++itr;
     }
     
-    auto client_flag = CLIENT_FOUND_ROWS; // Return number of matched rows rather than number of changed rows (accessed with mysql_affected_rows(OBJ)
-    
     OBJ = mysql_init(NULL);
     if (!OBJ){
         fprintf(stderr, "mysql_init failed: Out of memory\n");
         abort();
     }
     
-    if (!mysql_real_connect(OBJ, host, user, pwrd, dbnm, port_n, path, client_flag)){
-        fprintf(stderr, "Failed to conenct to MySQL server at %s:%s@%s:%ld%s with flag %lu\n", user, pwrd, host, port_n, path, client_flag);
+    if (!mysql_real_connect(OBJ, host, user, pwrd, dbnm, port_n, path, 0)){
+        fprintf(stderr, "Failed to conenct to MySQL server at %s:%s@%s:%u%s\n", user, pwrd, host, port_n, path);
         abort();
     }
 }
