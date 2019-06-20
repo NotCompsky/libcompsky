@@ -14,7 +14,7 @@ extern char* AUTH_PTR;
 
 void ef_reed();
 
-void create_config(const char* stmts,  const char* env_var = 0);
+void create_config(const char* stmts,  const char* permissions_str,  const char* env_var = 0);
 
 }
 } // END namespace compsky::mysql
