@@ -49,7 +49,7 @@ void ef_reed(){
 }
 
 
-void create_config(const char* stmts,  const char* env_var){
+void create_config(const char* stmts,  const char* permissions_str,  const char* env_var){
     std::cout << "* MySQL Configuration *" << std::endl;
     
     std::cout << "Absolute file path to save the config file to (will NOT create folders/directories for you): ";
@@ -180,7 +180,7 @@ void create_config(const char* stmts,  const char* env_var){
     
     if (is_localhost){
         exec("CREATE USER IF NOT EXISTS `", esc, '`', username, "`@`localhost` IDENTIFIED BY \"", esc, '"', password, "\"");
-        exec("GRANT SELECT, INSERT, UPDATE ON ", db_name, ".* TO `", esc, '`', username, "`@`localhost`");
+        exec("GRANT ", permissions_str, " ON ", db_name, ".* TO `", esc, '`', username, "`@`localhost`");
     } else {
         std::cout << "You must manually create the user `" << username << "` and grant him permissions: SELECT, INSERT, UPDATE on `" << db_name << "`" << std::endl;
     }
