@@ -81,11 +81,8 @@ else()
     if(NOT WHICH_MYSQL_CLIENT)
         message(FATAL_ERROR "Please specify the mysql client to use with -DWHICH_MYSQL_CLIENT=...\nDiscover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev")
     endif()
-    if(NOT WHICH_CURL)
-        message(FATAL_ERROR "Please specify the curl package to use with -DWHICH_CURL=...\nDiscover this with the command:  apt list --installed | grep libcurl")
-    endif()
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "${WHICH_MYSQL_CLIENT}, mysql-server, libcompsky, ${WHICH_CURL}, libqt5widgets5, qt5-default")
-    # TODO: Split Qt5 and curl dependant portions into their own packages
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "${WHICH_MYSQL_CLIENT}, mysql-server, libqt5widgets5, qt5-default")
+    # TODO: Split Qt5 dependant portion into its own package
     # TODO: Sort out version ranges. Figure out if libmysqlclient dependency can be generalised.
 
     # Icon and app shortcut for Linux systems
