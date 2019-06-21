@@ -102,8 +102,6 @@ If you get an error relating to libmysqlclient/libmariadbclient not being instal
 
 ## Windows
 
-The recommended way of building for Windows is using `MXE` on a Unix system. I have not successfully build it with Visual Studio Code 2015 on my Windows machine, though I spent a day trying and got close.
-
 ### Cross Compiling from Linux
 
 You must use MXE, as the standard MinGW tools on Ubuntu do not include things such as libmysqlclient. If you haven't installed it already, allocate an hour or so (and ~3GB) for it to download and build all dependencies.
@@ -127,36 +125,3 @@ Now build libcompsky:
     x86_64-w64-mingw32.static-cmake ..
     make
     sudo make install
-
-### Native
-
-#### VS Code
-
-##### Actually Building It
-
-Right click on the `Command Prompt for VS` and run as admin.
-
-    mkdir build
-    cd build
-    cmake --config Release -G "Visual Studio 15 2017 Win64" ..
-    cmake --build . --config Release --target INSTALL
-
-##### If things go wrong
-
-The expected output includes lots of warnings - `'fopen' is unsafe`, `conversion from 'size_t' to 'unsigned long'`, `format string requires an argument of 'unsigned long'` etc., which can all perhaps be safely ignored.
-
-If `mysql.h` cannot be found, run the `cmake --config Release ...` command again but with `-DWIN_MYSQL_DIR=<value>`, replacing `<value>` with the path to your MySQL server directory, replacing the backslashes with forward slashes - the default is `C:/Program Files/MySQL/MySQL Server VERSION`.
-
-If you get the `library machine type 'x64' conflicts with target machine type 'x86'` warning, you forgot to specify `Win64` in the generator `-G` option before.
-
-The generator must be set to 64 bit otherwise VC will force a x86 build (even if the x64 command prompt is used), and that causes undefined reference (linking) errors.
-
-Note that `--config Release` must be used because `-DCMAKE_BUILD_TYPE` is ignored. Debug builds are not possible in VC builds on Windows because VC believes it can only have the same debug level as libmysqlclient (which is Release).
-
-The directories must be explicitly stated because the `find_package` command does not find them, even if the FindMySQL.cmake file from the CMake community wiki is copied into the CMake Modules folder. 
-
-##### Rebuilding Libraries
-
-Despite forcing `lib` files to be built - compsky_mysql could not compile if we didn't - these `lib` files are deleted when CMake has finished building, and are not installed. Hence our libraries are unusable by other programs.
-
-The `lib` files need to be rebuilt. 
