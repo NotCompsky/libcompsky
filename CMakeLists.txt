@@ -50,6 +50,9 @@ include_directories("${PROJECT_SOURCE_DIR}")
 add_subdirectory(asciify)
 add_subdirectory(security)
 add_subdirectory(mysql)
+if(BUILD_PACKAGES)
+    add_subdirectory(packaging)
+endif()
 
 # Add all targets to the build-tree export set
 export(TARGETS compsky_asciify compsky_security compsky_mysql FILE "${PROJECT_BINARY_DIR}/CompskyTargets.cmake")

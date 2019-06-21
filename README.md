@@ -81,7 +81,11 @@ Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that h
 
 # Installing
 
-To my knowledge, the pre-built binaries are not currently available in any repositories, so you will have to build from source.
+## Ubuntu and other Debian-derived systems
+
+Navigate to [the releases page](https://github.com/NotCompsky/rscraper/releases), download the appropriate `deb` file, and run:
+
+    sudo dpkg -i /path/to/libcompsky-VERSION-ARCHITECTURE.deb
 
 # Building
 
