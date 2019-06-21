@@ -15,7 +15,6 @@
 
 namespace compsky {
 namespace asciify {
-    char* BUF = (char*)malloc(1024);
     size_t BUF_INDX = 0;
 }
 
@@ -35,7 +34,6 @@ MYSQL_ROW ROW1;
 
 char* EMPTYSTR = {0};
 
-
 char* AUTH_PTR;
 
 void ef_reed(){
@@ -50,20 +48,24 @@ void ef_reed(){
 
 
 void create_config(const char* stmts,  const char* permissions_str,  const char* env_var){
+    char* buf = (char*)malloc(4096 * 2);
+    
     std::cout << "* MySQL Configuration *" << std::endl;
     
     std::cout << "Absolute file path to save the config file to (will NOT create folders/directories for you): ";
-    char cfg_pth[1024];
+    
+    char* cfg_pth = buf;
     {
     char c;
     for(auto i = 0;  (c = fgetc(stdin));  ++i){
         if (c != '\n')
-            cfg_pth[i] = c;
+            *(buf++) = c;
         else break;
     }
     }
+    *(buf++) = 0;
     
-    char auth[4096];
+    char* auth = buf;
     memcpy(auth, "HOST: ", 6);
     char* AUTH_PTR_ENDS[6];
     AUTH_PTR = auth + 6;
@@ -158,6 +160,7 @@ void create_config(const char* stmts,  const char* permissions_str,  const char*
     
     MYSQL_AUTH[4] = EMPTYSTR; // We haven't created the database yet, so cannot connect to it
     
+    compsky::asciify::BUF = ++AUTH_PTR;
     
     login_from_auth();
     
