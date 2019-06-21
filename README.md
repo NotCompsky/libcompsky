@@ -87,6 +87,8 @@ Navigate to [the releases page](https://github.com/NotCompsky/rscraper/releases)
 
     sudo dpkg -i /path/to/libcompsky-VERSION-ARCHITECTURE.deb
 
+If you get an error relating to libmysqlclient/libmariadbclient not being installed, that's most likely due to the package name being different in different repositories. You can use `equivs` to circumvent this issue, but do drop a bug report to notify me so that I can look into releasing seperate `deb` files for your platform.
+
 # Building
 
 ## Unix
