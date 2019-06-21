@@ -6,8 +6,6 @@ if(NOT Qt5Widgets_FOUND)
     return() # Exit this file
 endif()
 
-message(WARNING "Skipping compilation of compsky::qt5")
-
 
 # Unused because it is not needed so far. Kept code as example of how to do it (specifically, how to avoid the vtables error)
 
