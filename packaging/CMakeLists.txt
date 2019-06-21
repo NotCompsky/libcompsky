@@ -79,7 +79,7 @@ else()
     set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${HOMEPAGE}")
     if(NOT WHICH_MYSQL_CLIENT)
-        message(FATAL_ERROR "Please specify the mysql client to use. Discover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev'")
+        message(FATAL_ERROR "Please specify the mysql client to use with -DWHICH_MYSQL_CLIENT=...\nDiscover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev'")
     endif()
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "${WHICH_MYSQL_CLIENT}, mysql-server, libcompsky, libcurl4, libqt5widgets5, qt5-default")
     # TODO: Split Qt5 and curl dependant portions into their own packages
