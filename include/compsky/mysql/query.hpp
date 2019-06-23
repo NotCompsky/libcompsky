@@ -36,7 +36,7 @@ T ascii2n(MYSQL_ROW row,  int* col,  T m);
 
 
 template<typename... Args>
-void assign_next_column(MYSQL_ROW row,  int* col,  flag::SizeOfAssigned*& f,  size_t*& sz,  Args... args);
+void assign_next_column(MYSQL_ROW row,  int* col,  flag::SizeOfAssigned f,  size_t*& sz,  Args... args);
 
 template<typename... Args>
 void assign_next_column(MYSQL_ROW row,  int* col,  uint64_t*& n,  Args... args);
@@ -165,7 +165,7 @@ T ascii2n(MYSQL_ROW row,  int col,  T m){
 
 
 template<typename... Args>
-void assign_next_column(MYSQL_ROW row,  int* col,  flag::SizeOfAssigned*& f,  size_t*& sz,  Args... args){
+void assign_next_column(MYSQL_ROW row,  int* col,  flag::SizeOfAssigned f,  size_t*& sz,  Args... args){
     *sz = row[*col+1] - row[*col];
     return assign_next_column(row,  col,  args...);
 };
