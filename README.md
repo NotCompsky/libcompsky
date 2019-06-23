@@ -69,12 +69,6 @@ This benchmark is just to satisfy curiosity. I don't think `compsky::asciify` is
 
 You can test it yourself using [the patch](3rdparty/patches/format-benchmark/0001-Added-compsky-asciify.patch) and applying it in the `format-benchmark` directory with `git am < /PATH/TO/0001-Added-compsky-asciify.patch`).
 
-# qt5
-
-An optional module that is only built if CMake can find the `Qt5Widgets` module (installed with `libqt5`).
-
-At the moment it is almost empty.
-
 # security
 
 Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that he released into the Public Domain. It is used to wipe `mysql` authentification details when `compsky::mysql::exit()` is called.
@@ -109,7 +103,7 @@ You must use MXE, as the standard MinGW tools on Ubuntu do not include things su
     git clone https://github.com/mxe/mxe
     cd mxe
     make MXE_TARGETS=x86_64-w64-mingw32.static
-    make qtbase libmysqlclient
+    make libmysqlclient
 
 Ensure MXE's `/usr/bin` is in your `PATH`:
 
