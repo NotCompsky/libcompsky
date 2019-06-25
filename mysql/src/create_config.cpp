@@ -85,19 +85,15 @@ void create_config(const char* stmts,  const char* permissions_str,  const char*
     
     bool is_localhost = (strncmp(MYSQL_AUTH[i-1], "localhost", strlen("localhost")) == 0)  ||  (strncmp(MYSQL_AUTH[i-1], "127.0.0.1", strlen("127.0.0.1")) == 0);
     
-  #ifndef _WIN32
-    if (is_localhost){
-        FILE* proc = popen("mysql_config --socket", "r");
-        AUTH_PTR += fread(AUTH_PTR, 1, 1024, proc) - 1; // Overwrite trailing newline
-        pclose(proc);
-    } else {
+    std::cout << "Socket file path or named pipe name (blank if not used)";
+  #ifdef _WIN32
+    std::cout << ": ";
+  #else
+    std::cout << "\nHint: you can run `mysql_config --socket` to find it, but it is probably `/var/run/mysqld/mysqld.sock`\nSocket file path: ";
   #endif
-        std::cout << "Socket file path or named pipe name (blank if not used): ";
-        // NOTE: We do not need to escape \\ in input strings
-        ef_reed();
-  #ifndef _WIN32
-    }
-  #endif
+    // NOTE: We do not need to escape \\ in input strings
+    ef_reed();
+    
     AUTH_PTR_ENDS[i] = AUTH_PTR;
     memcpy(AUTH_PTR, "\nUSER: ", 7);
     AUTH_PTR += 7;
