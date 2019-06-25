@@ -32,6 +32,7 @@ auto indexof(std::vector<A>& ls,  A x){
         break_twice:
         ++i;
     }
+    ls.push_back(x);
     return i;
 };
 
@@ -44,6 +45,8 @@ char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_na
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
     char group_name[128];
+    
+    groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
     
     while(*src != 0){
         if (last_chars_were_brckt_qstn_P  &&  *src == '<'){
@@ -66,14 +69,7 @@ char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_na
             char* group_name_allocd = (char*)dummy;
             memcpy(group_name_allocd,  group_name,  len + 1); // Include terminating \0
             
-            auto i = indexof(reason_name2id, group_name_allocd);
-            if (i == reason_name2id.size()){ // i.e. i is one greater than the last index
-                reason_name2id.push_back(group_name_allocd);
-                i = reason_name2id.size();
-            }
-            // Append new group names to reason_name2id
-            
-            groupindx2reason.push_back(i);
+            groupindx2reason.push_back(indexof(reason_name2id, group_name_allocd));
             //printf("Group %d is %s\n",  groupindx2reason.size() - 1,  group_name_allocd);
             
             last_chars_were_brckt_qstn_P = false;
