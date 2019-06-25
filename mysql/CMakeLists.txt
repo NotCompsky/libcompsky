@@ -68,6 +68,16 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND NOT ${CMAKE_HOST_SYSTEM_NAME} STR
 endif()
 
 include(CheckCXXSourceCompiles)
-check_cxx_source_compiles("#include <mysql/mysql.h>" MYSQL_UNDER_DIR)
+check_cxx_source_compiles("#include <mysql/mysql.h>" MYSQL_IS_UNDER_DIR)
+check_cxx_source_compiles("#include <mysql.h>" MYSQL_IS_NOT_UNDER_DIR)
+if(MYSQL_UNDER_DIR_OVERRIDE)
+elseif(NOT MYSQL_IS_UNDER_DIR AND NOT MYSQL_IS_NOT_UNDER_DIR)
+    message(FATAL_ERROR "Cannot include mysql.h - please manually define -DMYSQL_UNDER_DIR=... and -DMYSQL_UNDER_DIR_OVERRIDE=1")
+    set(MYSQL_UNDER_DIR 1)
+elseif(MYSQL_IS_UNDER_DIR)
+    set(MYSQL_UNDER_DIR 1)
+else()
+    unset(MYSQL_UNDER_DIR)
+endif()
 
 configure_file("${INC_DIR}/compsky/mysql/mysql.h.in" "${INC_DIR}/compsky/mysql/mysql.h")
