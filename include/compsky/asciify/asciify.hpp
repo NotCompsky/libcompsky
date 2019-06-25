@@ -136,7 +136,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  const char**
 
 #ifdef USE_VECTOR
 template<typename SZ,  typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*> ss,  T n,  Args... args);
+void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args);
 #endif
 
 template<typename... Args>
@@ -502,7 +502,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  const char**
 
 #ifdef USE_VECTOR
 template<typename SZ,  typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*> ss,  T n,  Args... args){
+void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ss[i]);
