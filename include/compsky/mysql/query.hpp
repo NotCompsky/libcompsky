@@ -166,7 +166,9 @@ T ascii2n(MYSQL_ROW row,  int col,  T m){
 
 template<typename... Args>
 void assign_next_column(MYSQL_ROW row,  int* col,  flag::SizeOfAssigned f,  size_t*& sz,  Args... args){
-    *sz = row[*col+1] - row[*col];
+    // TODO: Look into using `*sz = row[*col+1] - row[*col];`.
+    // Not currently used as I am unsure as to when rows are guaranteed to be contiguous
+    *sz = strlen(row[*col]);
     return assign_next_column(row,  col,  args...);
 };
 
