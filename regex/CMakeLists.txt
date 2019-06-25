@@ -8,7 +8,7 @@ install(
     TARGETS compsky_regex_dummylib
     EXPORT CompskyTargets
     LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT shlib
+    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
     PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/regex"
         COMPONENT dev
 )
