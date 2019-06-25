@@ -67,11 +67,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND NOT ${CMAKE_HOST_SYSTEM_NAME} STR
     target_link_libraries(compsky_mysql_create_config PRIVATE secur32 ws2_32)
 endif()
 
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("#include <mysql/mysql.h>" MYSQL_UNDER_DIR)
 
-if(EXISTS "/usr/include/mysql/mysql.h" AND NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(MYSQL_UNDER_DIR "True")
-elseif(EXISTS "${WIN_MYSQL_DIR}/include/mysql/mysql.h")
-    # NOTE: MySQL_DIR == MySQL_DIR-NOTFOUND on Ubuntu - despite compiling fine - so cannot test the converse.
-    set(MYSQL_UNDER_DIR)
-endif()
 configure_file("${INC_DIR}/compsky/mysql/mysql.h.in" "${INC_DIR}/compsky/mysql/mysql.h")
