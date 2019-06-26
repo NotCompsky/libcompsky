@@ -37,7 +37,7 @@ auto indexof(std::vector<A>& ls,  A x){
 };
 
 template<typename B>
-char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<B>& groupindx2reason){
+char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<B>& groupindx2reason,  std::vector<char*>& group_starts,  std::vector<char*>& group_ends){
     char* tmp = dst;
     
     bool last_char_was_bracket = false;
@@ -45,8 +45,12 @@ char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_na
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
     char group_name[128];
+    int bracket_depth = 0;
+    std::vector<bool> group_bracket_depths; // ((:?( -> true, false, true
     
     groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
+    group_starts.push_back(0); // Skip first entry
+    group_ends.push_back(0);   // Skip first entry
     
     while(*src != 0){
         if (last_chars_were_brckt_qstn_P  &&  *src == '<'){
@@ -71,6 +75,8 @@ char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_na
             
             groupindx2reason.push_back(indexof(reason_name2id, group_name_allocd));
             //printf("Group %d is %s\n",  groupindx2reason.size() - 1,  group_name_allocd);
+            group_starts.push_back(dst);
+            group_bracket_depths.push_back(true);
             
             last_chars_were_brckt_qstn_P = false;
             
@@ -79,20 +85,43 @@ char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_na
             continue;
         }
         
-        if (*src == '('  &&  *(src+1) != '?'  &&  !last_char_was_backslash){
-            //printf("%.10s\n", src);
-            groupindx2reason.push_back(1); // 1 for Unknown reason matched
+        *(dst++) = *src;
+        
+        if (!last_char_was_backslash){
+            if (*src == '('){
+                const bool b = (*(src+1) != '?');
+                if (b){
+                    //printf("%.10s\n", src);
+                    groupindx2reason.push_back(1); // 1 for Unknown reason matched
+                    group_starts.push_back(dst);
+                }
+                group_bracket_depths.push_back(b);
+                ++bracket_depth;
+            } else if (*src == ')'){
+                --bracket_depth;
+                if (group_bracket_depths.back()){
+                    group_ends.push_back(dst);
+                }
+                group_bracket_depths.pop_back();
+            }
         }
         
         
         last_chars_were_brckt_qstn_P = (last_chars_were_brckt_qstn  &&  *src == 'P');
         last_chars_were_brckt_qstn = (last_char_was_bracket  &&  *src == '?');
-        last_char_was_bracket = (*src == '(');
+        last_char_was_bracket = (*src == '('  &&  !last_char_was_backslash);
         last_char_was_backslash = (*src == '\\');
         
-        *(dst++) = *(src++);
+        ++src;
     }
     return dst;
+};
+
+template<typename B>
+char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<B>& groupindx2reason){
+    std::vector<char*> dummy1;
+    std::vector<char*> dummy2;
+    return convert_named_groups(src, dst, reason_name2id, groupindx2reason, dummy1, dummy2);
 };
 
 }
