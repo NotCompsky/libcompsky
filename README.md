@@ -79,7 +79,9 @@ Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that h
 
 Navigate to [the releases page](https://github.com/NotCompsky/libcompsky/releases), download the appropriate `deb` file, and run:
 
-    sudo dpkg -i /path/to/libcompsky-VERSION-ARCHITECTURE.deb
+    sudo apt install /path/to/libcompsky-VERSION-ARCHITECTURE.deb
+
+Replace `apt install` with `dpkg -i` if necessary (probably older systems).
 
 If you get an error relating to libmysqlclient/libmariadbclient not being installed, that's most likely due to the package name being different in different repositories. You can use `equivs` to circumvent this issue, but do drop a bug report to notify me so that I can look into releasing seperate `deb` files for your platform.
 
