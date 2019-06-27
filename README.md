@@ -2,6 +2,12 @@
 
 This package is just a collection of a few bits and bobs used in various projects of mine.
 
+# Installing
+
+## Ubuntu and other Debian-derived systems
+
+See [installing on Ubuntu](INSTALLING_UBUNTU.md). Other Debian-based distributions may have to modify the package names of dependencies before the packages will install.
+
 # mysql
 
 This is the main feature of the library. It is a wrapper around `libmysqlclient` that - in my opinion - has a far simpler syntax. And presumably far fewer features, although of course you still have access to the underlying `libmysqlclient` functions.
@@ -72,18 +78,6 @@ You can test it yourself using [the patch](3rdparty/patches/format-benchmark/000
 # security
 
 Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that he released into the Public Domain. It is used to wipe `mysql` authentification details when `compsky::mysql::exit()` is called.
-
-# Installing
-
-## Ubuntu and other Debian-derived systems
-
-Navigate to [the releases page](https://github.com/NotCompsky/libcompsky/releases), download the appropriate `deb` file, and run:
-
-    sudo apt install /path/to/libcompsky-VERSION-ARCHITECTURE.deb
-
-Replace `apt install` with `dpkg -i` if necessary (probably older systems).
-
-If you get an error relating to libmysqlclient/libmariadbclient not being installed, that's most likely due to the package name being different in different repositories. You can use `equivs` to circumvent this issue, but do drop a bug report to notify me so that I can look into releasing seperate `deb` files for your platform.
 
 # Building
 
