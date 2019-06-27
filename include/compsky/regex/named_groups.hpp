@@ -36,6 +36,9 @@ auto indexof(std::vector<A>& ls,  A x){
     return i;
 };
 
+template<typename T>
+void push_back_only_if_vector(T t){};
+
 template<typename T,  typename X>
 void push_back_only_if_vector(T t,  X x){};
 
@@ -44,19 +47,25 @@ void push_back_only_if_vector(std::vector<X>& t){
     t.push_back(nullptr);
 };
 
+template<>
+void push_back_only_if_vector(std::vector<bool>& t){
+    t.push_back(false);
+};
+
 template<typename X>
 void push_back_only_if_vector(std::vector<X>& t,  X x){
     t.push_back(x);
 };
 #include <stdio.h>
-template<typename A,  typename B,  typename C>
+template<typename A,  typename B,  typename C,  typename D>
 char* convert_named_groups(
     char* src,
     char* dst,
     std::vector<char*>& reason_name2id,
     std::vector<A>& groupindx2reason,
-    B& group_starts,   // = 0 (effectively)
-    C& group_ends      // = 0 (effectively)
+    B& record_contents,
+    C& group_starts,   // = 0 (effectively)
+    D& group_ends      // = 0 (effectively)
 ){
     char* tmp = dst;
     
@@ -72,9 +81,12 @@ char* convert_named_groups(
     
     push_back_only_if_vector(group_starts); // Skip first entry
     push_back_only_if_vector(group_ends);   // Skip first entry
+    push_back_only_if_vector(record_contents); // Skip first entry
     
     while(*src != 0){
         if (last_chars_were_brckt_qstn_P  &&  *src == '<'){
+            push_back_only_if_vector(record_contents,  ((*(src + 1) != '!'))); // Do not record contents of the comments if the capture group name begins with !
+            
             dst -= 2; // strlen("?P")
             
             char* itr = group_name;
@@ -112,6 +124,7 @@ char* convert_named_groups(
                 const bool b = (*(src+1) != '?');
                 if (b){
                     groupindx2reason.push_back(1); // 1 for Unknown reason matched
+                    push_back_only_if_vector(record_contents, true);
                     push_back_only_if_vector(group_starts, dst);
                 }
                 group_bracket_depths.push_back(b);
@@ -137,10 +150,18 @@ char* convert_named_groups(
 };
 
 template<typename A>
+char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason,  std::vector<bool>& record_contents){
+    constexpr static const char dummy1 = 0;
+    constexpr static const char dummy2 = 0;
+    convert_named_groups(src, dst, reason_name2id, groupindx2reason, record_contents, dummy1, dummy2);
+};
+
+template<typename A>
 char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason){
     constexpr static const char dummy1 = 0;
     constexpr static const char dummy2 = 0;
-    convert_named_groups(src, dst, reason_name2id, groupindx2reason, dummy1, dummy2);
+    constexpr static const char dummy3 = 0;
+    convert_named_groups(src, dst, reason_name2id, groupindx2reason, dummy1, dummy2, dummy3);
 };
 
 }
