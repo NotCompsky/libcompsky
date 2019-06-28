@@ -6,7 +6,18 @@ This package is just a collection of a few bits and bobs used in various project
 
 ## Ubuntu and other Debian-derived systems
 
-See [installing on Ubuntu](INSTALLING_UBUNTU.md). Other Debian-based distributions may have to modify the package names of dependencies before the packages will install.
+    regexp="https://github\.com/NotCompsky/libcompsky/releases/download/[0-9]\.[0-9]\.[0-9]/libcompsky-[0-9]+\.[0-9]+\.[0-9]+-$(dpkg --print-architecture)\.deb"
+    url=$(curl -s https://api.github.com/repos/NotCompsky/libcompsky/releases/latest  |  egrep "$regexp" | sed 's%.*"\(https://.*\)"%\1%g')
+    curl "$url" -o /tmp/libcompsky.deb
+    sudo apt install /tmp/libcompsky.deb
+
+Users of other Debian-based distributions may have to modify the dependency package names before the packages will install (you could use `equivs` if you don't want to modify the `deb` itself). Send a bug report with your platform and a suggestion for the alternative dependency.
+
+If installation still fails for some reason, see [installing on Ubuntu](INSTALLING_UBUNTU.md) (and also make a bug report).
+
+## Other
+
+You should compile from source. But if there's enough interest, I'll distribute Windows installers too.
 
 # mysql
 
