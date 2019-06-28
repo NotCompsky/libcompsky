@@ -8,7 +8,7 @@ This package is just a collection of a few bits and bobs used in various project
 
     regexp="https://github\.com/NotCompsky/libcompsky/releases/download/[0-9]\.[0-9]\.[0-9]/libcompsky-[0-9]+\.[0-9]+\.[0-9]+-$(dpkg --print-architecture)\.deb"
     url=$(curl -s https://api.github.com/repos/NotCompsky/libcompsky/releases/latest  |  egrep "$regexp" | sed 's%.*"\(https://.*\)"%\1%g')
-    curl -L -C "$url" -o /tmp/libcompsky.deb
+    wget -O /tmp/libcompsky.deb "$url"
     sudo apt install /tmp/libcompsky.deb
 
 Users of other Debian-based distributions may have to modify the dependency package names before the packages will install (you could use `equivs` if you don't want to modify the `deb` itself). Send a bug report with your platform and a suggestion for the alternative dependency.
