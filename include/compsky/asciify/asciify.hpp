@@ -3,6 +3,10 @@
 
 #include <inttypes.h> // for u?int[0-9]{1,2}_t
 
+#ifdef ASCIIFY_TIME
+# include "compsky/asciify/time_h.hpp"
+#endif
+
 #include "compsky/asciify/core.hpp"
 #include "compsky/asciify/base.hpp"
 #include "compsky/asciify/flags.hpp"
@@ -593,6 +597,12 @@ void asciify(flag::prefix::Start e,  const char* s,  const size_t sz,  flag::pre
 }
 } // END: namespace compsky::asciify
 
+
+
+
+#ifdef ASCIIFY_TIME
+# include "compsky/asciify/time.hpp"
+#endif
 
 
 #endif
