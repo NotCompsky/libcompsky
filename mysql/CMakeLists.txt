@@ -34,7 +34,7 @@ else()
     add_library(compsky_mysql_create_config SHARED "${SRC_DIR}/create_config.cpp")
 endif()
 
-target_link_libraries(compsky_mysql PRIVATE ${CHOOSE_MYSQL_CLIENT_DEPENDS} compsky_asciify compsky_security)
+target_link_libraries(compsky_mysql PRIVATE ${CHOOSE_MYSQL_CLIENT} compsky_asciify compsky_security)
 target_link_libraries(compsky_mysql_create_config PRIVATE compsky_asciify compsky_mysql)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
