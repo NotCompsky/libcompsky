@@ -22,6 +22,18 @@ if(NOT "${WIN_MYSQL_DIR} " STREQUAL " ") # Trailing space is important - string 
     message(STATUS "Using MySQL directory: ${WIN_MYSQL_DIR}")
 endif()
 
+if (NOT WHICH_MYSQL_CLIENT)
+    find_library(WHICH_MYSQL_CLIENT mariadbclient)
+endif()
+if (NOT WHICH_MYSQL_CLIENT)
+    find_library(WHICH_MYSQL_CLIENT mysqlclient)
+endif()
+if (WHICH_MYSQL_CLIENT)
+    message(STATUS "WHICH_MYSQL_CLIENT: ${WHICH_MYSQL_CLIENT}")
+else()
+    message(FATAL_ERROR "Please specify the libmysqlclient equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu, you would specify -DWHICH_MYSQL_CLIENT=mysqlclient; for debian, -DWHICH_MYSQL_CLIENT=mariadbclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev")
+endif()
+
 # BEGIN: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -33,7 +45,7 @@ else()
     add_library(compsky_mysql_create_config SHARED "${SRC_DIR}/create_config.cpp")
 endif()
 
-target_link_libraries(compsky_mysql PRIVATE mysqlclient compsky_asciify compsky_security)
+target_link_libraries(compsky_mysql PRIVATE ${WHICH_MYSQL_CLIENT} compsky_asciify compsky_security)
 target_link_libraries(compsky_mysql_create_config PRIVATE compsky_asciify compsky_mysql)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")

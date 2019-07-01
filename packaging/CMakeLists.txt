@@ -50,9 +50,6 @@ else()
     message(STATUS "   + DEB                                  YES ")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${HOMEPAGE}")
-    if(NOT WHICH_MYSQL_CLIENT)
-        message(FATAL_ERROR "Please specify the mysql client to use with -DWHICH_MYSQL_CLIENT=...\nDiscover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev")
-    endif()
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "${WHICH_MYSQL_CLIENT}")
     # TODO: Sort out version ranges. Figure out if libmysqlclient dependency can be generalised.
 
