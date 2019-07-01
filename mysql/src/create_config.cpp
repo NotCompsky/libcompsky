@@ -89,7 +89,7 @@ void create_config(const char* stmts,  const char* permissions_str,  const char*
   #ifdef _WIN32
     std::cout << ": ";
   #else
-    std::cout << "\nHint: you can run `mysql_config --socket` to find it, but it is probably `/var/run/mysqld/mysqld.sock`\nSocket file path: ";
+    std::cout << "\nHint: you can run `mysql_config --socket` to find it, but it is probably `/var/run/mysqld/mysqld.sock`\nYou can set the location in the MySQL config file, which is probably `/etc/mysql/my.cnf` - restart the MySQL server service if you do.\nSocket file path: ";
   #endif
     // NOTE: We do not need to escape \\ in input strings
     ef_reed();
