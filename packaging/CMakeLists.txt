@@ -50,7 +50,7 @@ else()
     message(STATUS "   + DEB                                  YES ")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${HOMEPAGE}")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "${WHICH_MYSQL_CLIENT}")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "${WHICH_MYSQL_CLIENT_DEPENDS}")
     # TODO: Sort out version ranges. Figure out if libmysqlclient dependency can be generalised.
 
     # Icon and app shortcut for Linux systems
