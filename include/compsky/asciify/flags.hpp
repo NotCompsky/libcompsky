@@ -35,6 +35,9 @@ namespace flag {
         
         struct BetweenZeroAndTenLeftInclusive{};
     }
+    namespace to {
+        struct AlphaNumeric{};
+    }
 }
 }
 }

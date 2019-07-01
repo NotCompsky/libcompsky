@@ -1,5 +1,8 @@
 #include <compsky/asciify/asciify.hpp>
 
+#include <stdio.h> // for FILE
+
+
 namespace compsky {
 namespace asciify {
 
