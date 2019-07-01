@@ -315,7 +315,7 @@ void assign_next_column(MYSQL_ROW row,  int* col,  asciify::flag::StrLen f,  siz
 
 template<typename... Args>
 bool assign_next_row(MYSQL_RES* res,  MYSQL_ROW* row,  Args... args){
-    if ((*row = mysql_fetch_row(res))){
+    if (likely((*row = mysql_fetch_row(res)))){
         int col = 0;
         assign_next_column(*row, &col, args...);
         return true;
