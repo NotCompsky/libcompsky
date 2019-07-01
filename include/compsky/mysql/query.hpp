@@ -65,13 +65,16 @@ template<typename... Args>
 void assign_next_column(MYSQL_ROW row,  int* col,  double*& d,  Args... args);
 
 template<typename... Args>
+void assign_next_column(MYSQL_ROW row,  int* col,  asciify::flag::guarantee::BetweenZeroAndOneExclusive f,  double*& d,  Args... args);
+
+template<typename... Args>
 void assign_next_column(MYSQL_ROW row,  int* col,  asciify::flag::guarantee::BetweenZeroAndOneInclusive f,  double*& d,  Args... args);
 
 template<typename... Args>
 void assign_next_column(MYSQL_ROW row,  int* col,  asciify::flag::guarantee::BetweenZeroAndTenLeftInclusive f,  double*& d,  Args... args);
 
 template<typename... Args>
-void assign_next_column(MYSQL_ROW row,  int* col,  asciify::flag::StrLen f,  size_t*& d,  Args... args);
+void assign_next_column(MYSQL_ROW row,  int* col,  asciify::flag::StrLen f,  size_t*& sz,  Args... args);
 
 template<typename... Args>
 bool assign_next_row(MYSQL_RES* res,  MYSQL_ROW* row,  Args... args);
