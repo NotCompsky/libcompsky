@@ -10,6 +10,7 @@ Multiple groups can share the same name. Group names can include any character e
 
 #include <map>
 #include <vector>
+#include <string.h> // for memcpy
 
 
 namespace compsky {
@@ -47,10 +48,10 @@ void push_back_only_if_vector(std::vector<X>& t){
     t.push_back(nullptr);
 };
 
-template<>
+inline
 void push_back_only_if_vector(std::vector<bool>& t){
     t.push_back(false);
-};
+}
 
 template<typename X>
 void push_back_only_if_vector(std::vector<X>& t,  X x){
@@ -67,8 +68,6 @@ char* convert_named_groups(
     C& group_starts,   // = 0 (effectively)
     D& group_ends      // = 0 (effectively)
 ){
-    char* tmp = dst;
-    
     bool last_char_was_bracket = false;
     bool last_chars_were_brckt_qstn = false;
     bool last_chars_were_brckt_qstn_P = false;
@@ -153,7 +152,7 @@ template<typename A>
 char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason,  std::vector<bool>& record_contents){
     constexpr static const char dummy1 = 0;
     constexpr static const char dummy2 = 0;
-    convert_named_groups(src, dst, reason_name2id, groupindx2reason, record_contents, dummy1, dummy2);
+    return convert_named_groups(src, dst, reason_name2id, groupindx2reason, record_contents, dummy1, dummy2);
 };
 
 template<typename A>
@@ -161,7 +160,7 @@ char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_na
     constexpr static const char dummy1 = 0;
     constexpr static const char dummy2 = 0;
     constexpr static const char dummy3 = 0;
-    convert_named_groups(src, dst, reason_name2id, groupindx2reason, dummy1, dummy2, dummy3);
+    return convert_named_groups(src, dst, reason_name2id, groupindx2reason, dummy1, dummy2, dummy3);
 };
 
 }
