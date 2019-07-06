@@ -23,23 +23,23 @@ set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${INC_DIR}")
 
 
-
 if (NOT WHICH_MYSQL_CLIENT)
-    find_library(WHICH_MYSQL_CLIENT mariadbclient)
+    find_library(FOUND_MYSQL_CLIENT mariadbclient)
+    if (FOUND_MYSQL_CLIENT)
+        set(WHICH_MYSQL_CLIENT mariadbclient)
+    endif()
 endif()
 if (NOT WHICH_MYSQL_CLIENT)
-    find_library(WHICH_MYSQL_CLIENT mysqlclient)
+    find_library(FOUND_MYSQL_CLIENT mysqlclient)
+    if (FOUND_MYSQL_CLIENT)
+        set(WHICH_MYSQL_CLIENT mysqlclient)
+    endif()
 endif()
 if (WHICH_MYSQL_CLIENT)
     message(STATUS "WHICH_MYSQL_CLIENT: ${WHICH_MYSQL_CLIENT}")
 else()
-    message(FATAL_ERROR "Please specify the libmysqlclient equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu, you would specify -DWHICH_MYSQL_CLIENT=mysqlclient; for debian, -DWHICH_MYSQL_CLIENT=mariadbclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g'")
+    message(FATAL_ERROR "Please specify the libmysqlclient equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu/Debian, you would specify -DWHICH_MYSQL_CLIENT=mariadbclient; for others, perhaps, -DWHICH_MYSQL_CLIENT=mysqlclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g'")
 endif()
-
-if (NOT WHICH_MYSQL_CLIENT_DEPENDS)
-    message(FATAL_ERROR "Please specify the libmysqlclient equivalent's package name with -DWHICH_MYSQL_CLIENT_DEPENDS=...\nFor instance, for Ubuntu, you would specify -DWHICH_MYSQL_CLIENT_DEPENDS=libmysqlclient20; for debian, -DWHICH_MYSQL_CLIENT_DEPENDS=libmariadbclient18\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev")
-endif()
-
 
 
 # BEGIN src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
