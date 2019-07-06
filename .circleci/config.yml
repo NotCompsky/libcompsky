@@ -2,15 +2,22 @@ version: 2
 jobs:
   build:
     docker:
-      - image: debian:stretch
+            - image: debian:buster
 
     steps:
       - checkout
-
       - run:
-          name: Greeting
-          command: echo Hello, world.
-
+          name: Install sudo
+          command: 'apt update  &&  apt install -y sudo  &&  rm -rf /var/lib/apt/lists/*'
       - run:
-          name: Print the Current Time
-          command: date
+          name: Install GCC
+          command: 'apt update  &&  apt install -y gcc g++'
+      - run:
+          name: Install CMake
+          command: 'apt update  &&  sudo apt install -y cmake'
+      - run:
+          name: Generate build files
+          command: 'mkdir build  &&  cd build  &&  cmake ..'
+      - run:
+          name: Build
+          command: 'cmake --build build'
