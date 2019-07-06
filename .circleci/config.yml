@@ -7,6 +7,12 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install SQL Client Dev
+          command: 'apt update  &&  apt install -y mariadb-client default-libmysqlclient-dev'
+      - run:
+          name: Find mysql.h
+          command: 'find /usr -maxdepth 5 -name mysql.h'
+      - run:
           name: Install sudo
           command: 'apt update  &&  apt install -y sudo  &&  rm -rf /var/lib/apt/lists/*'
       - run:
@@ -17,7 +23,7 @@ jobs:
           command: 'apt update  &&  sudo apt install -y cmake'
       - run:
           name: Generate build files
-          command: 'mkdir build  &&  cd build  &&  cmake ..'
+          command: 'mkdir build  &&  cd build  &&  cmake .. -DWHICH_MYSQL_CLIENT=mariadbclient -DMYSQL_UNDER_DIR=/usr/include/mysql -DMYSQL_UNDER_DIR_OVERRIDE=1'
       - run:
           name: Build
           command: 'cmake --build build'
