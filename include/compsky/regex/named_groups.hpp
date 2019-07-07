@@ -73,7 +73,6 @@ char* convert_named_groups(
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
     char group_name[128];
-    int bracket_depth = 0;
     std::vector<bool> group_bracket_depths; // ((:?( -> true, false, true
     
     groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
@@ -127,9 +126,7 @@ char* convert_named_groups(
                     push_back_only_if_vector(group_starts, dst);
                 }
                 group_bracket_depths.push_back(b);
-                ++bracket_depth;
             } else if (*src == ')'){
-                --bracket_depth;
                 if (group_bracket_depths.back()){
                     push_back_only_if_vector(group_ends, dst);
                 }
