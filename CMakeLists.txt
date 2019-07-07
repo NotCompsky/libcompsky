@@ -24,8 +24,8 @@ include_directories("${INC_DIR}")
 
 
 if (NOT WHICH_MYSQL_CLIENT)
-    find_library(FOUND_MYSQL_CLIENT mariadbclient)
-    if (FOUND_MYSQL_CLIENT)
+    find_library(FOUND_MARIADB_CLIENT mariadbclient)
+    if (FOUND_MARIADB_CLIENT)
         set(WHICH_MYSQL_CLIENT mariadbclient)
     endif()
 endif()
