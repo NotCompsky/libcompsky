@@ -57,6 +57,7 @@ void init_auth(const char* fp){
             itr += 7; // To skip "ABCD: "
             MYSQL_AUTH[++n_lines] = itr;
         }
+    fclose(f);
 }
 
 void login_from_auth(){
