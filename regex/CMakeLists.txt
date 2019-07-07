@@ -1,16 +1,14 @@
-cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR) # CONTRIBUTIONS WELCOME: Tests of previous/future versions which work or not
 
-add_library(compsky_regex INTERFACE)
+add_library(compsky_regex_dummylib STATIC "${CMAKE_CURRENT_SOURCE_DIR}/src/dummy.cpp")
 
-target_include_directories(
-    compsky_regex
-    INTERFACE $<BUILD_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compsky/regex>
-    $<INSTALL_INTERFACE:include/compsky/regex>
-)
+set_target_properties(compsky_regex_dummylib PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/regex/named_groups.hpp")
 
 install(
-    TARGETS compsky_regex
+    TARGETS compsky_regex_dummylib
     EXPORT CompskyTargets
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/regex"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/regex"
         COMPONENT dev
 )
