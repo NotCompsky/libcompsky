@@ -2,11 +2,11 @@
 
 tl;dr don't be rude
 
-# Encouraged Behaviour
+## Encouraged Behaviour
 
 * Good English
 
-# Prohibited Behaviour
+## Prohibited Behaviour
 
 * Politics
 * Trolling
