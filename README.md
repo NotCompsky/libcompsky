@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/NotCompsky/libcompsky.svg?style=shield)](https://circleci.com/gh/NotCompsky/libcompsky)
+
 # Description
 
 This package is just a collection of a few bits and bobs used in various projects of mine.
