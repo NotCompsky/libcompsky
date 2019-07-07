@@ -72,17 +72,17 @@ Here `init.sql` is a file next to the source file that only contains the SQL com
 
 Using [libfmt's benchmark](https://github.com/fmtlib/format-benchmark) patched to include `compsky::asciify`, I get the following results on my machine (Intel Ubuntu 18.04):
 
-| real | user | sys |
-| - | - | - |
-| printf | 1.07 | 1.06 |
-| iostreams | 1.76 | 1.76 |
-| format | 1.01 | 1.01 |
-| fmt::prepare | 0.93 | 0.86 |
-| tinyformat | 2.17 | 2.16 |
-| boost | 6.19 | 6.18 |
+| real             | user | sys  |
+| -                | -    | -    |
+| printf           | 1.07 | 1.06 |
+| iostreams        | 1.76 | 1.76 |
+| format           | 1.01 | 1.01 |
+| fmt::prepare     | 0.93 | 0.86 |
+| tinyformat       | 2.17 | 2.16 |
+| boost            | 6.19 | 6.18 |
 | compsky::asciify | 0.32 | 0.31 |
-| folly | N/A | N/A |
-| stb_sprintf | 0.68 | 0.68 |
+| folly            | N/A  | N/A  |
+| stb_sprintf      | 0.68 | 0.68 |
 
 This benchmark is just to satisfy curiosity. I don't think `compsky::asciify` is particularly useful to anyone - if you look at the output, you can see that the floats are not printed exactly, with `1.2339999999` instead of `1.2340000000` and (more worryingly) `3.12` instead of `+3.13`. Perhaps this is something that can be fixed, but I would expect many other flaws exist, and suggest that `compsky::asciify` is only useful where both a *nearly* correct answer is acceptable and performance is critical and you have a relatively new compiler (i.e. almost never).
 
