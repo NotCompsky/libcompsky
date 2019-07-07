@@ -29,7 +29,7 @@ It uses `asciify` (another part of this project) to format the strings sent to t
 
 ### Dependencies
 
-* libmysqlclient
+*   libmysqlclient
 
 ### Usage Examples
 
