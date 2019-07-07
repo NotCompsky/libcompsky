@@ -1,4 +1,7 @@
 version: 2
+general:
+  artifacts:
+    - "packages"
 jobs:
   build:
     docker:
@@ -20,7 +23,15 @@ jobs:
           command: 'apt update  &&  sudo apt install -y cmake'
       - run:
           name: Generate build files
-          command: 'mkdir build  &&  cd build  &&  cmake .. -DMYSQL_UNDER_DIR=/usr/include/mysql -DMYSQL_UNDER_DIR_OVERRIDE=1'
+          command: 'mkdir build  &&  cd build  &&  cmake .. -DMYSQL_UNDER_DIR=/usr/include/mysql -DMYSQL_UNDER_DIR_OVERRIDE=1 -DBUILD_PACKAGES=1 -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=$(dpkg --print-architecture)'
       - run:
           name: Build
           command: 'cmake --build build'
+      - run:
+          name: Create Packages
+          command: 'cd build  &&  cpack' # 'cpack -B packages' is the proper option, but it hangs during 'Create package' stage. Instead, have to move files afterwards.
+      - run:
+          name: Move Packages to Artifact Storage
+          command: 'mkdir packages  &&  mv build/pkg/*.deb packages/'
+      - store_artifacts:
+          path: "packages"
