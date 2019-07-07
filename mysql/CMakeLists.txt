@@ -51,13 +51,9 @@ install(
     TARGETS compsky_mysql compsky_mysql_create_config
     # Adds the mysql library to the "export-set"
     EXPORT CompskyTargets
-    RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-        COMPONENT bin
-    LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT shlib
-    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT slib
-    PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/mysql"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        COMPONENT lib
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/mysql"
         COMPONENT dev
 )
 

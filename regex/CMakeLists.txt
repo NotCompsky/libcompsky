@@ -4,13 +4,13 @@ add_library(compsky_regex INTERFACE)
 
 target_include_directories(
     compsky_regex
-    INTERFACE $<BUILD_INTERFACE:${COMPSKY_INCLUDE_DIR}/compsky/regex>
+    INTERFACE $<BUILD_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compsky/regex>
     $<INSTALL_INTERFACE:include/compsky/regex>
 )
 
 install(
     TARGETS compsky_regex
     EXPORT CompskyTargets
-    INCLUDES DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/regex"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/regex"
         COMPONENT dev
 )

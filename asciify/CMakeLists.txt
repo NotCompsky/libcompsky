@@ -32,13 +32,9 @@ install(
     TARGETS compsky_asciify
     # Adds the asciify library to the "export-set"
     EXPORT CompskyTargets
-    RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-        COMPONENT bin
-    LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT shlib
-    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT slib
-    PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/asciify"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        COMPONENT lib
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/asciify"
         COMPONENT dev
 )
 
@@ -50,13 +46,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         install(
             # For Windows - install the lib files
             FILES "${CMAKE_BINARY_DIR}/asciify/Release/compsky_asciify.lib"
-            DESTINATION "${INSTALL_LIB_DIR}"
+	    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
     else()
         install(
             # For Windows - install the lib files
             FILES "${CMAKE_BINARY_DIR}/asciify/libcompsky_asciify.dll.a"
-            DESTINATION "${INSTALL_LIB_DIR}"
+	    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
     endif()
 endif()

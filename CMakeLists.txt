@@ -8,6 +8,9 @@ set(COMPSKY_PATCH_VERSION 0)
 set(COMPSKY_VERSION ${COMPSKY_MAJOR_VERSION}.${COMPSKY_MINOR_VERSION}.${COMPSKY_PATCH_VERSION})
 
 
+include(GNUInstallDirs)
+
+
 # Ensure symbols are exported for Windows Visual Studio. The alternative is to write the generate export headers commands in the CMakeLists files and import the `<NAME>_export.h`s in all source files.
 if(${MSVC})
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "TRUE")
