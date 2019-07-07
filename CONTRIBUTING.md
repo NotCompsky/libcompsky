@@ -28,9 +28,9 @@ For instance, adding two spaces between parameters if some parameters contain sp
 
 Examples:
 
-  * `{0, 1, 2}` rather than `{0,1,2}`
-  * `3600 * 24 * 7` rather than `604800` if it represents the number of seconds in a week
-  * `memcpy(buf + offset,  str,  strlen(str))` rather than `memcpy(buf + offset, str, strlen(str))`
+*   `{0, 1, 2}` rather than `{0,1,2}`
+*   `3600 * 24 * 7` rather than `604800` if it represents the number of seconds in a week
+*   `memcpy(buf + offset,  str,  strlen(str))` rather than `memcpy(buf + offset, str, strlen(str))`
 
 #### C-Style vs C++-Style
 

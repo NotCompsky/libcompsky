@@ -4,10 +4,10 @@ tl;dr don't be rude
 
 ## Encouraged Behaviour
 
-* Good English
+*   Good English
 
 ## Prohibited Behaviour
 
-* Politics
-* Trolling
-* Excessive personal attacks
+*   Politics
+*   Trolling
+*   Excessive personal attacks
