@@ -8,9 +8,6 @@ target_include_directories(
     $<INSTALL_INTERFACE:include/compsky/regex>
 )
 
-install(
-    TARGETS compsky_regex
-    EXPORT CompskyTargets
-    INCLUDES DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/regex"
-        COMPONENT dev
-)
+install(TARGETS compsky_regex EXPORT Compsky_Targets)
+
+install(DIRECTORY "${INC_DIR}/compsky/regex/" DESTINATION include/compsky COMPONENT dev)
