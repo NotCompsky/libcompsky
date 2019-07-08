@@ -1,12 +1,13 @@
 language: c++
-compiler:
-  - clang
-  - gcc
 
 matrix:
   include:
     - os: linux
       dist: bionic
+      compiler: clang
+    - os: linux
+      dist: bionic
+      compiler: gcc
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then  sudo apt update  &&  sudo apt install -y mariadb-client default-libmysqlclient-dev qt5-default libqt5widgets5;  fi
