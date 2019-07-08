@@ -1,5 +1,8 @@
-[![Build Status](https://travis-ci.org/NotCompsky/libcompsky.svg?branch=master)](https://travis-ci.org/NotCompsky/libcompsky)
-[![CircleCI](https://circleci.com/gh/NotCompsky/libcompsky.svg?style=shield)](https://circleci.com/gh/NotCompsky/libcompsky)
+Platform | CI Status
+---------|----------
+OSX      | [![OSX Build Status](http://badges.herokuapp.com/travis/NotCompsky/libcompsky?env=BADGE=osx&label=build&branch=master)](https://travis-ci.org/NotCompsky/libcompsky)
+Linux    | [![Linux Build Status](http://badges.herokuapp.com/travis/NotCompsky/libcompsky?env=BADGE=linux&label=build&branch=master)](https://travis-ci.org/NotCompsky/libcompsky) [![CircleCI](https://circleci.com/gh/NotCompsky/libcompsky.svg?style=shield)](https://circleci.com/gh/NotCompsky/libcompsky)
+
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/66dc520c5a27425c8e131f8d9b76b385)](https://www.codacy.com/app/NotCompsky/libcompsky?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=NotCompsky/libcompsky&amp;utm_campaign=Badge_Grade)
 
 ## Description
