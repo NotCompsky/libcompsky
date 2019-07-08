@@ -1,0 +1,2 @@
+exclude_paths:
+  - 'README.md'     # It freaks out with out build status table
