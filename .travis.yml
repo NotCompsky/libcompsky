@@ -1,0 +1,16 @@
+language: c++
+compiler:
+  - clang
+  - gcc
+
+matrix:
+  include:
+    - os: linux
+      dist: bionic
+
+before_install:
+  - if [ $TRAVIS_OS_NAME == linux ]; then  sudo apt update  &&  sudo apt install -y mariadb-client default-libmysqlclient-dev qt5-default libqt5widgets5;  fi
+script:
+  - mkdir build  &&  cd build  &&  cmake .. -DMYSQL_UNDER_DIR=/usr/include/mysql -DMYSQL_UNDER_DIR_OVERRIDE=1 -DBUILD_PACKAGES=1 -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=$(dpkg --print-architecture)
+after_success:
+  - echo "Success"
