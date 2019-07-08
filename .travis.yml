@@ -15,10 +15,10 @@ matrix:
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then  sudo apt update  &&  sudo apt install -y mariadb-client default-libmysqlclient-dev qt5-default libqt5widgets5;  fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then  brew update --force  &&  brew install mariadb-connector-c qt5;  fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then  brew update --force  &&  brew install mariadb-connector-c qt5  &&  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g';  fi
 
 script:
-  - mkdir build  &&  cd build  &&  cmake .. -DMYSQL_UNDER_DIR=/usr/include/mysql -DMYSQL_UNDER_DIR_OVERRIDE=1 -DBUILD_PACKAGES=1 -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=$(dpkg --print-architecture)
+  - mkdir build  &&  cd build  &&  cmake .. -DMYSQL_UNDER_DIR=/usr/include/mysql -DMYSQL_UNDER_DIR_OVERRIDE=1 -DBUILD_PACKAGES=1 -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=$(dpkg --print-architecture)  &&  make  &&  sudo cpack
 
 after_success:
   - echo "Success"
