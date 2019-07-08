@@ -77,13 +77,13 @@ void asciify(const char c,  Args... args){
 };
 
 template<typename... Args>
-void asciify(const char* s,  Args... args){
+void asciify(const char* __restrict s,  Args... args){
     asciify(s);
     return asciify(args...);
 };
 
 template<typename... Args>
-void asciify(const char** ss,  const int n,  Args... args){
+void asciify(const char** __restrict ss,  const int n,  Args... args){
     for (auto i = 0;  i < n;  ++i)
         asciify(ss[i]);
     return asciify(args...);
@@ -127,7 +127,7 @@ void asciify(T t,  Args... args){
 
 
 template<typename... Args>
-void asciify(flag::StrLen f,  const char* s,  const size_t sz,  Args... args){
+void asciify(flag::StrLen f,  const char* __restrict s,  const size_t sz,  Args... args){
     memcpy(BUF + BUF_INDX,  s,  sz);
     BUF_INDX += sz;
     asciify(args...);
@@ -228,7 +228,7 @@ void asciify(flag::guarantee::BetweenZeroAndOneExclusive f,  double d,  T precis
 };
 
 template<typename... Args>
-void asciify(flag::Escape f,  const char c,  const char* s,  Args... args){
+void asciify(flag::Escape f,  const char c,  const char* __restrict s,  Args... args){
     while(*s != 0){
         if (unlikely(*s == c  ||  *s == '\\'))
             BUF[BUF_INDX++] = '\\';
@@ -268,7 +268,7 @@ void asciify(void* ptr,  Args... args){
 
 /* Concatenation */
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  T t,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  T t,  Args... args){
     asciify(t);
     constexpr static const flag::StrLen g;
     asciify(g, s, sz);
@@ -276,14 +276,14 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  T t,  Args..
 };
 
 template<typename... Args>
-void asciify(flag::concat::Start e,  const char* s,  const int sz,  flag::concat::End f,  Args... args){
+void asciify(flag::concat::Start e,  const char* __restrict s,  const int sz,  flag::concat::End f,  Args... args){
     // Overrides previous (more general) template
     BUF_INDX -= sz;
     asciify(args...);
 };
 
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  const char** ss,  T n,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  const char** __restrict ss,  T n,  Args... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ss[i]);
@@ -294,7 +294,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  const char**
 
 #ifdef USE_VECTOR
 template<typename SZ,  typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ss[i]);
@@ -335,7 +335,7 @@ void asciify(flag::concat::Start f,  const char c,  flag::guarantee::BetweenZero
 
 /* Concatenation with other flag types */
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  T t,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  flag::prefix::Start g,  const char* __restrict ps,  const size_t psz,  T t,  Args... args){
     asciify(g, ps, psz, t);
     constexpr static const flag::StrLen strlen;
     asciify(strlen, s, sz);
@@ -343,7 +343,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix
 };
 
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  const char** ss,  T t,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  flag::prefix::Start g,  const char* __restrict ps,  const size_t psz,  const char** __restrict ss,  T t,  Args... args){
     constexpr static const flag::StrLen strlen;
     for (auto i = 0;  i < t;  ++i){
         asciify(g, ps, psz, ss[i]);
@@ -353,7 +353,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix
 };
 
 template<typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  flag::prefix::Start h,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  flag::prefix::Start g,  const char* __restrict ps,  const size_t psz,  flag::prefix::Start h,  Args... args){
     asciify(f, s, sz, args...);
 };
 
@@ -361,13 +361,13 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix
 
 /* Prefixes */
 template<typename... Args>
-void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const char* ss,  Args... args){
+void asciify(flag::prefix::Start f,  const char* __restrict s,  const size_t sz,  const char* __restrict ss,  Args... args){
     asciify(f, s, sz, ss);
     asciify(f, s, sz, args...);
 };
 
 template<typename T,  typename... Args>
-void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const char** ss,  T n,  Args... args){
+void asciify(flag::prefix::Start f,  const char* __restrict s,  const size_t sz,  const char** __restrict ss,  T n,  Args... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(g, s, sz);
@@ -377,7 +377,7 @@ void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const cha
 };
 
 template<typename... Args>
-void asciify(flag::prefix::Start e,  const char* s,  const size_t sz,  flag::prefix::End f,  Args... args){
+void asciify(flag::prefix::Start e,  const char* __restrict s,  const size_t sz,  flag::prefix::End f,  Args... args){
     asciify(args...);
 };
 
