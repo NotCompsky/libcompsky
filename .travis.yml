@@ -18,7 +18,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then  brew update --force  &&  brew install mariadb-connector-c qt5  &&  brew list | grep -e '(mysql|mariadb)';  fi
 
 script:
-  - mkdir build  &&  cd build  &&  cmake .. -DMYSQL_UNDER_DIR=/usr/include/mysql -DMYSQL_UNDER_DIR_OVERRIDE=1 -DBUILD_PACKAGES=1 -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=$(dpkg --print-architecture)  &&  make  &&  sudo cpack
+  - mkdir build  &&  cd build  &&  cmake .. -DBUILD_PACKAGES=1 -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=$(dpkg --print-architecture)  &&  sudo make package
 
 after_success:
   - echo "Success"
