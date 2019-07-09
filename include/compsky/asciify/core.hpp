@@ -1,5 +1,5 @@
-#ifndef __ASCIIFY_CORE__
-#define __ASCIIFY_CORE__
+#ifndef LIBCOMPSKY_ASCIIFY_CORE_HPP
+#define LIBCOMPSKY_ASCIIFY_CORE_HPP
 
 
 

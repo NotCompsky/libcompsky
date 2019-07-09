@@ -1,5 +1,5 @@
-#ifndef __ASCIIFY_FLAGS__
-#define __ASCIIFY_FLAGS__
+#ifndef LIBCOMPSKY_ASCIIFY_FLAGS_HPP
+#define LIBCOMPSKY_ASCIIFY_FLAGS_HPP
 
 namespace compsky {
 namespace asciify {

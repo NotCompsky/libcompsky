@@ -1,5 +1,5 @@
-#ifndef __COMPSKY__MYSQL__CREATECONFIG__
-#define __COMPSKY__MYSQL__CREATECONFIG__
+#ifndef LIBCOMPSKY_MYSQL_CREATE_CONFIG_HPP
+#define LIBCOMPSKY_MYSQL_CREATE_CONFIG_HPP
 
 #include "compsky/mysql/mysql.h"
 

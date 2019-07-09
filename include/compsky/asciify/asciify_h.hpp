@@ -1,3 +1,7 @@
+#ifndef LIBCOMPSKY_ASCIIFY_ASCIIFY_H_HPP
+#define LIBCOMPSKY_ASCIIFY_ASCIIFY_H_HPP
+
+
 #include <inttypes.h> // for u?int[0-9]{1,2}_t
 
 #ifdef ASCIIFY_TIME
@@ -175,3 +179,6 @@ void asciify(flag::to::AlphaNumeric f,  Int n,  Args... args);
 
 }
 } // END: namespace compsky::asciify
+
+
+#endif

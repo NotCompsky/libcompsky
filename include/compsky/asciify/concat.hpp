@@ -1,3 +1,7 @@
+#ifndef LIBCOMPSKY_ASCIIFY_CONCAT_HPP
+#define LIBCOMPSKY_ASCIIFY_CONCAT_HPP
+
+
 namespace compsky {
 namespace asciify {
 
@@ -95,3 +99,6 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix
 
 }
 }
+
+
+#endif

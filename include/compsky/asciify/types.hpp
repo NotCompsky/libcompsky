@@ -1,5 +1,5 @@
-#ifndef __ASCIIFY_TYPES__
-#define __ASCIIFY_TYPES__
+#ifndef LIBCOMPSKY_ASCIIFY_TYPES_HPP
+#define LIBCOMPSKY_ASCIIFY_TYPES_HPP
 
 namespace compsky {
     namespace asciify {

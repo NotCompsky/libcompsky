@@ -5,8 +5,8 @@ Multiple groups can share the same name. Group names can include any character e
 */
 
 
-#ifndef __COMPSKY_REGEX_NAMED_GROUPS_H__
-#define __COMPSKY_REGEX_NAMED_GROUPS_H__
+#ifndef LIBCOMPSKY_REGEX_NAMED_GROUPS_HPP
+#define LIBCOMPSKY_REGEX_NAMED_GROUPS_HPP
 
 #include <map>
 #include <vector>

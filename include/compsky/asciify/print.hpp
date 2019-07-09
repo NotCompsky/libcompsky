@@ -1,3 +1,7 @@
+#ifndef LIBCOMPSKY_ASCIIFY_PRINT_HPP
+#define LIBCOMPSKY_ASCIIFY_PRINT_HPP
+
+
 #include <compsky/asciify/asciify.hpp>
 
 #include <stdio.h> // for FILE
@@ -15,3 +19,6 @@ void write(FILE* f,  Args... args){
 
 } // END namespace compsky::asciify
 } // END namespace compsky
+
+
+#endif

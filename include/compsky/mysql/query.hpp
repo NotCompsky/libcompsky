@@ -1,5 +1,5 @@
-#ifndef __MYMYSQL_RESULTS__
-#define __MYMYSQL_RESULTS__
+#ifndef LIBCOMPSKY_MYSQL_QUERY_HPP
+#define LIBCOMPSKY_MYSQL_QUERY_HPP
 
 #include <cstddef> // for size_t
 #include <stdint.h> // for uintN_t

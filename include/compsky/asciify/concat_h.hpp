@@ -1,5 +1,5 @@
-#ifndef __COMPSKY_ASCIIFY_CONCAT_H__
-#define __COMPSKY_ASCIIFY_CONCAT_H__
+#ifndef LIBCOMPSKY_ASCIIFY_CONCAT_H_HPP
+#define LIBCOMPSKY_ASCIIFY_CONCAT_H_HPP
 
 namespace compsky {
 namespace asciify {

@@ -1,5 +1,5 @@
-#ifndef __COMPSKY__ASCIIFY__
-#define __COMPSKY__ASCIIFY__
+#ifndef LIBCOMPSKY_ASCIIFY_ASCIIFY_HPP
+#define LIBCOMPSKY_ASCIIFY_ASCIIFY_HPP
 
 #include "compsky/asciify/asciify_h.hpp"
 

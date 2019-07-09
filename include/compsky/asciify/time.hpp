@@ -1,3 +1,7 @@
+#ifndef LIBCOMPSKY_ASCIIFY_TIME_HPP
+#define LIBCOMPSKY_ASCIIFY_TIME_HPP
+
+
 #include "time_h.hpp"
 
 namespace compsky {
@@ -21,3 +25,6 @@ void asciify(const tm* t,  Args... args){
 
 }
 }
+
+
+#endif
