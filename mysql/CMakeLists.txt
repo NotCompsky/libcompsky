@@ -13,7 +13,8 @@ else()
     add_library(compsky_mysql_create_config SHARED "${SRC_DIR}/create_config.cpp")
 endif()
 
-target_link_libraries(compsky_mysql PRIVATE ${WHICH_MYSQL_CLIENT} compsky_asciify compsky_security)
+target_link_libraries(compsky_mysql PUBLIC "${WHICH_MYSQL_CLIENT}") # Interface needed for header-only parts
+target_link_libraries(compsky_mysql PRIVATE compsky_asciify compsky_security)
 target_link_libraries(compsky_mysql_create_config PRIVATE compsky_asciify compsky_mysql)
 
 set_target_properties(compsky_mysql PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/mysql/mysql.hpp;${INC_DIR}/compsky/mysql/query.hpp;${INC_DIR}/compsky/mysql/mysql.h")
