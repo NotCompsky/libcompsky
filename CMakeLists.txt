@@ -41,28 +41,6 @@ else()
     message(FATAL_ERROR "Please specify the libmysqlclient equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu/Debian, you would specify -DWHICH_MYSQL_CLIENT=mariadbclient; for others, perhaps, -DWHICH_MYSQL_CLIENT=mysqlclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | grep -e 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g'\nFor MacOS, it is probably mysql-connector-c")
 endif()
 
-
-# BEGIN src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
-
-if(WIN32 AND NOT CYGWIN)
-  set(DEF_INSTALL_CMAKE_DIR CMake)
-else()
-  set(DEF_INSTALL_CMAKE_DIR lib/CMake/Compsky)
-endif()
-set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
-
-# Make relative paths absolute (needed later on)
-foreach(p LIB BIN INCLUDE CMAKE)
-  set(var INSTALL_${p}_DIR)
-  if(NOT IS_ABSOLUTE "${${var}}")
-    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-  endif()
-endforeach()
-
-# set up include-directories
-include_directories("${PROJECT_SOURCE_DIR}")
-
-# Add sub-directories
 add_subdirectory(asciify)
 add_subdirectory(security)
 add_subdirectory(mysql)
@@ -71,14 +49,10 @@ if(BUILD_PACKAGES)
     add_subdirectory(packaging)
 endif()
 
-# Add all targets to the build-tree export set
 export(TARGETS compsky_asciify compsky_security compsky_mysql FILE "${PROJECT_BINARY_DIR}/CompskyTargets.cmake")
 
-# Registers the build-tree with a global CMake-registry
 export(PACKAGE Compsky)
 
-
-# Create the CompskyConfig.cmake and CompskyConfigVersion files
 file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
 
 # ... for the build tree
@@ -90,16 +64,13 @@ configure_file(CompskyConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECT
 # ... for both
 configure_file(CompskyConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/CompskyConfigVersion.cmake" @ONLY)
 
-# Install the CompskyConfig.cmake and CompskyConfigVersion.cmake
 install(
-    FILES
-    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CompskyConfig.cmake"
-    "${PROJECT_BINARY_DIR}/CompskyConfigVersion.cmake"
-    DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev
+	FILES
+		"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CompskyConfig.cmake"
+		"${PROJECT_BINARY_DIR}/CompskyConfigVersion.cmake"
+	DESTINATION "${INSTALL_CMAKE_DIR}"
+	COMPONENT dev
 )
 
-# Install the export set for use with the install-tree
 install(EXPORT CompskyTargets DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-# END src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
 
