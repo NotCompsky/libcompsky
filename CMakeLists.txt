@@ -25,11 +25,14 @@ set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories("${INC_DIR}")
 
+find_library(FINDLIB_mariadbclient		mariadbclient)
+find_library(FINDLIB_mysqlclient		mysqlclient)
+find_library(FINDLIB_mariadb-connector-c	mariadb-connector-c)
+find_library(FINDLIB_mysql-connector-c		mysql-connector-c)
+
 foreach(sqlconn mariadbclient mysqlclient mariadb-connector-c mysql-connector-c)
-	unset(FOUND_MYSQL_CLIENT)
 	if (NOT WHICH_MYSQL_CLIENT)
-		find_library(FOUND_MYSQL_CLIENT "${sqlconn}")
-		if (FOUND_MYSQL_CLIENT)
+		if (FINDLIB_${sqlconn})
 			set(WHICH_MYSQL_CLIENT "${sqlconn}")
 		endif()
 	endif()
@@ -53,8 +56,6 @@ export(TARGETS compsky_asciify compsky_security compsky_mysql FILE "${PROJECT_BI
 
 export(PACKAGE Compsky)
 
-file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
-
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
 configure_file(CompskyConfig.cmake.in "${PROJECT_BINARY_DIR}/CompskyConfig.cmake" @ONLY)
@@ -68,9 +69,9 @@ install(
 	FILES
 		"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CompskyConfig.cmake"
 		"${PROJECT_BINARY_DIR}/CompskyConfigVersion.cmake"
-	DESTINATION "${INSTALL_CMAKE_DIR}"
+	DESTINATION "${CMAKE_INSTALL_LIBDIR}/Compsky/"
 	COMPONENT dev
 )
 
-install(EXPORT CompskyTargets DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+install(EXPORT CompskyTargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/Compsky/" COMPONENT dev)
 
