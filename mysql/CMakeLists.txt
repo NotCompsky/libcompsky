@@ -16,10 +16,6 @@ endif()
 target_link_libraries(compsky_mysql PRIVATE ${WHICH_MYSQL_CLIENT} compsky_asciify compsky_security)
 target_link_libraries(compsky_mysql_create_config PRIVATE compsky_asciify compsky_mysql)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../security/include")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../asciify/include")
-
 set_target_properties(compsky_mysql PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/mysql/mysql.hpp;${INC_DIR}/compsky/mysql/query.hpp;${INC_DIR}/compsky/mysql/mysql.h")
 set_target_properties(compsky_mysql_create_config PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/mysql/create_config.hpp")
 
