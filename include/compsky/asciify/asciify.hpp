@@ -21,6 +21,9 @@ namespace compsky {
 namespace asciify {
 
 
+template<typename T>
+void asciify(){};
+
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
 void asciify(uint64_t t,  Args... args){
