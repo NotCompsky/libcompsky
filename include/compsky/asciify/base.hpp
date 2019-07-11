@@ -6,6 +6,8 @@ namespace compsky {
 namespace asciify {
 
 extern char* BUF;
+extern char* ITR;
+
 
 }
 }

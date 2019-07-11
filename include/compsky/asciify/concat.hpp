@@ -17,7 +17,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  T t,  Args..
 template<typename... Args>
 void asciify(flag::concat::Start e,  const char* s,  const int sz,  flag::concat::End f,  Args... args){
     // Overrides previous (more general) template
-    BUF_INDX -= sz;
+    ITR -= sz;
     asciify(args...);
 };
 
@@ -45,7 +45,7 @@ void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<c
 
 template<typename... Args>
 void asciify(flag::concat::Start e,  const char c,  flag::concat::End f,  Args... args){
-    --BUF_INDX;
+    --ITR;
     asciify(args...);
 };
 

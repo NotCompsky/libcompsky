@@ -5,10 +5,10 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 # BEGIN: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    add_library(compsky_asciify STATIC "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+    add_library(compsky_asciify STATIC "${SRC_DIR}/types.cpp" "${SRC_DIR}/base.cpp")
     target_compile_definitions(compsky_asciify PRIVATE COMPILING_STATIC_LIB)
 else()
-    add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+    add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/base.cpp")
 endif()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -18,7 +18,6 @@ set(headers
 	"${INC_DIR}/compsky/asciify/utils.hpp"
 	"${INC_DIR}/compsky/asciify/types.hpp"
 	"${INC_DIR}/compsky/asciify/flags.hpp"
-	"${INC_DIR}/compsky/asciify/core.hpp"
 	"${INC_DIR}/compsky/asciify/base.hpp"
 	"${INC_DIR}/compsky/asciify/asciify_h.hpp"
 	"${INC_DIR}/compsky/asciify/asciify.hpp"

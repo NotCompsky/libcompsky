@@ -14,11 +14,6 @@
 
 
 namespace compsky {
-namespace asciify {
-    size_t BUF_INDX = 0;
-}
-
-
 namespace mysql {
 
 #ifdef COMPILING_STATIC_LIB
@@ -156,7 +151,7 @@ void create_config(const char* stmts,  const char* permissions_str,  const char*
     
     MYSQL_AUTH[4] = EMPTYSTR; // We haven't created the database yet, so cannot connect to it
     
-    compsky::asciify::BUF = ++AUTH_PTR;
+    compsky::asciify::ITR = ++AUTH_PTR;
     
     login_from_auth();
     

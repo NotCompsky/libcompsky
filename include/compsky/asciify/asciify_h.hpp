@@ -12,7 +12,6 @@
 # include <QString>
 #endif
 
-#include "compsky/asciify/core.hpp"
 #include "compsky/asciify/base.hpp"
 #include "compsky/asciify/flags.hpp"
 #include "compsky/asciify/types.hpp"

@@ -131,8 +131,8 @@ void asciify(T t,  Args... args){
 
 template<typename... Args>
 void asciify(flag::StrLen f,  const char* __restrict s,  const size_t sz,  Args... args){
-    memcpy(BUF + BUF_INDX,  s,  sz);
-    BUF_INDX += sz;
+    memcpy(ITR,  s,  sz);
+    ITR += sz;
     asciify(args...);
 };
 
@@ -142,20 +142,19 @@ template<typename T>
 void asciify_integer(T n){
     auto n_digits = count_digits(n);
     auto i = n_digits;
-    BUF_INDX += i;
+    ITR += i;
     do {
-        BUF[--BUF_INDX] = '0' + (n % 10);
+        *(--ITR) = '0' + (n % 10);
         n /= 10;
     } while (n != 0);
-    BUF_INDX += n_digits;
+    ITR += n_digits;
 };
 
 
 /* Initialise Buffer */
 template<typename... Args>
-void asciify(flag::ChangeBuffer f,  char* buf,  size_t indx,  Args... args){
-    BUF = buf;
-    BUF_INDX = indx;
+void asciify(flag::ChangeBuffer f,  char* buf,  Args... args){
+    ITR = buf;
     asciify(args...);
 };
 
@@ -167,7 +166,7 @@ template<typename T,  typename... Args>
 void asciify(flag::FillWithLeadingZeros f,  const int min_digits,  T n,  Args... args){
     int n_digits = count_digits(n);
     for (auto i = n_digits;  i < min_digits;  ++i)
-        BUF[BUF_INDX++] = '0';
+        *(ITR++) = '0';
     asciify(n, args...);
 };
 
@@ -234,8 +233,8 @@ template<typename... Args>
 void asciify(flag::Escape f,  const char c,  const char* __restrict s,  Args... args){
     while(*s != 0){
         if (unlikely(*s == c  ||  *s == '\\'))
-            BUF[BUF_INDX++] = '\\';
-        BUF[BUF_INDX++] = *s;
+            *(ITR++) = '\\';
+        *(ITR++) = *s;
         ++s;
     }
     asciify(args...);
@@ -252,17 +251,17 @@ void asciify(flag::Escape f,  const char c,  const QString& qs,  Args... args){
 
 template<typename... Args>
 void asciify(void* ptr,  Args... args){
-    BUF[BUF_INDX++] = '0';
-    BUF[BUF_INDX++] = 'x';
+    *(ITR++) = '0';
+    *(ITR++) = 'x';
     uintptr_t n = (uintptr_t)ptr;
     auto n_digits = count_digits(n);
-    for (auto buf_indx = BUF_INDX + n_digits;  buf_indx != BUF_INDX;  ){
+    for (char* itr = ITR + n_digits;  itr != ITR;  ){
         const uint8_t m = (n % 16);
         const char c  =  (m < 10)  ?  '0' + m  :  'a' + m - 10;
-        BUF[--buf_indx] = c;
+        *(--itr) = c;
         n /= 16;
     }
-    BUF_INDX += n_digits;
+    ITR += n_digits;
     asciify(args...);
 };
 
@@ -281,7 +280,7 @@ void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  T
 template<typename... Args>
 void asciify(flag::concat::Start e,  const char* __restrict s,  const int sz,  flag::concat::End f,  Args... args){
     // Overrides previous (more general) template
-    BUF_INDX -= sz;
+    ITR -= sz;
     asciify(args...);
 };
 
@@ -309,7 +308,7 @@ void asciify(flag::concat::Start f,  const char* __restrict s,  SZ sz,  const st
 
 template<typename... Args>
 void asciify(flag::concat::Start e,  const char c,  flag::concat::End f,  Args... args){
-    --BUF_INDX;
+    --ITR;
     asciify(args...);
 };
 
@@ -399,13 +398,15 @@ void asciify(flag::to::AlphaNumeric f,  Int n,  Args... args){
         m /= 36;
     } while (m != 0);
     
-    size_t buf_indx = BUF_INDX + n_digits;
+    ITR += n_digits;
     
     do {
         const char digit = n % 36;
-        BUF[--buf_indx] = digit + ((digit<10) ? '0' : 'a' - 10);
+        *(--ITR) = digit + ((digit<10) ? '0' : 'a' - 10);
         n /= 36;
     } while (n != 0);
+    
+    ITR += n_digits;
     
     asciify(args...);
 };

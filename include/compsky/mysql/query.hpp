@@ -6,7 +6,6 @@
 #include <string.h> // for strlen
 
 #include <compsky/asciify/asciify.hpp> // for asciify::*
-#include <compsky/asciify/core.hpp> // for compsky::asciify::BUF_INDX
 #include <compsky/asciify/flags.hpp> // for compsky::asciify::flag::*
 
 #include <compsky/mysql/mysql.hpp>
@@ -132,18 +131,18 @@ namespace mysql {
 template<typename... Args>
 void exec(Args... args){
     constexpr static const asciify::flag::ChangeBuffer change_buffer;
-    asciify::asciify(change_buffer, asciify::BUF, 0, args...);
+    asciify::asciify(change_buffer, asciify::BUF, args..., '\0');
   #ifdef DEBUG
     printf("%s\n", asciify::BUF);
   #endif
-    exec_buffer(asciify::BUF, asciify::BUF_INDX);
+    exec_buffer(asciify::BUF);
 };
 
 template<typename... Args>
 void query(MYSQL_RES** res,  Args... args){
     constexpr static const asciify::flag::ChangeBuffer change_buffer;
-    asciify::asciify(change_buffer, asciify::BUF, 0, args...);
-    query_buffer(res, asciify::BUF, asciify::BUF_INDX);
+    asciify::asciify(change_buffer, asciify::BUF, args..., '\0');
+    query_buffer(res, asciify::BUF);
 };
 
 
