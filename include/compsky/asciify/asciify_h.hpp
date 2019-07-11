@@ -89,10 +89,10 @@ template<typename... Args>
 void asciify(flag::ChangeBufferTmp f,  char* buf_tmp,  Args... args);
 
 template<typename... Args>
-void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t*& count,  Args... args);
+void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t* count,  Args... args);
 
 template<typename... Args>
-void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t*& count,  Args... args);
+void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t* count,  Args... args);
 
 
 

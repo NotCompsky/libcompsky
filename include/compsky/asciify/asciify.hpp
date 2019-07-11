@@ -181,7 +181,7 @@ void asciify(flag::ChangeBufferTmp f,  char* buf_tmp,  Args... args){
 };
 
 template<typename... Args>
-void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t*& count,  Args... args){
+void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t* count,  Args... args){
     char* const buf_old = BUF;
     ITR = buf_tmp;
     asciify(args...);
@@ -190,7 +190,7 @@ void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t*& count,  Arg
 };
 
 template<typename... Args>
-void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t*& count,  Args... args){
+void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t* count,  Args... args){
     char* const buf_old = BUF;
     ITR = buf_tmp + *count;
     asciify(args...);
