@@ -18,9 +18,9 @@ install(
     # Adds the security library to the "export-set"
     EXPORT CompskyTargets
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        COMPONENT lib
+        COMPONENT security
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/security"
-        COMPONENT dev
+        COMPONENT security-dev
 )
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #

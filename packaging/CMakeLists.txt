@@ -16,7 +16,7 @@
 include(InstallRequiredSystemLibraries)
 
 set(CPACK_PACKAGE_VENDOR "NotCompsky")
-set(CPACK_PACKAGE_NAME "libcompsky")
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_CONTACT "NotCompsky <adammarkgray@gmail.com>")
 set(HOMEPAGE "https://github.com/NotCompsky/libcompsky")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Family of resources written in C++ for scraping Reddit into a MySQL database.")
@@ -37,7 +37,7 @@ endif()
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
 
-set(CPACK_CREATE_DESKTOP_LINKS rscrape-cmnts rscrape-mods libcompsky-tags)
+
 set(CPACK_STRIP_FILES TRUE)
 
 if(APPLE OR NOT UNIX)
@@ -45,7 +45,7 @@ if(APPLE OR NOT UNIX)
 else()
     #-----------------------------------------------------------------------------
     # Linux specific
-    set(CPACK_GENERATOR "DEB;TBZ2;TXZ")
+    set(CPACK_GENERATOR "DEB")
     message(STATUS "Package generation - UNIX")
     message(STATUS "   + DEB                                  YES ")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)

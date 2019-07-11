@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR) # CONTRIBUTIONS WELCOME: Test
 project(Compsky CXX) # Important that it is set before find_package is called
 
 set(COMPSKY_MAJOR_VERSION 0)
-set(COMPSKY_MINOR_VERSION 1)
-set(COMPSKY_PATCH_VERSION 1)
+set(COMPSKY_MINOR_VERSION 2)
+set(COMPSKY_PATCH_VERSION 0)
 set(COMPSKY_VERSION ${COMPSKY_MAJOR_VERSION}.${COMPSKY_MINOR_VERSION}.${COMPSKY_PATCH_VERSION})
 
 
@@ -25,30 +25,42 @@ set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories("${INC_DIR}")
 
-find_library(FINDLIB_mariadbclient		mariadbclient)
-find_library(FINDLIB_mysqlclient		mysqlclient)
-find_library(FINDLIB_mariadb-connector-c	mariadb-connector-c)
-find_library(FINDLIB_mysql-connector-c		mysql-connector-c)
-
-foreach(sqlconn mariadbclient mysqlclient mariadb-connector-c mysql-connector-c)
-	if (NOT WHICH_MYSQL_CLIENT)
-		if (FINDLIB_${sqlconn})
-			set(WHICH_MYSQL_CLIENT "${sqlconn}")
-		endif()
-	endif()
-endforeach(sqlconn)
-
-if (WHICH_MYSQL_CLIENT)
-    message(STATUS "WHICH_MYSQL_CLIENT: ${WHICH_MYSQL_CLIENT}")
-else()
-    message(FATAL_ERROR "Please specify the libmysqlclient equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu/Debian, you would specify -DWHICH_MYSQL_CLIENT=mariadbclient; for others, perhaps, -DWHICH_MYSQL_CLIENT=mysqlclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | grep -e 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g'\nFor MacOS, it is probably mysql-connector-c")
-endif()
-
 add_subdirectory(asciify)
 add_subdirectory(security)
 add_subdirectory(mysql)
 add_subdirectory(regex)
 if(BUILD_PACKAGES)
+    set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+    SET(CPACK_RPM_COMPONENT_INSTALL     ON)
+    SET(CPACK_DEB_COMPONENT_INSTALL     ON)
+    set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+
+
+    if("${BUILD_PACKAGES}" STREQUAL "1")
+        set(CPACK_COMPONENTS_ALL asciify asciify-dev mysql mysql-dev regex-dev security-dev)
+        message(STATUS "Note: You can specify the packages to build with -DBUILD_PACKAGES=<package_name>")
+    else()
+        set(CPACK_COMPONENTS_ALL ${BUILD_PACKAGES})
+    endif()
+
+
+    set(CPACK_COMPONENT_ASCIIFY_DESCRIPTION
+        "C++ library for rapid stringification prioritising speed above all")
+    set(CPACK_COMPONENT_ASCIIFY_DEV_DESCRIPTION
+        "C++ header files")
+    set(CPACK_COMPONENT_MYSQL_DESCRIPTION
+        "C++ library for interacting with MySQL/MariaDB prioritising speed and usability")
+    set(CPACK_COMPONENT_MYSQL_DEV_DESCRIPTION
+        "C++ header files")
+    set(CPACK_COMPONENT_REGEX_DEV_DESCRIPTION
+        "C++ library for pre-processing regex, in particular assigning named groups in a flexible manner")
+    set(CPACK_COMPONENT_SECURITY_DEV_DESCRIPTION
+        "C++ header files")
+    
+    set(Boost_USE_STATIC_LIBS ON) # Different repos have different libboost-regex versions that different repositories include, just easier to avoid this dependency for packages.
+    set(CPACK_DEBIAN_MYSQL_PACKAGE_DEPENDS "libcompsky-asciify libcompsky-security")
+    set(CPACK_DEBIAN_MYSQL_DEV_PACKAGE_DEPENDS "libcompsky-asciify-dev libcompsky-security-dev")
+
     add_subdirectory(packaging)
 endif()
 

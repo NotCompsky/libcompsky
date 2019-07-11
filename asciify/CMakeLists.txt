@@ -48,9 +48,9 @@ install(
     # Adds the asciify library to the "export-set"
     EXPORT CompskyTargets
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        COMPONENT lib
+        COMPONENT asciify
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/asciify"
-        COMPONENT dev
+        COMPONENT asciify-dev
 )
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
