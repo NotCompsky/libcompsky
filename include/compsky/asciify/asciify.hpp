@@ -21,10 +21,8 @@ namespace compsky {
 namespace asciify {
 
 
-template<typename... Args>
-void asciify(Args... args){
-    static_assert(sizeof...(Args) == 0,  "Base case should only ever be called with 0 arguments");
-};
+inline
+void asciify(){};
 
 /* Getter functions */
 template<typename... Args>

@@ -22,8 +22,8 @@ namespace compsky {
 namespace asciify {
 
 
-template<typename... Args>
-void asciify(Args... args);
+inline
+void asciify();
 
 /* Getter functions */
 template<typename... Args>
