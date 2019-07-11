@@ -12,6 +12,7 @@ namespace flag {
         struct Start{};
         struct End{};
     }
+    struct ResetIndex{};
     struct ChangeBuffer{};
     struct Escape{};
     struct StrLen{};

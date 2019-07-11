@@ -21,8 +21,10 @@ namespace compsky {
 namespace asciify {
 
 
-template<typename T>
-void asciify(){};
+template<typename... Args>
+void asciify(Args... args){
+    static_assert(sizeof...(Args) == 0,  "Base case should only ever be called with 0 arguments");
+};
 
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
@@ -153,8 +155,14 @@ void asciify_integer(T n){
 
 /* Initialise Buffer */
 template<typename... Args>
+void asciify(flag::ResetIndex f,  Args... args){
+    ITR = BUF;
+    asciify(args...);
+};
+
+template<typename... Args>
 void asciify(flag::ChangeBuffer f,  char* buf,  Args... args){
-    ITR = buf;
+    ITR = BUF = buf;
     asciify(args...);
 };
 
