@@ -37,7 +37,7 @@ if(BUILD_PACKAGES)
 
 
     if("${BUILD_PACKAGES}" STREQUAL "1")
-        set(CPACK_COMPONENTS_ALL asciify asciify-dev mysql mysql-dev regex-dev security-dev)
+        set(CPACK_COMPONENTS_ALL asciify asciify-dev mysql mysql-dev regex-dev security security-dev)
         message(STATUS "Note: You can specify the packages to build with -DBUILD_PACKAGES=<package_name>")
     else()
         set(CPACK_COMPONENTS_ALL ${BUILD_PACKAGES})
@@ -54,12 +54,14 @@ if(BUILD_PACKAGES)
         "C++ header files")
     set(CPACK_COMPONENT_REGEX_DEV_DESCRIPTION
         "C++ library for pre-processing regex, in particular assigning named groups in a flexible manner")
+    set(CPACK_COMPONENT_SECURITY_DESCRIPTION
+        "C++ library with secure memset")
     set(CPACK_COMPONENT_SECURITY_DEV_DESCRIPTION
         "C++ header files")
-    
+
     set(Boost_USE_STATIC_LIBS ON) # Different repos have different libboost-regex versions that different repositories include, just easier to avoid this dependency for packages.
-    set(CPACK_DEBIAN_MYSQL_PACKAGE_DEPENDS "libcompsky-asciify libcompsky-security")
-    set(CPACK_DEBIAN_MYSQL_DEV_PACKAGE_DEPENDS "libcompsky-asciify-dev libcompsky-security-dev")
+    set(CPACK_DEBIAN_MYSQL_PACKAGE_DEPENDS "compsky-asciify (= ${COMPSKY_VERSION}), compsky-security (= ${COMPSKY_VERSION})")
+    set(CPACK_DEBIAN_MYSQL_DEV_PACKAGE_DEPENDS "compsky-asciify-dev (= ${COMPSKY_VERSION}), compsky-security-dev (= ${COMPSKY_VERSION})")
 
     add_subdirectory(packaging)
 endif()
