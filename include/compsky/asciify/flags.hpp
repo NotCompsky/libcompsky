@@ -12,7 +12,6 @@ namespace flag {
         struct Start{};
         struct End{};
     }
-    struct ResetIndex{};
     struct ChangeBuffer{};
     struct ChangeBufferTmp{};
     struct ChangeBufferTmpCount{};
@@ -21,6 +20,7 @@ namespace flag {
     struct StrLen{};
     struct FillWithLeadingZeros{};
     struct UpToFirstZero{};
+    struct LiteralChar{};
     namespace ensure {
         struct BetweenZeroAndOneInclusive{};
         struct BetweenZeroAndOneExclusive{};

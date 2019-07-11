@@ -128,13 +128,10 @@ bool assign_next_row(MYSQL_RES* res,  MYSQL_ROW* row,  Args... args);
 
 namespace mysql {
 
-namespace _f {
-    constexpr static const asciify::flag::ResetIndex resetindx;
-}
-
 template<typename... Args>
 void exec(Args... args){
-    asciify::asciify(_f::resetindx, args...);
+    asciify::reset_index();
+    asciify::asciify(args...);
   #ifdef DEBUG
     printf("%s\n", asciify::BUF);
   #endif
@@ -143,7 +140,8 @@ void exec(Args... args){
 
 template<typename... Args>
 void query(MYSQL_RES** res,  Args... args){
-    asciify::asciify(_f::resetindx, args...);
+    asciify::reset_index();
+    asciify::asciify(args...);
     query_buffer(res, asciify::BUF, asciify::get_index());
 };
 

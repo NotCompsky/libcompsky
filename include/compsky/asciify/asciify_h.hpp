@@ -29,6 +29,9 @@ void asciify();
 template<typename... Args>
 size_t get_index(Args... args);
 
+template<typename C>
+void append(C c);
+
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
 void asciify(uint64_t t,  Args... args);
@@ -56,6 +59,8 @@ void asciify(unsigned long t,  Args... args);
 
 template<typename... Args>
 void asciify(const char c,  Args... args);
+// We want uintN_t to be translated into human-readable, but char to be pasted as its literal value
+// Unfortunately, uint8_t and char are usually the same type, so we cannot differentiate between them
 
 template<typename... Args>
 void asciify(const char* s,  Args... args);
@@ -79,8 +84,8 @@ void asciify_integer(T n);
 
 
 /* Initialise Buffer */
-template<typename... Args>
-void asciify(flag::ResetIndex f,  Args... args);
+inline
+void reset_index();
 
 template<typename... Args>
 void asciify(flag::ChangeBuffer f,  char* buf,  Args... args);

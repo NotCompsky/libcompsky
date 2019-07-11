@@ -30,6 +30,11 @@ size_t get_index(Args... args){
     return (uintptr_t)ITR - (uintptr_t)BUF;
 };
 
+template<typename C>
+void append(C c){
+    *(ITR++) = c;
+};
+
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
 void asciify(uint64_t t,  Args... args){
@@ -81,13 +86,14 @@ void asciify(unsigned long t,  Args... args){
 
 template<typename... Args>
 void asciify(const char c,  Args... args){
-    asciify(c);
+    *(ITR++) = c;
     return asciify(args...);
 };
 
 template<typename... Args>
 void asciify(const char* __restrict s,  Args... args){
-    asciify(s);
+    memcpy(ITR, s, strlen(s));
+    ITR += strlen(s);
     return asciify(args...);
 };
 
@@ -158,11 +164,10 @@ void asciify_integer(T n){
 
 
 /* Initialise Buffer */
-template<typename... Args>
-void asciify(flag::ResetIndex f,  Args... args){
+inline
+void reset_index(){
     ITR = BUF;
-    asciify(args...);
-};
+}
 
 template<typename... Args>
 void asciify(flag::ChangeBuffer f,  char* buf,  Args... args){
