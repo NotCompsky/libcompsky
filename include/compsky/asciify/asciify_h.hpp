@@ -25,6 +25,10 @@ namespace asciify {
 template<typename... Args>
 void asciify(Args... args);
 
+/* Getter functions */
+template<typename... Args>
+size_t get_index(Args... args);
+
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
 void asciify(uint64_t t,  Args... args);
@@ -81,7 +85,14 @@ void asciify(flag::ResetIndex f,  Args... args);
 template<typename... Args>
 void asciify(flag::ChangeBuffer f,  char* buf,  Args... args);
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmp f,  char* buf_tmp,  Args... args);
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t*& count,  Args... args);
+
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t*& count,  Args... args);
 
 
 

@@ -14,6 +14,9 @@ namespace flag {
     }
     struct ResetIndex{};
     struct ChangeBuffer{};
+    struct ChangeBufferTmp{};
+    struct ChangeBufferTmpCount{};
+    struct ChangeBufferTmpCountFrom{};
     struct Escape{};
     struct StrLen{};
     struct FillWithLeadingZeros{};

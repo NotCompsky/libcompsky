@@ -26,6 +26,12 @@ void asciify(Args... args){
     static_assert(sizeof...(Args) == 0,  "Base case should only ever be called with 0 arguments");
 };
 
+/* Getter functions */
+template<typename... Args>
+size_t get_index(Args... args){
+    return (uintptr_t)ITR - (uintptr_t)BUF;
+};
+
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
 void asciify(uint64_t t,  Args... args){
@@ -166,7 +172,31 @@ void asciify(flag::ChangeBuffer f,  char* buf,  Args... args){
     asciify(args...);
 };
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmp f,  char* buf_tmp,  Args... args){
+    char* const buf_old = BUF;
+    ITR = buf_tmp;
+    asciify(args...);
+    ITR = BUF = buf_old;
+};
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t*& count,  Args... args){
+    char* const buf_old = BUF;
+    ITR = buf_tmp;
+    asciify(args...);
+    *count = (uintptr_t)ITR - (uintptr_t)buf_tmp;
+    ITR = BUF = buf_old;
+};
+
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t*& count,  Args... args){
+    char* const buf_old = BUF;
+    ITR = buf_tmp + count;
+    asciify(args...);
+    *count += (uintptr_t)ITR - (uintptr_t)buf_tmp;
+    ITR = BUF = buf_old;
+};
 
 
 

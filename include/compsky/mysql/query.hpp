@@ -134,17 +134,17 @@ namespace _f {
 
 template<typename... Args>
 void exec(Args... args){
-    asciify::asciify(_f::resetindx, args..., '\0');
+    asciify::asciify(_f::resetindx, args...);
   #ifdef DEBUG
     printf("%s\n", asciify::BUF);
   #endif
-    exec_buffer(asciify::BUF);
+    exec_buffer(asciify::BUF, asciify::get_index());
 };
 
 template<typename... Args>
 void query(MYSQL_RES** res,  Args... args){
-    asciify::asciify(_f::resetindx, args..., '\0');
-    query_buffer(res, asciify::BUF);
+    asciify::asciify(_f::resetindx, args...);
+    query_buffer(res, asciify::BUF, asciify::get_index());
 };
 
 
