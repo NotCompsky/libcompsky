@@ -57,7 +57,35 @@ template<typename X>
 void push_back_only_if_vector(std::vector<X>& t,  X x){
     t.push_back(x);
 };
-#include <stdio.h>
+
+template<typename T,  typename X,  typename N>
+void assign_only_if_vector(T t,  N n,  X x){};
+
+template<typename X,  typename N>
+void assign_only_if_vector(std::vector<X>& t,  N n,  X x){
+    t[n] = x;
+};
+
+template<typename T>
+size_t vector_size(T t){
+    return 0;
+};
+
+template<typename X>
+size_t vector_size(std::vector<X> v){
+    return v.size();
+};
+
+template<typename T,  typename N>
+bool is_vector_element_nullptr(T t,  N n){
+    return true;
+};
+
+template<typename X,  typename N>
+bool is_vector_element_nullptr(std::vector<X*> v,  N n){
+    return (v[n] == nullptr);
+};
+
 template<typename A,  typename B,  typename C,  typename D>
 char* convert_named_groups(
     char* src,
@@ -73,7 +101,7 @@ char* convert_named_groups(
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
     char group_name[128];
-    std::vector<bool> group_bracket_depths; // ((:?( -> true, false, true
+    std::vector<bool> group_is_capturing; // ((:?( -> true, false, true
     
     groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
     
@@ -106,11 +134,14 @@ char* convert_named_groups(
             
             groupindx2reason.push_back(indexof(reason_name2id, group_name_allocd));
             push_back_only_if_vector(group_starts, dst);
-            group_bracket_depths.push_back(true);
+            push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
+            group_is_capturing[group_is_capturing.size()-1] = true; // Overwrite the value set when '(' was being processed.
             
             last_chars_were_brckt_qstn_P = false;
             
             ++src; // Skip '>'
+
+            // last_char_was_backslash = false; // necessary?
             
             continue;
         }
@@ -124,13 +155,16 @@ char* convert_named_groups(
                     groupindx2reason.push_back(1); // 1 for Unknown reason matched
                     push_back_only_if_vector(record_contents, true);
                     push_back_only_if_vector(group_starts, dst);
+                    push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
                 }
-                group_bracket_depths.push_back(b);
+                group_is_capturing.push_back(b);
             } else if (*src == ')'){
-                if (group_bracket_depths.back()){
-                    push_back_only_if_vector(group_ends, dst);
+                if (group_is_capturing.back()){
+                    size_t k = vector_size(group_ends);
+                    while(!is_vector_element_nullptr(group_ends, --k)); // Cycle through until encounter a nullptr
+                    assign_only_if_vector(group_ends,  k,  dst);
                 }
-                group_bracket_depths.pop_back();
+                group_is_capturing.pop_back();
             }
         }
         
