@@ -1,3 +1,7 @@
+#ifndef LIBCOMPSKY_ASCIIFY_ASCIIFY_H_HPP
+#define LIBCOMPSKY_ASCIIFY_ASCIIFY_H_HPP
+
+
 #include <inttypes.h> // for u?int[0-9]{1,2}_t
 
 #ifdef ASCIIFY_TIME
@@ -8,7 +12,6 @@
 # include <QString>
 #endif
 
-#include "compsky/asciify/core.hpp"
 #include "compsky/asciify/base.hpp"
 #include "compsky/asciify/flags.hpp"
 #include "compsky/asciify/types.hpp"
@@ -19,6 +22,15 @@ namespace compsky {
 namespace asciify {
 
 
+inline
+void asciify();
+
+/* Getter functions */
+template<typename... Args>
+size_t get_index(Args... args);
+
+template<typename C>
+void append(C c);
 
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
@@ -47,6 +59,8 @@ void asciify(unsigned long t,  Args... args);
 
 template<typename... Args>
 void asciify(const char c,  Args... args);
+// We want uintN_t to be translated into human-readable, but char to be pasted as its literal value
+// Unfortunately, uint8_t and char are usually the same type, so we cannot differentiate between them
 
 template<typename... Args>
 void asciify(const char* s,  Args... args);
@@ -70,10 +84,20 @@ void asciify_integer(T n);
 
 
 /* Initialise Buffer */
+inline
+void reset_index();
+
 template<typename... Args>
-void asciify(flag::ChangeBuffer f,  char* buf,  size_t indx,  Args... args);
+void asciify(flag::ChangeBuffer f,  char* buf,  Args... args);
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmp f,  char* buf_tmp,  Args... args);
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t* count,  Args... args);
+
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t* count,  Args... args);
 
 
 
@@ -175,3 +199,6 @@ void asciify(flag::to::AlphaNumeric f,  Int n,  Args... args);
 
 }
 } // END: namespace compsky::asciify
+
+
+#endif

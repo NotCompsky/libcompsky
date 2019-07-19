@@ -1,5 +1,5 @@
-#ifndef __COMPSKY_MYMYSQL__
-#define __COMPSKY_MYMYSQL__
+#ifndef LIBCOMPSKY_MYSQL_MYSQL_HPP
+#define LIBCOMPSKY_MYSQL_MYSQL_HPP
 
 #include "compsky/mysql/mysql.h" // for mysql.h
 

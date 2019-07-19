@@ -5,16 +5,31 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 # BEGIN: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    add_library(compsky_asciify STATIC "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+    add_library(compsky_asciify STATIC "${SRC_DIR}/types.cpp" "${SRC_DIR}/base.cpp")
     target_compile_definitions(compsky_asciify PRIVATE COMPILING_STATIC_LIB)
 else()
-    add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/core.cpp" "${SRC_DIR}/base.cpp")
+    add_library(compsky_asciify SHARED "${SRC_DIR}/types.cpp" "${SRC_DIR}/base.cpp")
 endif()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-set_target_properties(compsky_asciify PROPERTIES PUBLIC_HEADER "${INC_DIR}/compsky/asciify/utils.hpp;${INC_DIR}/compsky/asciify/types.hpp;${INC_DIR}/compsky/asciify/flags.hpp;${INC_DIR}/compsky/asciify/core.hpp;${INC_DIR}/compsky/asciify/base.hpp;${INC_DIR}/compsky/asciify/asciify.hpp;${INC_DIR}/compsky/asciify/print.hpp")
+set(headers
+	"${INC_DIR}/compsky/asciify/utils.hpp"
+	"${INC_DIR}/compsky/asciify/types.hpp"
+	"${INC_DIR}/compsky/asciify/flags.hpp"
+	"${INC_DIR}/compsky/asciify/base.hpp"
+	"${INC_DIR}/compsky/asciify/asciify_h.hpp"
+	"${INC_DIR}/compsky/asciify/asciify.hpp"
+	"${INC_DIR}/compsky/asciify/print.hpp"
+	"${INC_DIR}/compsky/asciify/time_h.hpp"
+	"${INC_DIR}/compsky/asciify/time.hpp"
+	"${INC_DIR}/compsky/asciify/concat_h.hpp"
+	"${INC_DIR}/compsky/asciify/concat.hpp"
+)
+set_target_properties(compsky_asciify
+	PROPERTIES PUBLIC_HEADER "${headers}"
+)
 
 set_property(TARGET compsky_asciify PROPERTY CXX_STANDARD 17)
 
@@ -32,14 +47,10 @@ install(
     TARGETS compsky_asciify
     # Adds the asciify library to the "export-set"
     EXPORT CompskyTargets
-    RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-        COMPONENT bin
-    LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT shlib
-    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT slib
-    PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/asciify"
-        COMPONENT dev
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        COMPONENT asciify
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/asciify"
+        COMPONENT asciify-dev
 )
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
@@ -50,13 +61,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         install(
             # For Windows - install the lib files
             FILES "${CMAKE_BINARY_DIR}/asciify/Release/compsky_asciify.lib"
-            DESTINATION "${INSTALL_LIB_DIR}"
+	    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
     else()
         install(
             # For Windows - install the lib files
             FILES "${CMAKE_BINARY_DIR}/asciify/libcompsky_asciify.dll.a"
-            DESTINATION "${INSTALL_LIB_DIR}"
+	    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
     endif()
 endif()

@@ -1,5 +1,5 @@
-#ifndef __COMPSKY__ASCIIFY__
-#define __COMPSKY__ASCIIFY__
+#ifndef LIBCOMPSKY_ASCIIFY_ASCIIFY_HPP
+#define LIBCOMPSKY_ASCIIFY_ASCIIFY_HPP
 
 #include "compsky/asciify/asciify_h.hpp"
 
@@ -20,6 +20,20 @@
 namespace compsky {
 namespace asciify {
 
+
+inline
+void asciify(){};
+
+/* Getter functions */
+template<typename... Args>
+size_t get_index(Args... args){
+    return (uintptr_t)ITR - (uintptr_t)BUF;
+};
+
+template<typename C>
+void append(C c){
+    *(ITR++) = c;
+};
 
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
@@ -72,18 +86,19 @@ void asciify(unsigned long t,  Args... args){
 
 template<typename... Args>
 void asciify(const char c,  Args... args){
-    asciify(c);
+    *(ITR++) = c;
     return asciify(args...);
 };
 
 template<typename... Args>
-void asciify(const char* s,  Args... args){
-    asciify(s);
+void asciify(const char* __restrict s,  Args... args){
+    memcpy(ITR, s, strlen(s));
+    ITR += strlen(s);
     return asciify(args...);
 };
 
 template<typename... Args>
-void asciify(const char** ss,  const int n,  Args... args){
+void asciify(const char** __restrict ss,  const int n,  Args... args){
     for (auto i = 0;  i < n;  ++i)
         asciify(ss[i]);
     return asciify(args...);
@@ -127,9 +142,9 @@ void asciify(T t,  Args... args){
 
 
 template<typename... Args>
-void asciify(flag::StrLen f,  const char* s,  const size_t sz,  Args... args){
-    memcpy(BUF + BUF_INDX,  s,  sz);
-    BUF_INDX += sz;
+void asciify(flag::StrLen f,  const char* __restrict s,  const size_t sz,  Args... args){
+    memcpy(ITR,  s,  sz);
+    ITR += sz;
     asciify(args...);
 };
 
@@ -139,24 +154,52 @@ template<typename T>
 void asciify_integer(T n){
     auto n_digits = count_digits(n);
     auto i = n_digits;
-    BUF_INDX += i;
+    ITR += i;
     do {
-        BUF[--BUF_INDX] = '0' + (n % 10);
+        *(--ITR) = '0' + (n % 10);
         n /= 10;
     } while (n != 0);
-    BUF_INDX += n_digits;
+    ITR += n_digits;
 };
 
 
 /* Initialise Buffer */
+inline
+void reset_index(){
+    ITR = BUF;
+}
+
 template<typename... Args>
-void asciify(flag::ChangeBuffer f,  char* buf,  size_t indx,  Args... args){
-    BUF = buf;
-    BUF_INDX = indx;
+void asciify(flag::ChangeBuffer f,  char* buf,  Args... args){
+    ITR = BUF = buf;
     asciify(args...);
 };
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmp f,  char* buf_tmp,  Args... args){
+    char* const buf_old = BUF;
+    ITR = buf_tmp;
+    asciify(args...);
+    ITR = BUF = buf_old;
+};
 
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t* count,  Args... args){
+    char* const buf_old = BUF;
+    ITR = buf_tmp;
+    asciify(args...);
+    *count = (uintptr_t)ITR - (uintptr_t)buf_tmp;
+    ITR = BUF = buf_old;
+};
+
+template<typename... Args>
+void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t* count,  Args... args){
+    char* const buf_old = BUF;
+    ITR = buf_tmp + *count;
+    asciify(args...);
+    *count += (uintptr_t)ITR - (uintptr_t)buf_tmp;
+    ITR = BUF = buf_old;
+};
 
 
 
@@ -164,7 +207,7 @@ template<typename T,  typename... Args>
 void asciify(flag::FillWithLeadingZeros f,  const int min_digits,  T n,  Args... args){
     int n_digits = count_digits(n);
     for (auto i = n_digits;  i < min_digits;  ++i)
-        BUF[BUF_INDX++] = '0';
+        *(ITR++) = '0';
     asciify(n, args...);
 };
 
@@ -228,11 +271,11 @@ void asciify(flag::guarantee::BetweenZeroAndOneExclusive f,  double d,  T precis
 };
 
 template<typename... Args>
-void asciify(flag::Escape f,  const char c,  const char* s,  Args... args){
+void asciify(flag::Escape f,  const char c,  const char* __restrict s,  Args... args){
     while(*s != 0){
         if (unlikely(*s == c  ||  *s == '\\'))
-            BUF[BUF_INDX++] = '\\';
-        BUF[BUF_INDX++] = *s;
+            *(ITR++) = '\\';
+        *(ITR++) = *s;
         ++s;
     }
     asciify(args...);
@@ -249,17 +292,17 @@ void asciify(flag::Escape f,  const char c,  const QString& qs,  Args... args){
 
 template<typename... Args>
 void asciify(void* ptr,  Args... args){
-    BUF[BUF_INDX++] = '0';
-    BUF[BUF_INDX++] = 'x';
+    *(ITR++) = '0';
+    *(ITR++) = 'x';
     uintptr_t n = (uintptr_t)ptr;
     auto n_digits = count_digits(n);
-    for (auto buf_indx = BUF_INDX + n_digits;  buf_indx != BUF_INDX;  ){
+    for (char* itr = ITR + n_digits;  itr != ITR;  ){
         const uint8_t m = (n % 16);
         const char c  =  (m < 10)  ?  '0' + m  :  'a' + m - 10;
-        BUF[--buf_indx] = c;
+        *(--itr) = c;
         n /= 16;
     }
-    BUF_INDX += n_digits;
+    ITR += n_digits;
     asciify(args...);
 };
 
@@ -268,7 +311,7 @@ void asciify(void* ptr,  Args... args){
 
 /* Concatenation */
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  T t,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  T t,  Args... args){
     asciify(t);
     constexpr static const flag::StrLen g;
     asciify(g, s, sz);
@@ -276,14 +319,14 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  T t,  Args..
 };
 
 template<typename... Args>
-void asciify(flag::concat::Start e,  const char* s,  const int sz,  flag::concat::End f,  Args... args){
+void asciify(flag::concat::Start e,  const char* __restrict s,  const int sz,  flag::concat::End f,  Args... args){
     // Overrides previous (more general) template
-    BUF_INDX -= sz;
+    ITR -= sz;
     asciify(args...);
 };
 
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  const char** ss,  T n,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  const char** __restrict ss,  T n,  Args... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ss[i]);
@@ -294,7 +337,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  const char**
 
 #ifdef USE_VECTOR
 template<typename SZ,  typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ss[i]);
@@ -306,7 +349,7 @@ void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<c
 
 template<typename... Args>
 void asciify(flag::concat::Start e,  const char c,  flag::concat::End f,  Args... args){
-    --BUF_INDX;
+    --ITR;
     asciify(args...);
 };
 
@@ -335,7 +378,7 @@ void asciify(flag::concat::Start f,  const char c,  flag::guarantee::BetweenZero
 
 /* Concatenation with other flag types */
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  T t,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  flag::prefix::Start g,  const char* __restrict ps,  const size_t psz,  T t,  Args... args){
     asciify(g, ps, psz, t);
     constexpr static const flag::StrLen strlen;
     asciify(strlen, s, sz);
@@ -343,7 +386,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix
 };
 
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  const char** ss,  T t,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  flag::prefix::Start g,  const char* __restrict ps,  const size_t psz,  const char** __restrict ss,  T t,  Args... args){
     constexpr static const flag::StrLen strlen;
     for (auto i = 0;  i < t;  ++i){
         asciify(g, ps, psz, ss[i]);
@@ -353,7 +396,7 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix
 };
 
 template<typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  flag::prefix::Start h,  Args... args){
+void asciify(flag::concat::Start f,  const char* __restrict s,  const int sz,  flag::prefix::Start g,  const char* __restrict ps,  const size_t psz,  flag::prefix::Start h,  Args... args){
     asciify(f, s, sz, args...);
 };
 
@@ -361,13 +404,13 @@ void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix
 
 /* Prefixes */
 template<typename... Args>
-void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const char* ss,  Args... args){
+void asciify(flag::prefix::Start f,  const char* __restrict s,  const size_t sz,  const char* __restrict ss,  Args... args){
     asciify(f, s, sz, ss);
     asciify(f, s, sz, args...);
 };
 
 template<typename T,  typename... Args>
-void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const char** ss,  T n,  Args... args){
+void asciify(flag::prefix::Start f,  const char* __restrict s,  const size_t sz,  const char** __restrict ss,  T n,  Args... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(g, s, sz);
@@ -377,7 +420,7 @@ void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const cha
 };
 
 template<typename... Args>
-void asciify(flag::prefix::Start e,  const char* s,  const size_t sz,  flag::prefix::End f,  Args... args){
+void asciify(flag::prefix::Start e,  const char* __restrict s,  const size_t sz,  flag::prefix::End f,  Args... args){
     asciify(args...);
 };
 
@@ -396,13 +439,15 @@ void asciify(flag::to::AlphaNumeric f,  Int n,  Args... args){
         m /= 36;
     } while (m != 0);
     
-    size_t buf_indx = BUF_INDX + n_digits;
+    ITR += n_digits;
     
     do {
         const char digit = n % 36;
-        BUF[--buf_indx] = digit + ((digit<10) ? '0' : 'a' - 10);
+        *(--ITR) = digit + ((digit<10) ? '0' : 'a' - 10);
         n /= 36;
     } while (n != 0);
+    
+    ITR += n_digits;
     
     asciify(args...);
 };

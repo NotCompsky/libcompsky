@@ -1,5 +1,5 @@
-#ifndef __ASCIIFY_FLAGS__
-#define __ASCIIFY_FLAGS__
+#ifndef LIBCOMPSKY_ASCIIFY_FLAGS_HPP
+#define LIBCOMPSKY_ASCIIFY_FLAGS_HPP
 
 namespace compsky {
 namespace asciify {
@@ -13,10 +13,14 @@ namespace flag {
         struct End{};
     }
     struct ChangeBuffer{};
+    struct ChangeBufferTmp{};
+    struct ChangeBufferTmpCount{};
+    struct ChangeBufferTmpCountFrom{};
     struct Escape{};
     struct StrLen{};
     struct FillWithLeadingZeros{};
     struct UpToFirstZero{};
+    struct LiteralChar{};
     namespace ensure {
         struct BetweenZeroAndOneInclusive{};
         struct BetweenZeroAndOneExclusive{};

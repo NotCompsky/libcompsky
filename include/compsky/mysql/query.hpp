@@ -1,12 +1,11 @@
-#ifndef __MYMYSQL_RESULTS__
-#define __MYMYSQL_RESULTS__
+#ifndef LIBCOMPSKY_MYSQL_QUERY_HPP
+#define LIBCOMPSKY_MYSQL_QUERY_HPP
 
 #include <cstddef> // for size_t
 #include <stdint.h> // for uintN_t
 #include <string.h> // for strlen
 
 #include <compsky/asciify/asciify.hpp> // for asciify::*
-#include <compsky/asciify/core.hpp> // for compsky::asciify::BUF_INDX
 #include <compsky/asciify/flags.hpp> // for compsky::asciify::flag::*
 
 #include <compsky/mysql/mysql.hpp>
@@ -134,19 +133,19 @@ namespace mysql {
 
 template<typename... Args>
 void exec(Args... args){
-    constexpr static const asciify::flag::ChangeBuffer change_buffer;
-    asciify::asciify(change_buffer, asciify::BUF, 0, args...);
+    asciify::reset_index();
+    asciify::asciify(args...);
   #ifdef DEBUG
     printf("%s\n", asciify::BUF);
   #endif
-    exec_buffer(asciify::BUF, asciify::BUF_INDX);
+    exec_buffer(asciify::BUF, asciify::get_index());
 };
 
 template<typename... Args>
 void query(MYSQL_RES** res,  Args... args){
-    constexpr static const asciify::flag::ChangeBuffer change_buffer;
-    asciify::asciify(change_buffer, asciify::BUF, 0, args...);
-    query_buffer(res, asciify::BUF, asciify::BUF_INDX);
+    asciify::reset_index();
+    asciify::asciify(args...);
+    query_buffer(res, asciify::BUF, asciify::get_index());
 };
 
 

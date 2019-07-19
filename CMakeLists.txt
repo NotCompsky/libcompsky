@@ -3,9 +3,12 @@ cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR) # CONTRIBUTIONS WELCOME: Test
 project(Compsky CXX) # Important that it is set before find_package is called
 
 set(COMPSKY_MAJOR_VERSION 0)
-set(COMPSKY_MINOR_VERSION 1)
+set(COMPSKY_MINOR_VERSION 2)
 set(COMPSKY_PATCH_VERSION 0)
 set(COMPSKY_VERSION ${COMPSKY_MAJOR_VERSION}.${COMPSKY_MINOR_VERSION}.${COMPSKY_PATCH_VERSION})
+
+
+include(GNUInstallDirs)
 
 
 # Ensure symbols are exported for Windows Visual Studio. The alternative is to write the generate export headers commands in the CMakeLists files and import the `<NAME>_export.h`s in all source files.
@@ -22,68 +25,50 @@ set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories("${INC_DIR}")
 
-
-
-if (NOT WHICH_MYSQL_CLIENT)
-    find_library(WHICH_MYSQL_CLIENT mariadbclient)
-endif()
-if (NOT WHICH_MYSQL_CLIENT)
-    find_library(WHICH_MYSQL_CLIENT mysqlclient)
-endif()
-if (WHICH_MYSQL_CLIENT)
-    message(STATUS "WHICH_MYSQL_CLIENT: ${WHICH_MYSQL_CLIENT}")
-else()
-    message(FATAL_ERROR "Please specify the libmysqlclient equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu, you would specify -DWHICH_MYSQL_CLIENT=mysqlclient; for debian, -DWHICH_MYSQL_CLIENT=mariadbclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g'")
-endif()
-
-if (NOT WHICH_MYSQL_CLIENT_DEPENDS)
-    message(FATAL_ERROR "Please specify the libmysqlclient equivalent's package name with -DWHICH_MYSQL_CLIENT_DEPENDS=...\nFor instance, for Ubuntu, you would specify -DWHICH_MYSQL_CLIENT_DEPENDS=libmysqlclient20; for debian, -DWHICH_MYSQL_CLIENT_DEPENDS=libmariadbclient18\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | egrep 'lib(mysql|mariadb)client' | grep -v -- -dev")
-endif()
-
-
-
-# BEGIN src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
-
-# Offer the user the choice of overriding the installation directories
-set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
-set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
-set(INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header files")
-if(WIN32 AND NOT CYGWIN)
-  set(DEF_INSTALL_CMAKE_DIR CMake)
-else()
-  set(DEF_INSTALL_CMAKE_DIR lib/CMake/Compsky)
-endif()
-set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
-
-# Make relative paths absolute (needed later on)
-foreach(p LIB BIN INCLUDE CMAKE)
-  set(var INSTALL_${p}_DIR)
-  if(NOT IS_ABSOLUTE "${${var}}")
-    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-  endif()
-endforeach()
-
-# set up include-directories
-include_directories("${PROJECT_SOURCE_DIR}")
-
-# Add sub-directories
 add_subdirectory(asciify)
 add_subdirectory(security)
 add_subdirectory(mysql)
 add_subdirectory(regex)
 if(BUILD_PACKAGES)
+    set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+    SET(CPACK_RPM_COMPONENT_INSTALL     ON)
+    SET(CPACK_DEB_COMPONENT_INSTALL     ON)
+    set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+
+
+    if("${BUILD_PACKAGES}" STREQUAL "1")
+        set(CPACK_COMPONENTS_ALL asciify asciify-dev mysql mysql-dev regex-dev security security-dev)
+        message(STATUS "Note: You can specify the packages to build with -DBUILD_PACKAGES=<package_name>")
+    else()
+        set(CPACK_COMPONENTS_ALL ${BUILD_PACKAGES})
+    endif()
+
+
+    set(CPACK_COMPONENT_ASCIIFY_DESCRIPTION
+        "C++ library for rapid stringification prioritising speed above all")
+    set(CPACK_COMPONENT_ASCIIFY_DEV_DESCRIPTION
+        "C++ header files")
+    set(CPACK_COMPONENT_MYSQL_DESCRIPTION
+        "C++ library for interacting with MySQL/MariaDB prioritising speed and usability")
+    set(CPACK_COMPONENT_MYSQL_DEV_DESCRIPTION
+        "C++ header files")
+    set(CPACK_COMPONENT_REGEX_DEV_DESCRIPTION
+        "C++ library for pre-processing regex, in particular assigning named groups in a flexible manner")
+    set(CPACK_COMPONENT_SECURITY_DESCRIPTION
+        "C++ library with secure memset")
+    set(CPACK_COMPONENT_SECURITY_DEV_DESCRIPTION
+        "C++ header files")
+
+    set(Boost_USE_STATIC_LIBS ON) # Different repos have different libboost-regex versions that different repositories include, just easier to avoid this dependency for packages.
+    set(CPACK_DEBIAN_MYSQL_PACKAGE_DEPENDS "compsky-asciify (= ${COMPSKY_VERSION}), compsky-security (= ${COMPSKY_VERSION})")
+    set(CPACK_DEBIAN_MYSQL_DEV_PACKAGE_DEPENDS "compsky-asciify-dev (= ${COMPSKY_VERSION}), compsky-security-dev (= ${COMPSKY_VERSION})")
+
     add_subdirectory(packaging)
 endif()
 
-# Add all targets to the build-tree export set
 export(TARGETS compsky_asciify compsky_security compsky_mysql FILE "${PROJECT_BINARY_DIR}/CompskyTargets.cmake")
 
-# Registers the build-tree with a global CMake-registry
 export(PACKAGE Compsky)
-
-
-# Create the CompskyConfig.cmake and CompskyConfigVersion files
-file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${INSTALL_INCLUDE_DIR}")
 
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
@@ -94,16 +79,13 @@ configure_file(CompskyConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECT
 # ... for both
 configure_file(CompskyConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/CompskyConfigVersion.cmake" @ONLY)
 
-# Install the CompskyConfig.cmake and CompskyConfigVersion.cmake
 install(
-    FILES
-    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CompskyConfig.cmake"
-    "${PROJECT_BINARY_DIR}/CompskyConfigVersion.cmake"
-    DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev
+	FILES
+		"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CompskyConfig.cmake"
+		"${PROJECT_BINARY_DIR}/CompskyConfigVersion.cmake"
+	DESTINATION "${CMAKE_INSTALL_LIBDIR}/Compsky/"
+	COMPONENT dev
 )
 
-# Install the export set for use with the install-tree
-install(EXPORT CompskyTargets DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-# END src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
+install(EXPORT CompskyTargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/Compsky/" COMPONENT dev)
 

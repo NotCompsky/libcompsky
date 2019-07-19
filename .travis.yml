@@ -1,0 +1,25 @@
+language: c++
+
+matrix:
+  include:
+    - os: linux
+      dist: bionic
+      compiler: clang
+      env: BADGE=linux # To allow OS-wise badges - see https://github.com/travis-ci/travis-ci/issues/9579
+#    - os: linux
+#      dist: bionic
+#      compiler: gcc
+    - os: osx
+      compiler: clang
+      env: BADGE=osx
+
+before_install:
+  - if [ $TRAVIS_OS_NAME == linux ]; then  sudo apt update  &&  sudo apt install -y mariadb-client default-libmysqlclient-dev qt5-default libqt5widgets5;  fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then  brew update --force;  fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then  brew install mariadb qt5;  fi
+
+script:
+  - mkdir build  &&  cd build  &&  cmake .. -DBUILD_PACKAGES=1 -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=$(dpkg --print-architecture)  &&  sudo make package
+
+after_success:
+  - echo "Success"

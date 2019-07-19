@@ -17,14 +17,10 @@ install(
     TARGETS compsky_security
     # Adds the security library to the "export-set"
     EXPORT CompskyTargets
-    RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-        COMPONENT bin
-    LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT shlib
-    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-        COMPONENT slib
-    PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/compsky/security"
-        COMPONENT dev
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        COMPONENT security
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/security"
+        COMPONENT security-dev
 )
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
@@ -35,13 +31,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         install(
             # For Windows - install the lib files
             FILES "${CMAKE_BINARY_DIR}/security/Release/compsky_security.lib"
-            DESTINATION "${INSTALL_BIN_DIR}"
+	    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
     else()
         install(
             # For Windows - install the lib files
             FILES "${CMAKE_BINARY_DIR}/security/libcompsky_security.dll.a"
-            DESTINATION "${INSTALL_LIB_DIR}"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
     endif()
 endif()

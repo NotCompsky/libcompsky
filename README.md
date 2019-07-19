@@ -1,10 +1,17 @@
-# Description
+Platform | CI Status
+---------|----------
+OSX      | [![OSX Build Status](http://badges.herokuapp.com/travis/NotCompsky/libcompsky?env=BADGE=osx&label=build&branch=master)](https://travis-ci.org/NotCompsky/libcompsky)
+Linux    | [![Linux Build Status](http://badges.herokuapp.com/travis/NotCompsky/libcompsky?env=BADGE=linux&label=build&branch=master)](https://travis-ci.org/NotCompsky/libcompsky) [![CircleCI](https://circleci.com/gh/NotCompsky/libcompsky.svg?style=shield)](https://circleci.com/gh/NotCompsky/libcompsky)
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/66dc520c5a27425c8e131f8d9b76b385)](https://www.codacy.com/app/NotCompsky/libcompsky?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=NotCompsky/libcompsky&amp;utm_campaign=Badge_Grade)
+
+## Description
 
 This package is just a collection of a few bits and bobs used in various projects of mine.
 
-# Installing
+## Installing
 
-## Ubuntu and other Debian-derived systems
+### Ubuntu and other Debian-derived systems
 
     regexp="https://github\.com/NotCompsky/libcompsky/releases/download/[0-9]\.[0-9]\.[0-9]/libcompsky-[0-9]+\.[0-9]+\.[0-9]+-$(dpkg --print-architecture)\.deb"
     url=$(curl -s https://api.github.com/repos/NotCompsky/libcompsky/releases/latest  |  egrep "$regexp" | sed 's%.*"\(https://.*\)"%\1%g')
@@ -15,21 +22,21 @@ Users of other Debian-based distributions may have to modify the dependency pack
 
 If installation still fails for some reason, see [installing on Ubuntu](INSTALLING_UBUNTU.md) (and also make a bug report).
 
-## Other
+### Other
 
 You should compile from source. But if there's enough interest, I'll distribute Windows installers too.
 
-# mysql
+## mysql
 
 This is the main feature of the library. It is a wrapper around `libmysqlclient` that - in my opinion - has a far simpler syntax. And presumably far fewer features, although of course you still have access to the underlying `libmysqlclient` functions.
 
 It uses `asciify` (another part of this project) to format the strings sent to the MySQL server.
 
-## Dependencies
+### Dependencies
 
-* libmysqlclient
+*   libmysqlclient
 
-## Usage Examples
+### Usage Examples
 
     #include <compsky/mysql/query.hpp>
     
@@ -64,35 +71,35 @@ For convenience, `compsky_mysql_create_config` provides a way to make very simpl
 
 Here `init.sql` is a file next to the source file that only contains the SQL commands to create tables, in a raw string.
 
-# asciify
+## asciify
 
-## Benchmarks
+### Benchmarks
 
 Using [libfmt's benchmark](https://github.com/fmtlib/format-benchmark) patched to include `compsky::asciify`, I get the following results on my machine (Intel Ubuntu 18.04):
 
-| real | user | sys |
-| - | - | - |
-| printf | 1.07 | 1.06 |
-| iostreams | 1.76 | 1.76 |
-| format | 1.01 | 1.01 |
-| fmt::prepare | 0.93 | 0.86 |
-| tinyformat | 2.17 | 2.16 |
-| boost | 6.19 | 6.18 |
+| real             | user | sys  |
+| -                | -    | -    |
+| printf           | 1.07 | 1.06 |
+| iostreams        | 1.76 | 1.76 |
+| format           | 1.01 | 1.01 |
+| fmt::prepare     | 0.93 | 0.86 |
+| tinyformat       | 2.17 | 2.16 |
+| boost            | 6.19 | 6.18 |
 | compsky::asciify | 0.32 | 0.31 |
-| folly | N/A | N/A |
-| stb_sprintf | 0.68 | 0.68 |
+| folly            | N/A  | N/A  |
+| stb_sprintf      | 0.68 | 0.68 |
 
 This benchmark is just to satisfy curiosity. I don't think `compsky::asciify` is particularly useful to anyone - if you look at the output, you can see that the floats are not printed exactly, with `1.2339999999` instead of `1.2340000000` and (more worryingly) `3.12` instead of `+3.13`. Perhaps this is something that can be fixed, but I would expect many other flaws exist, and suggest that `compsky::asciify` is only useful where both a *nearly* correct answer is acceptable and performance is critical and you have a relatively new compiler (i.e. almost never).
 
 You can test it yourself using [the patch](3rdparty/patches/format-benchmark/0001-Added-compsky-asciify.patch) and applying it in the `format-benchmark` directory with `git am < /PATH/TO/0001-Added-compsky-asciify.patch`).
 
-# security
+## security
 
 Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that he released into the Public Domain. It is used to wipe `mysql` authentification details when `compsky::mysql::exit()` is called.
 
-# Building
+## Building
 
-## Unix
+### Unix
 
     git clone https://github.com/NotCompsky/libcompsky
     cd libcompsky
@@ -101,9 +108,9 @@ Contains the `memzero_secure` function based on the work of `Zhaomo Yang` that h
     cmake ..
     sudo cmake install
 
-## Windows
+### Windows
 
-### Cross Compiling from Linux
+#### Cross Compiling from Linux
 
 You must use MXE, as the standard MinGW tools on Ubuntu do not include things such as libmysqlclient. If you haven't installed it already, allocate an hour or so (and ~3GB) for it to download and build all dependencies.
 
