@@ -101,7 +101,7 @@ char* convert_named_groups(
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
     char group_name[128];
-    std::vector<bool> group_is_capturing; // ((:?( -> true, false, true
+    std::vector<const char> group_is_capturing; // ((:?( -> true, false, true // true is represented by 0, false by any other value
     
     groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
     
@@ -135,7 +135,7 @@ char* convert_named_groups(
             groupindx2reason.push_back(indexof(reason_name2id, group_name_allocd));
             push_back_only_if_vector(group_starts, dst);
             push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
-            group_is_capturing[group_is_capturing.size()-1] = true; // Overwrite the value set when '(' was being processed.
+            group_is_capturing[group_is_capturing.size()-1] = 0; // Overwrite the value set when '(' was being processed.
             
             last_chars_were_brckt_qstn_P = false;
             
@@ -150,8 +150,8 @@ char* convert_named_groups(
         
         if (!last_char_was_backslash){
             if (*src == '('){
-                const bool b = (*(src+1) != '?');
-                if (b){
+                const char b = (*(src+1) - '?');
+                if (b == 0){
                     groupindx2reason.push_back(1); // 1 for Unknown reason matched
                     push_back_only_if_vector(record_contents, true);
                     push_back_only_if_vector(group_starts, dst);
@@ -159,7 +159,7 @@ char* convert_named_groups(
                 }
                 group_is_capturing.push_back(b);
             } else if (*src == ')'){
-                if (group_is_capturing.back()){
+                if (group_is_capturing.back() == 0){
                     size_t k = vector_size(group_ends);
                     while(!is_vector_element_nullptr(group_ends, --k)); // Cycle through until encounter a nullptr
                     assign_only_if_vector(group_ends,  k,  dst);
