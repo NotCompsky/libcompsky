@@ -101,7 +101,7 @@ char* convert_named_groups(
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
     char group_name[128];
-    std::vector<const char> group_is_capturing; // ((:?( -> true, false, true // true is represented by 0, false by any other value
+    std::vector<char> group_is_capturing; // ((:?( -> true, false, true // true is represented by 0, false by any other value
     
     groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
     
