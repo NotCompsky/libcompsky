@@ -16,26 +16,24 @@ Multiple groups can share the same name. Group names can include any character e
 namespace compsky {
 namespace regex {
 
-struct CharPaar {
-    char* const  str;
-    const size_t len;
-    CharPaar(char* const s,  const size_t l) : str(s), len(l) {};
-};
-
-inline
-auto indexof(std::vector<CharPaar>& ls,  char* const str,  const size_t len){
+template<typename A>
+auto indexof(std::vector<A>& ls,  A x){
     auto i = 0;
     while(i < ls.size()){
-        const CharPaar x = ls[i];
-        for (auto j = 0;  j < len  &&  j < x.len;  ++j)
-            if (x.str[j] != str[j])
+        A itr = ls[i];
+        A y = x;
+        while(*itr != 0){
+            if (*itr != *y)
                 goto break_twice;
+            ++y;
+            ++itr;
+        }
         return i;
         
         break_twice:
         ++i;
     }
-    ls.emplace_back(str, len);
+    ls.push_back(x);
     return i;
 };
 
@@ -92,7 +90,7 @@ template<typename A,  typename B,  typename C,  typename D>
 char* convert_named_groups(
     char* src,
     char* dst,
-    std::vector<CharPaar>& reason_name2id,
+    std::vector<char*>& reason_name2id,
     std::vector<A>& groupindx2reason,
     B& record_contents,
     C& group_starts,   // = 0 (effectively)
@@ -102,6 +100,7 @@ char* convert_named_groups(
     bool last_chars_were_brckt_qstn = false;
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
+    char group_name[128];
     std::vector<char> group_is_capturing; // ((:?( -> true, false, true // true is represented by 0, false by any other value
     
     groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
@@ -116,14 +115,24 @@ char* convert_named_groups(
             
             dst -= 2; // strlen("?P")
             
-            char* const group_name = src + 1;
+            char* itr = group_name;
             while(*(++src) != '>'){
                 if (*src == '\\')
                     ++src;
+                *(itr++) = *src;
             }
-            const size_t len = (uintptr_t)src - (uintptr_t)group_name;
+            *itr = 0;
             
-            groupindx2reason.push_back(indexof(reason_name2id, group_name, len));
+            const size_t len = (size_t)itr - (size_t)group_name;
+            
+            void* dummy = malloc(len + 1);
+            if (dummy == nullptr)
+                exit(900);
+            
+            char* group_name_allocd = (char*)dummy;
+            memcpy(group_name_allocd,  group_name,  len + 1); // Include terminating \0
+            
+            groupindx2reason.push_back(indexof(reason_name2id, group_name_allocd));
             push_back_only_if_vector(group_starts, dst);
             push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
             group_is_capturing[group_is_capturing.size()-1] = 0; // Overwrite the value set when '(' was being processed.
@@ -171,14 +180,14 @@ char* convert_named_groups(
 };
 
 template<typename A>
-char* convert_named_groups(char* src,  char* dst,  std::vector<CharPaar>& reason_name2id,  std::vector<A>& groupindx2reason,  std::vector<bool>& record_contents){
+char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason,  std::vector<bool>& record_contents){
     constexpr static const char dummy1 = 0;
     constexpr static const char dummy2 = 0;
     return convert_named_groups(src, dst, reason_name2id, groupindx2reason, record_contents, dummy1, dummy2);
 };
 
 template<typename A>
-char* convert_named_groups(char* src,  char* dst,  std::vector<CharPaar>& reason_name2id,  std::vector<A>& groupindx2reason){
+char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason){
     constexpr static const char dummy1 = 0;
     constexpr static const char dummy2 = 0;
     constexpr static const char dummy3 = 0;
