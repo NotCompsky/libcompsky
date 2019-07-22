@@ -90,48 +90,48 @@ bool is_vector_element_nullptr(std::vector<X*> v,  N n){
 };
 
 inline
-write_char(char* dst,  const char c){
+void write_char(char* dst,  const char c){
     *dst = c;
 }
 
 inline
-write_char(const char* dst,  const char c){}
+void write_char(const size_t dst,  const char c){}
 
-template<typename A,  typename B,  typename C>
+template<typename A,  typename B,  typename C,  typename G>
 char* get_trailing_data_storage(
     char* src,
     char* dst,
     C reason_name2id,
     A groupindx2reason,
     B& record_contents,
-    C& group_starts,   // = 0 (effectively)
-    C& group_ends      // = 0 (effectively)
+    G& group_starts,   // = 0 (effectively)
+    G& group_ends      // = 0 (effectively)
 ){
-    return convert_named_groups(src, const_cast<const char*>(dst), reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
+    return dst + convert_named_groups(src, (size_t)0, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
 };
 
-template<typename A,  typename B,  typename C>
-const char* get_trailing_data_storage(
+template<typename A,  typename B,  typename C,  typename G>
+size_t get_trailing_data_storage(
     char* src,
-    const char* dst,
-    C reason_name2id,
-    A groupindx2reason,
+    size_t dst,
+    C& reason_name2id,
+    A& groupindx2reason,
     B& record_contents,
-    C& group_starts,   // = 0 (effectively)
-    C& group_ends      // = 0 (effectively)
+    G& group_starts,   // = 0 (effectively)
+    G& group_ends      // = 0 (effectively)
 ){
-    return nullptr;
+    return 0;
 };
 
-template<typename A,  typename B,  typename C,  typename D>
+template<typename A,  typename B,  typename C,  typename D,  typename G>
 D convert_named_groups(
     char* src,
     D dst,             // either char* or const char*
-    C reason_name2id,
-    A groupindx2reason,
+    C& reason_name2id,
+    A& groupindx2reason,
     B& record_contents,
-    C& group_starts,   // = 0 (effectively)
-    C& group_ends      // = 0 (effectively)
+    G& group_starts,   // = 0 (effectively)
+    G& group_ends      // = 0 (effectively)
 ){
     bool last_char_was_bracket = false;
     bool last_chars_were_brckt_qstn = false;
@@ -216,17 +216,8 @@ D convert_named_groups(
 
 template<typename A>
 char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason,  std::vector<bool>& record_contents){
-    constexpr static const char dummy1 = 0;
-    constexpr static const char dummy2 = 0;
-    return convert_named_groups(src, dst, reason_name2id, groupindx2reason, record_contents, dummy1, dummy2);
-};
-
-template<typename A>
-char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason){
-    constexpr static const char dummy1 = 0;
-    constexpr static const char dummy2 = 0;
-    constexpr static const char dummy3 = 0;
-    return convert_named_groups(src, dst, reason_name2id, groupindx2reason, dummy1, dummy2, dummy3);
+    constexpr static const int dummy = 0;
+    return convert_named_groups(src, dst, reason_name2id, groupindx2reason, record_contents, dummy, dummy);
 };
 
 }
