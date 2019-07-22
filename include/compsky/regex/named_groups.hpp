@@ -101,6 +101,7 @@ template<typename A,  typename B,  typename C,  typename D,  typename G>
 D convert_named_groups(
     char* src,
     D dst,             // either char* or const char*
+    size_t& trailing_data_size,
     C& reason_name2id,
     A& groupindx2reason,
     B& record_contents,
@@ -108,42 +109,18 @@ D convert_named_groups(
     G& group_ends      // = 0 (effectively)
 );
 
-template<typename A,  typename B,  typename C,  typename G>
-size_t get_trailing_data_size(
+inline
+size_t get_final_length_and_trailing_data_size(
     char* src,
     char* dst,
-    C& reason_name2id,
-    A& groupindx2reason,
-    B& record_contents,
-    G& group_starts,   // = 0 (effectively)
-    G& group_ends      // = 0 (effectively)
+    size_t& trailing_data_size
 ){
     constexpr static const int dummy = 0;
-    return convert_named_groups(src, (size_t)0, dummy, dummy, dummy, dummy, dummy);
-};
-
-template<typename A,  typename B,  typename C,  typename G>
-size_t get_trailing_data_size(
-    char* src,
-    size_t dst,
-    C& reason_name2id,
-    A& groupindx2reason,
-    B& record_contents,
-    G& group_starts,   // = 0 (effectively)
-    G& group_ends      // = 0 (effectively)
-){
-    return 0;
+    return convert_named_groups(src, (size_t)0, trailing_data_size, dummy, dummy, dummy, dummy, dummy);
 };
 
 inline
-char* dst_or_trailingdatasize(char* const dst,  const size_t trailing_data_size){
-    return dst;
-}
-
-inline
-size_t dst_or_trailingdatasize(const size_t dst,  const size_t trailing_data_size){
-    return trailing_data_size;
-}
+size_t get_final_length_and_trailing_data_size(char*,  size_t dst, size_t*){ return 0; }
 
 inline
 char* alloc_trailing_data(char* const dst,  const size_t trailing_data_size){
@@ -181,6 +158,7 @@ template<typename A,  typename B,  typename C,  typename D,  typename G>
 D convert_named_groups(
     char* src,
     D dst,             // either char* or const char*
+    size_t& trailing_data_size,
     C& reason_name2id,
     A& groupindx2reason,
     B& record_contents,
@@ -199,8 +177,9 @@ D convert_named_groups(
     push_back_only_if_vector(group_ends);   // Skip first entry
     push_back_only_if_vector(record_contents); // Skip first entry
     
-    size_t trailing_data_size = get_trailing_data_size(src, dst, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
-    D trl = alloc_trailing_data(dst, trailing_data_size);
+    trailing_data_size = 0;
+    D trl_final = get_final_length_and_trailing_data_size(src, dst, trailing_data_size) + 1; // Location of contents in trl, after trl has been memcpy'd to dst
+    D trl = alloc_trailing_data(dst, trailing_data_size); // Location of contents in trl, before it has been memcpy'd
     D trl_orig = trl;
     /*
     Avoid heap allocations by re-using this buffer, by appending to the end of it.
@@ -212,15 +191,17 @@ D convert_named_groups(
             
             dst -= 2; // strlen("?P")
             
-            D const group_name = trl;
+            D const group_name = trl_final;
             
             while(*(++src) != '>'){
                 if (*src == '\\')
                     ++src;
                 write_char(trl++, *src);
+                ++trl_final;
                 ++trailing_data_size;
             }
             write_char(trl++, 0);
+            ++trl_final;
             
             push_back_only_if_vector(groupindx2reason, indexof(reason_name2id, group_name));
             push_back_only_if_vector(group_starts, dst);
@@ -269,13 +250,27 @@ D convert_named_groups(
     }
     memcpy_trailing_data(dst, trl_orig, trailing_data_size);
     free_trailing_data(trl_orig);
-    return dst_or_trailingdatasize(dst, trailing_data_size);
+    return dst;
+};
+
+template<typename A,  typename B,  typename C,  typename D,  typename G>
+D convert_named_groups(
+    char* src,
+    D dst,             // either char* or const char*
+    C& reason_name2id,
+    A& groupindx2reason,
+    B& record_contents,
+    G& group_starts,   // = 0 (effectively)
+    G& group_ends      // = 0 (effectively)
+){
+    constexpr static const size_t dummy = 0;
+    return convert_named_groups(src, dst, dummy, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
 };
 
 template<typename A>
 char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason,  std::vector<bool>& record_contents){
-    constexpr static const int dummy = 0;
-    return convert_named_groups(src, dst, reason_name2id, groupindx2reason, record_contents, dummy, dummy);
+    constexpr static const size_t dummy = 0;
+    return convert_named_groups(src, dst, dummy, reason_name2id, groupindx2reason, record_contents, dummy, dummy);
 };
 
 }
