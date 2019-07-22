@@ -97,21 +97,33 @@ void write_char(char* dst,  const char c){
 inline
 void write_char(const size_t dst,  const char c){}
 
+template<typename A,  typename B,  typename C,  typename D,  typename G>
+D convert_named_groups(
+    char* src,
+    D dst,             // either char* or const char*
+    C& reason_name2id,
+    A& groupindx2reason,
+    B& record_contents,
+    G& group_starts,   // = 0 (effectively)
+    G& group_ends      // = 0 (effectively)
+);
+
 template<typename A,  typename B,  typename C,  typename G>
-char* get_trailing_data_storage(
+size_t get_trailing_data_size(
     char* src,
     char* dst,
-    C reason_name2id,
-    A groupindx2reason,
+    C& reason_name2id,
+    A& groupindx2reason,
     B& record_contents,
     G& group_starts,   // = 0 (effectively)
     G& group_ends      // = 0 (effectively)
 ){
-    return dst + convert_named_groups(src, (size_t)0, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
+    constexpr static const int dummy = 0;
+    return convert_named_groups(src, (size_t)0, dummy, dummy, dummy, dummy, dummy);
 };
 
 template<typename A,  typename B,  typename C,  typename G>
-size_t get_trailing_data_storage(
+size_t get_trailing_data_size(
     char* src,
     size_t dst,
     C& reason_name2id,
@@ -122,6 +134,48 @@ size_t get_trailing_data_storage(
 ){
     return 0;
 };
+
+inline
+char* dst_or_trailingdatasize(char* const dst,  const size_t trailing_data_size){
+    return dst;
+}
+
+inline
+size_t dst_or_trailingdatasize(const size_t dst,  const size_t trailing_data_size){
+    return trailing_data_size;
+}
+
+inline
+char* alloc_trailing_data(char* const dst,  const size_t trailing_data_size){
+    void* dummy = malloc(trailing_data_size);
+    if (dummy == nullptr)
+        exit(4096);
+    return (char*)dummy;
+}
+
+inline
+size_t alloc_trailing_data(const size_t dst,  const size_t trailing_data_size){
+    return 0;
+}
+
+inline
+void free_trailing_data(char* const s){
+    free(s);
+}
+
+inline
+void free_trailing_data(size_t const s){}
+
+inline
+void memcpy_trailing_data(char* const dst,  char* const trl_orig,  size_t const trailing_data_size){
+    *(dst) = 0;
+    memcpy(dst + 1,  trl_orig,  trailing_data_size);
+    dst[trailing_data_size] = 0;
+    // NOTE: We at worst add the equivalent of "<>", which is obviously less than that removed from 'src': "?P<>"
+}
+
+inline
+void memcpy_trailing_data(size_t const,  size_t const,  size_t const){}
 
 template<typename A,  typename B,  typename C,  typename D,  typename G>
 D convert_named_groups(
@@ -145,8 +199,9 @@ D convert_named_groups(
     push_back_only_if_vector(group_ends);   // Skip first entry
     push_back_only_if_vector(record_contents); // Skip first entry
     
-    D trl = get_trailing_data_storage(src, dst, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
-    write_char(trl++, 0);
+    size_t trailing_data_size = get_trailing_data_size(src, dst, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
+    D trl = alloc_trailing_data(dst, trailing_data_size);
+    D trl_orig = trl;
     /*
     Avoid heap allocations by re-using this buffer, by appending to the end of it.
     Everything we might wish to append originates from the src itself, so is guaranteed not to overflow, *so long as dst is at least as large as src*.
@@ -157,12 +212,13 @@ D convert_named_groups(
             
             dst -= 2; // strlen("?P")
             
-            char* const group_name = src + 1;
+            D const group_name = trl;
             
             while(*(++src) != '>'){
                 if (*src == '\\')
                     ++src;
                 write_char(trl++, *src);
+                ++trailing_data_size;
             }
             write_char(trl++, 0);
             
@@ -211,7 +267,9 @@ D convert_named_groups(
         
         ++src;
     }
-    return dst;
+    memcpy_trailing_data(dst, trl_orig, trailing_data_size);
+    free_trailing_data(trl_orig);
+    return dst_or_trailingdatasize(dst, trailing_data_size);
 };
 
 template<typename A>
