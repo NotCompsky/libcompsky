@@ -97,6 +97,32 @@ write_char(char* dst,  const char c){
 inline
 write_char(const char* dst,  const char c){}
 
+template<typename A,  typename B,  typename C>
+char* get_trailing_data_storage(
+    char* src,
+    char* dst,
+    C reason_name2id,
+    A groupindx2reason,
+    B& record_contents,
+    C& group_starts,   // = 0 (effectively)
+    C& group_ends      // = 0 (effectively)
+){
+    return convert_named_groups(src, const_cast<const char*>(dst), reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
+};
+
+template<typename A,  typename B,  typename C>
+const char* get_trailing_data_storage(
+    char* src,
+    const char* dst,
+    C reason_name2id,
+    A groupindx2reason,
+    B& record_contents,
+    C& group_starts,   // = 0 (effectively)
+    C& group_ends      // = 0 (effectively)
+){
+    return nullptr;
+};
+
 template<typename A,  typename B,  typename C,  typename D>
 D convert_named_groups(
     char* src,
@@ -111,7 +137,6 @@ D convert_named_groups(
     bool last_chars_were_brckt_qstn = false;
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
-    char group_name[128];
     std::vector<char> group_is_capturing; // ((:?( -> true, false, true // true is represented by 0, false by any other value
     
     push_back_only_if_vector(groupindx2reason, 1); // First match - match[0] - is the entire match.
@@ -120,30 +145,28 @@ D convert_named_groups(
     push_back_only_if_vector(group_ends);   // Skip first entry
     push_back_only_if_vector(record_contents); // Skip first entry
     
+    D trl = get_trailing_data_storage(src, dst, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
+    write_char(trl++, 0);
+    /*
+    Avoid heap allocations by re-using this buffer, by appending to the end of it.
+    Everything we might wish to append originates from the src itself, so is guaranteed not to overflow, *so long as dst is at least as large as src*.
+    */
     while(*src != 0){
         if (last_chars_were_brckt_qstn_P  &&  *src == '<'){
             push_back_only_if_vector(record_contents,  ((*(src + 1) != '!'))); // Do not record contents of the comments if the capture group name begins with !
             
             dst -= 2; // strlen("?P")
             
-            char* itr = group_name;
+            char* const group_name = src + 1;
+            
             while(*(++src) != '>'){
                 if (*src == '\\')
                     ++src;
-                *(itr++) = *src;
+                write_char(trl++, *src);
             }
-            *itr = 0;
+            write_char(trl++, 0);
             
-            const size_t len = (size_t)itr - (size_t)group_name;
-            
-            void* dummy = malloc(len + 1);
-            if (dummy == nullptr)
-                exit(900);
-            
-            char* group_name_allocd = (char*)dummy;
-            memcpy(group_name_allocd,  group_name,  len + 1); // Include terminating \0
-            
-            push_back_only_if_vector(groupindx2reason, indexof(reason_name2id, group_name_allocd));
+            push_back_only_if_vector(groupindx2reason, indexof(reason_name2id, group_name));
             push_back_only_if_vector(group_starts, dst);
             push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
             group_is_capturing[group_is_capturing.size()-1] = 0; // Overwrite the value set when '(' was being processed.
