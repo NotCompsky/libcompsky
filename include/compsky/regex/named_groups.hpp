@@ -37,6 +37,9 @@ auto indexof(std::vector<A>& ls,  A x){
     return i;
 };
 
+template<typename A>
+int indexof(int,  A){return 0;};
+
 template<typename T>
 void push_back_only_if_vector(T t){};
 
@@ -86,15 +89,23 @@ bool is_vector_element_nullptr(std::vector<X*> v,  N n){
     return (v[n] == nullptr);
 };
 
+inline
+write_char(char* dst,  const char c){
+    *dst = c;
+}
+
+inline
+write_char(const char* dst,  const char c){}
+
 template<typename A,  typename B,  typename C,  typename D>
-char* convert_named_groups(
+D convert_named_groups(
     char* src,
-    char* dst,
-    std::vector<char*>& reason_name2id,
-    std::vector<A>& groupindx2reason,
+    D dst,             // either char* or const char*
+    C reason_name2id,
+    A groupindx2reason,
     B& record_contents,
     C& group_starts,   // = 0 (effectively)
-    D& group_ends      // = 0 (effectively)
+    C& group_ends      // = 0 (effectively)
 ){
     bool last_char_was_bracket = false;
     bool last_chars_were_brckt_qstn = false;
@@ -103,7 +114,7 @@ char* convert_named_groups(
     char group_name[128];
     std::vector<char> group_is_capturing; // ((:?( -> true, false, true // true is represented by 0, false by any other value
     
-    groupindx2reason.push_back(1); // First match - match[0] - is the entire match.
+    push_back_only_if_vector(groupindx2reason, 1); // First match - match[0] - is the entire match.
     
     push_back_only_if_vector(group_starts); // Skip first entry
     push_back_only_if_vector(group_ends);   // Skip first entry
@@ -132,7 +143,7 @@ char* convert_named_groups(
             char* group_name_allocd = (char*)dummy;
             memcpy(group_name_allocd,  group_name,  len + 1); // Include terminating \0
             
-            groupindx2reason.push_back(indexof(reason_name2id, group_name_allocd));
+            push_back_only_if_vector(groupindx2reason, indexof(reason_name2id, group_name_allocd));
             push_back_only_if_vector(group_starts, dst);
             push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
             group_is_capturing[group_is_capturing.size()-1] = 0; // Overwrite the value set when '(' was being processed.
@@ -146,13 +157,14 @@ char* convert_named_groups(
             continue;
         }
         
-        *(dst++) = *src;
+        write_char(dst, *src);
+        ++dst;
         
         if (!last_char_was_backslash){
             if (*src == '('){
                 const char b = (*(src+1) - '?');
                 if (b == 0){
-                    groupindx2reason.push_back(1); // 1 for Unknown reason matched
+                    push_back_only_if_vector(groupindx2reason, 1); // 1 for Unknown reason matched
                     push_back_only_if_vector(record_contents, true);
                     push_back_only_if_vector(group_starts, dst);
                     push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
