@@ -110,17 +110,17 @@ D convert_named_groups(
 );
 
 inline
-size_t get_final_length_and_trailing_data_size(
+char* get_final_length_and_trailing_data_size(
     char* src,
     char* dst,
     size_t& trailing_data_size
 ){
     constexpr static const int dummy = 0;
-    return convert_named_groups(src, (size_t)0, trailing_data_size, dummy, dummy, dummy, dummy, dummy);
+    return dst + convert_named_groups(src, (size_t)0, trailing_data_size, dummy, dummy, dummy, dummy, dummy); // The latter returns the number of resulting elements that will inhabit dst
 };
 
 inline
-size_t get_final_length_and_trailing_data_size(char*,  size_t dst, size_t*){ return 0; }
+size_t get_final_length_and_trailing_data_size(char*,  size_t dst, size_t&){ return 0; }
 
 inline
 char* alloc_trailing_data(char* const dst,  const size_t trailing_data_size){
@@ -169,7 +169,7 @@ D convert_named_groups(
     bool last_chars_were_brckt_qstn = false;
     bool last_chars_were_brckt_qstn_P = false;
     bool last_char_was_backslash = false;
-    std::vector<char> group_is_capturing; // ((:?( -> true, false, true // true is represented by 0, false by any other value
+    std::vector<bool> group_is_capturing; // ((:?( -> true, false, true
     
     push_back_only_if_vector(groupindx2reason, 1); // First match - match[0] - is the entire match.
     
@@ -177,7 +177,7 @@ D convert_named_groups(
     push_back_only_if_vector(group_ends);   // Skip first entry
     push_back_only_if_vector(record_contents); // Skip first entry
     
-    trailing_data_size = 0;
+    trailing_data_size = 1; // Skip the first null byte
     D trl_final = get_final_length_and_trailing_data_size(src, dst, trailing_data_size) + 1; // Location of contents in trl, after trl has been memcpy'd to dst
     D trl = alloc_trailing_data(dst, trailing_data_size); // Location of contents in trl, before it has been memcpy'd
     D trl_orig = trl;
@@ -202,11 +202,12 @@ D convert_named_groups(
             }
             write_char(trl++, 0);
             ++trl_final;
+            ++trailing_data_size;
             
             push_back_only_if_vector(groupindx2reason, indexof(reason_name2id, group_name));
             push_back_only_if_vector(group_starts, dst);
             push_back_only_if_vector(group_ends); // NOTE: While I would like to explicitly add 'nullptr' to this, it messes with the type.
-            group_is_capturing[group_is_capturing.size()-1] = 0; // Overwrite the value set when '(' was being processed.
+            group_is_capturing[group_is_capturing.size()-1] = true; // Overwrite the value set when '(' was being processed.
             
             last_chars_were_brckt_qstn_P = false;
             
@@ -222,8 +223,8 @@ D convert_named_groups(
         
         if (!last_char_was_backslash){
             if (*src == '('){
-                const char b = (*(src+1) - '?');
-                if (b == 0){
+                const bool b = (*(src+1) != '?');
+                if (b){
                     push_back_only_if_vector(groupindx2reason, 1); // 1 for Unknown reason matched
                     push_back_only_if_vector(record_contents, true);
                     push_back_only_if_vector(group_starts, dst);
@@ -231,7 +232,7 @@ D convert_named_groups(
                 }
                 group_is_capturing.push_back(b);
             } else if (*src == ')'){
-                if (group_is_capturing.back() == 0){
+                if (group_is_capturing.back()){
                     size_t k = vector_size(group_ends);
                     while(!is_vector_element_nullptr(group_ends, --k)); // Cycle through until encounter a nullptr
                     assign_only_if_vector(group_ends,  k,  dst);
@@ -263,13 +264,13 @@ D convert_named_groups(
     G& group_starts,   // = 0 (effectively)
     G& group_ends      // = 0 (effectively)
 ){
-    constexpr static const size_t dummy = 0;
+    size_t dummy = 0;
     return convert_named_groups(src, dst, dummy, reason_name2id, groupindx2reason, record_contents, group_starts, group_ends);
 };
 
 template<typename A>
 char* convert_named_groups(char* src,  char* dst,  std::vector<char*>& reason_name2id,  std::vector<A>& groupindx2reason,  std::vector<bool>& record_contents){
-    constexpr static const size_t dummy = 0;
+    size_t dummy = 0;
     return convert_named_groups(src, dst, dummy, reason_name2id, groupindx2reason, record_contents, dummy, dummy);
 };
 
