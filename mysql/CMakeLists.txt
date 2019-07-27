@@ -62,16 +62,18 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND NOT ${CMAKE_HOST_SYSTEM_NAME} STR
 endif()
 
 include(CheckIncludeFiles)
-check_include_files(mysql/mysql.h MYSQL_IS_UNDER_DIR)
-check_include_files(mysql.h       MYSQL_IS_NOT_UNDER_DIR)
+check_include_files(mysql/mysql.h   MYSQL_IS_UNDER_MYSQL_DIR)
+check_include_files(mariadb/mysql.h MYSQL_IS_UNDER_MARIADB_DIR)
+check_include_files(mysql.h         MYSQL_IS_NOT_UNDER_DIR)
 if(MYSQL_UNDER_DIR_OVERRIDE)
-elseif(NOT MYSQL_IS_UNDER_DIR AND NOT MYSQL_IS_NOT_UNDER_DIR)
-    message(FATAL_ERROR "Cannot include mysql.h - please manually define -DMYSQL_UNDER_DIR=<path to MySQL root directory> and -DMYSQL_UNDER_DIR_OVERRIDE=1")
-    set(MYSQL_UNDER_DIR 1)
-elseif(MYSQL_IS_UNDER_DIR)
-    set(MYSQL_UNDER_DIR 1)
+elseif(
+    (MYSQL_IS_NOT_UNDER_DIR     AND NOT (MYSQL_IS_UNDER_MARIADB_DIR AND MYSQL_IS_UNDER_MYSQL_DIR)) OR
+    (MYSQL_IS_UNDER_MARIADB_DIR AND NOT (MYSQL_IS_NOT_UNDER_DIR     AND MYSQL_IS_UNDER_MYSQL_DIR)) OR
+    (MYSQL_IS_UNDER_MYSQL_DIR   AND NOT (MYSQL_IS_NOT_UNDER_DIR     AND MYSQL_IS_UNDER_MARIADB_DIR))
+)
+elseif(MYSQL_IS_NOT_UNDER_DIR OR MYSQL_IS_UNDER_MYSQL_DIR OR MYSQL_IS_UNDER_MARIADB_DIR)
 else()
-    unset(MYSQL_UNDER_DIR)
+    message(FATAL_ERROR "Cannot include mysql.h - please manually define -DMYSQL_UNDER_DIR=<path to MySQL root directory> and -DMYSQL_UNDER_DIR_OVERRIDE=1")
 endif()
 
 configure_file("${INC_DIR}/compsky/mysql/mysql.h.in" "${INC_DIR}/compsky/mysql/mysql.h")

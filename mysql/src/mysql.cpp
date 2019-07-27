@@ -4,11 +4,6 @@
 #include <stdlib.h> // for abort, exit
 #include <string.h> // for strlen
 #include <stdio.h> // for fopen, fread
-#ifdef MYSQL_UNDER_DIR
-  #include <mysql/mysql.h>
-#else
-  #include <mysql.h>
-#endif
 #ifndef _WIN32
   #include <sys/mman.h> // for mmap, munmap
 #endif

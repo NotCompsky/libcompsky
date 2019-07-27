@@ -1,6 +1,9 @@
-#cmakedefine MYSQL_UNDER_DIR
-#ifdef MYSQL_UNDER_DIR
+#cmakedefine MYSQL_IS_UNDER_MYSQL_DIR
+#cmakedefine MYSQL_IS_UNDER_MARIADB_DIR
+#ifdef MYSQL_IS_UNDER_MYSQL_DIR
   #include <mysql/mysql.h>
+#elif defined(MYSQL_IS_UNDER_MARIADB_DIR)
+  #include <mariadb/mysql.h>
 #else
   #include <mysql.h>
 #endif
