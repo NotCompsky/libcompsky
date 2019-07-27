@@ -43,24 +43,22 @@ void ef_reed(){
 
 
 void create_config(const char* stmts,  const char* permissions_str,  const char* env_var){
-    char* buf = (char*)malloc(4096 * 2);
-    
     std::cout << "* MySQL Configuration *" << std::endl;
     
     std::cout << "Absolute file path to save the config file to (will NOT create folders/directories for you): ";
     
-    char* cfg_pth = buf;
+    char* cfg_pth = asciify::BUF;
     {
     char c;
     for(auto i = 0;  (c = fgetc(stdin));  ++i){
         if (c != '\n')
-            *(buf++) = c;
+            *(asciify::BUF++) = c;
         else break;
     }
     }
-    *(buf++) = 0;
+    *(asciify::BUF++) = 0;
     
-    char* auth = buf;
+    char* auth = asciify::BUF;
     memcpy(auth, "HOST: ", 6);
     char* AUTH_PTR_ENDS[6];
     AUTH_PTR = auth + 6;
@@ -94,7 +92,7 @@ void create_config(const char* stmts,  const char* permissions_str,  const char*
     AUTH_PTR += 7;
     MYSQL_AUTH[++i] = AUTH_PTR;
     
-    std::cout << "A user will be now created for RScraper to use, that will only have access to the one database it uses:" << std::endl;
+    std::cout << "A user will be now created for the program to use, that will only have access to the one database it uses:" << std::endl;
     
     std::cout << "  Username: ";
     ef_reed();
