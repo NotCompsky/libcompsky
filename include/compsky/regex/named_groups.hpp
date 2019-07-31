@@ -18,8 +18,9 @@ namespace regex {
 
 template<typename A>
 auto indexof(std::vector<A>& ls,  A x){
-    auto i = 0;
-    while(i < ls.size()){
+    int i = 0;
+    const int sz = ls.size();
+    while(i < sz){
         A itr = ls[i];
         A y = x;
         while(*itr != 0){
