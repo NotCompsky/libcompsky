@@ -155,6 +155,14 @@ void memcpy_trailing_data(char* const dst,  char* const trl_orig,  size_t const 
 inline
 void memcpy_trailing_data(size_t const,  size_t const,  size_t const){}
 
+inline
+void increment_if_dst_is_int(size_t const dst,  size_t& trailing_data_size){
+	++trailing_data_size;
+}
+
+inline
+void increment_if_dst_is_int(char* const,  size_t){}
+
 template<typename A,  typename B,  typename C,  typename D,  typename G>
 D convert_named_groups(
     char* src,
@@ -199,11 +207,11 @@ D convert_named_groups(
                     ++src;
                 write_char(trl++, *src);
                 ++trl_final;
-                ++trailing_data_size;
+                increment_if_dst_is_int(dst, trailing_data_size);
             }
             write_char(trl++, 0);
             ++trl_final;
-            ++trailing_data_size;
+            increment_if_dst_is_int(dst, trailing_data_size);
             
             push_back_only_if_vector(groupindx2reason, indexof(reason_name2id, group_name));
             push_back_only_if_vector(group_starts, dst);
