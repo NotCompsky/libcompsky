@@ -10,10 +10,6 @@
 
 #include <compsky/mysql/mysql.hpp>
 
-#ifdef DEBUG
-  #include <stdio.h> // for printf
-#endif
-
 
 // Assumes mysql/mysql.h, utils.hpp and mymysql.hpp are included in main scope of main program
 
@@ -135,9 +131,6 @@ template<typename... Args>
 void exec(Args... args){
     asciify::reset_index();
     asciify::asciify(args...);
-  #ifdef DEBUG
-    printf("%s\n", asciify::BUF);
-  #endif
     exec_buffer(asciify::BUF, asciify::get_index());
 };
 
