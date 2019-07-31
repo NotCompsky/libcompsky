@@ -15,6 +15,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 set(headers
+	"${INC_DIR}/compsky/asciify/init_h.hpp"
+	"${INC_DIR}/compsky/asciify/init.hpp"
 	"${INC_DIR}/compsky/asciify/utils.hpp"
 	"${INC_DIR}/compsky/asciify/types.hpp"
 	"${INC_DIR}/compsky/asciify/flags.hpp"
