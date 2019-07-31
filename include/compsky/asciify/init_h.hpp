@@ -2,6 +2,9 @@
 #define LIBCOMPSKY_ASCIIFY_INIT_H_HPP
 
 
+#include <cstddef> // for size_t
+
+
 namespace compsky {
 namespace asciify {
 
