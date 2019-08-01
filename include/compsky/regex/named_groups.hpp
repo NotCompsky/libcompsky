@@ -160,6 +160,26 @@ void increment_if_dst_is_int(size_t const dst,  size_t& trailing_data_size){
 	++trailing_data_size;
 }
 
+template<typename A,  typename B,  typename C>
+void increment_all_elements_beginning_at__only_if_vector(A, B, C){};
+
+template<typename A,  typename B,  typename C>
+void increment_all_elements_beginning_at__only_if_vector(std::vector<A>& v,  B b,  C c){
+	const size_t n = v.size();
+	for (size_t i = b;  i < n;  ++i)
+		v[b] += c;
+};
+
+template<typename T>
+size_t size_of_vector(T){
+	return 0;
+};
+
+template<typename T>
+size_t size_of_vector(std::vector<T>& v){
+	return v.size();
+};
+
 inline
 void increment_if_dst_is_int(char* const,  size_t){}
 
@@ -194,13 +214,16 @@ D convert_named_groups(
     Avoid heap allocations by re-using this buffer, by appending to the end of it.
     Everything we might wish to append originates from the src itself, so is guaranteed not to overflow, *so long as dst is at least as large as src*.
     */
+	
+	const size_t reason_name2id__new_entries_begin_from = size_of_vector(reason_name2id);
+	
     while(*src != 0){
         if (last_chars_were_brckt_qstn_P  &&  *src == '<'){
             push_back_only_if_vector(record_contents,  ((*(src + 1) != '!'))); // Do not record contents of the comments if the capture group name begins with !
             
             dst -= 2; // strlen("?P")
             
-            D const group_name = trl_final;
+            D const group_name = trl;
             
             while(*(++src) != '>'){
                 if (*src == '\\')
@@ -258,6 +281,7 @@ D convert_named_groups(
         
         ++src;
     }
+    increment_all_elements_beginning_at__only_if_vector(reason_name2id,  reason_name2id__new_entries_begin_from,  trl_final - trl);
     memcpy_trailing_data(dst, trl_orig, trailing_data_size);
     free_trailing_data(trl_orig);
     return dst;
