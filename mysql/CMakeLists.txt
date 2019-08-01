@@ -19,7 +19,10 @@ endforeach(sqlconn)
 if (WHICH_MYSQL_CLIENT)
     message(STATUS "WHICH_MYSQL_CLIENT: ${WHICH_MYSQL_CLIENT}")
 else()
-    message(FATAL_ERROR "Please specify the libmysqlclient equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu/Debian, you would specify -DWHICH_MYSQL_CLIENT=mariadbclient; for others, perhaps, -DWHICH_MYSQL_CLIENT=mysqlclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | grep -e 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g'\nFor MacOS, it is probably mysql-connector-c")
+    message(WARNING "Compiling without compsky::mysql")
+    message(STATUS "To compile with compsky::mysql, install a client library.")
+    message(STATUS "If you already have, and it wasn't detected by cmake, specify the library equivalent with -DWHICH_MYSQL_CLIENT=...\nFor instance, for Ubuntu/Debian, you would specify -DWHICH_MYSQL_CLIENT=mariadbclient; for others, perhaps, -DWHICH_MYSQL_CLIENT=mysqlclient\nFor Ubuntu/Debian, you can discover this with the command:  apt list --installed | grep -e 'lib(mysql|mariadb)client' | grep -v -- -dev | sed 's/^lib//g' | sed -r 's~[0-9]*/.*~~g'\nFor MacOS, it is probably mysql-connector-c")
+    return()
 endif()
 
 
@@ -53,6 +56,8 @@ install(
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/mysql"
         COMPONENT mysql-dev
 )
+
+list(APPEND PROJECT_TARGETS "compsky_mysql" "compsky_mysql_create_config")
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 

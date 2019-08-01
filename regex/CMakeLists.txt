@@ -12,3 +12,5 @@ install(
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/compsky/regex"
         COMPONENT regex-dev
 )
+
+list(APPEND PROJECT_TARGETS "compsky_regex_dummylib")

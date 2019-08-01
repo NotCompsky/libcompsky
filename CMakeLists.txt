@@ -25,6 +25,7 @@ set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories("${INC_DIR}")
 
+set(PROJECT_TARGETS)
 add_subdirectory(asciify)
 add_subdirectory(security)
 add_subdirectory(mysql)
@@ -66,7 +67,7 @@ if(BUILD_PACKAGES)
     add_subdirectory(packaging)
 endif()
 
-export(TARGETS compsky_asciify compsky_security compsky_mysql FILE "${PROJECT_BINARY_DIR}/CompskyTargets.cmake")
+export(TARGETS ${PROJECT_TARGETS} FILE "${PROJECT_BINARY_DIR}/CompskyTargets.cmake")
 
 export(PACKAGE Compsky)
 

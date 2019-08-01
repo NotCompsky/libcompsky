@@ -57,6 +57,8 @@ install(
 
 # END: src: https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file #
 
+list(APPEND PROJECT_TARGETS "compsky_asciify")
+
 return()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
