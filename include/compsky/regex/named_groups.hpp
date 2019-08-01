@@ -22,6 +22,14 @@ auto indexof(std::vector<A>& ls,  A x){
     const int sz = ls.size();
     while(i < sz){
         A itr = ls[i];
+		if(itr == nullptr){
+			/*
+			This happens if, for instance, we are dealing with a discontinuous table from a database.
+			In RScraper, reason_matched may have entries removed, creating gaps between ID=5 and ID=10; then all elements between 5 and 10 will be nullptr.
+			*/
+			++i;
+			continue;
+		}
         A y = x;
         while(*itr != 0){
             if (*itr != *y)
