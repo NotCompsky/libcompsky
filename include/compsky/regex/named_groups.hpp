@@ -168,13 +168,13 @@ void increment_if_dst_is_int(size_t const dst,  size_t& trailing_data_size){
 	++trailing_data_size;
 }
 
-template<typename A,  typename B,  typename C>
-void increment_all_elements_beginning_at__only_if_vector(A, B, C, C){};
+template<typename A,  typename BC>
+void increment_all_elements_beginning_at__only_if_vector(A,  B,  const uintptr_t,  const uintptr_t){};
 
-template<typename A,  typename B,  typename C>
-void increment_all_elements_beginning_at__only_if_vector(std::vector<A>& v,  B b,  C trl_final,  C trl_tmp){
+template<typename A,  typename B>
+void increment_all_elements_beginning_at__only_if_vector(std::vector<A>& v,  B b,  const uintptr_t trl_final,  const uintptr_t trl_tmp){
 	const size_t n = v.size();
-	const size_t d = (trl_final > trl_tmp) ? trl_final - trl_tmp : trl_tmp - trl_final;
+	const uintptr_t d = (trl_final > trl_tmp) ? trl_final - trl_tmp : trl_tmp - trl_final;
 	for (size_t i = b;  i < n;  ++i)
 		if (trl_final > trl_tmp)
 			v[b] += d;
@@ -293,7 +293,7 @@ D convert_named_groups(
         
         ++src;
     }
-    increment_all_elements_beginning_at__only_if_vector(reason_name2id,  reason_name2id__new_entries_begin_from,  trl_final,  trl);
+    increment_all_elements_beginning_at__only_if_vector(reason_name2id,  reason_name2id__new_entries_begin_from,  reinterpret_cast<uintptr_t>(trl_final),  reinterpret_cast<uintptr_t>(trl));
     memcpy_trailing_data(dst, trl_orig, trailing_data_size);
     free_trailing_data(trl_orig);
     return dst;
