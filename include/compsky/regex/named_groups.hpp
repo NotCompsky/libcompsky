@@ -168,7 +168,7 @@ void increment_if_dst_is_int(size_t const dst,  size_t& trailing_data_size){
 	++trailing_data_size;
 }
 
-template<typename A,  typename BC>
+template<typename A,  typename B>
 void increment_all_elements_beginning_at__only_if_vector(A,  B,  const uintptr_t,  const uintptr_t){};
 
 template<typename A,  typename B>
@@ -177,9 +177,9 @@ void increment_all_elements_beginning_at__only_if_vector(std::vector<A>& v,  B b
 	const uintptr_t d = (trl_final > trl_tmp) ? trl_final - trl_tmp : trl_tmp - trl_final;
 	for (size_t i = b;  i < n;  ++i)
 		if (trl_final > trl_tmp)
-			v[b] += d;
+			v[i] += d;
 		else
-			v[b] -= d;
+			v[i] -= d;
 };
 
 template<typename T>
