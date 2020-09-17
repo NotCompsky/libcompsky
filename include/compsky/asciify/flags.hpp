@@ -4,6 +4,9 @@
 namespace compsky {
 namespace asciify {
 namespace flag {
+	namespace debug {
+		struct PrintfStdOut{};
+	}
     namespace concat {
         struct Start{};
         struct End{};
@@ -12,15 +15,34 @@ namespace flag {
         struct Start{};
         struct End{};
     }
-    struct ChangeBuffer{};
-    struct ChangeBufferTmp{};
-    struct ChangeBufferTmpCount{};
-    struct ChangeBufferTmpCountFrom{};
+	struct EnvExpand{};
+	struct UntilNullOr{};
     struct Escape{};
+	struct JSONEscape{};
+	struct Repeat{};
     struct StrLen{};
     struct FillWithLeadingZeros{};
     struct UpToFirstZero{};
     struct LiteralChar{};
+	struct AlphaNumeric{};
+	struct TerminatedBy{};
+	template<unsigned N>
+	struct Zip{};
+	struct NElements{};
+	struct Hex{};
+	namespace grammatical_case {
+		struct Lower{};
+		struct Upper{};
+	}
+	namespace esc {
+		namespace URI_until_space {
+			// WARNING: AFAIK, in URLs, one should have e.g. spaces %20 before the ? and + after.
+			// This is for the former case
+			struct Unescape{};
+		}
+		struct SpacesAndNonAscii{};
+		struct DoubleQuote{};
+	}
     namespace ensure {
         struct BetweenZeroAndOneInclusive{};
         struct BetweenZeroAndOneExclusive{};
@@ -38,6 +60,8 @@ namespace flag {
         typedef BetweenZeroAndOneInclusive BetweenZeroAndOne;
         
         struct BetweenZeroAndTenLeftInclusive{};
+		
+		struct Positive{};
     }
     namespace to {
         struct AlphaNumeric{};

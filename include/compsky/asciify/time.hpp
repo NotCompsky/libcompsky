@@ -8,12 +8,12 @@ namespace compsky {
 namespace asciify {
 
 template<typename... Args>
-void asciify(const tm* t,  Args... args){
+void asciify(char*& ITR,  const tm* t,  Args... args){
     // Default format. Other formats will later be specifiable with flag::datetime:: or something
-    asciify(day2str[t->tm_wday]);
-    asciify('\t');
+    asciify(ITR, day2str[t->tm_wday]);
+    asciify(ITR, '\t');
     constexpr static const flag::FillWithLeadingZeros f;
-    asciify(
+    asciify(ITR, 
         1900 + t->tm_year,  '-',
         f, 2, t->tm_mon,  '-',
         f, 2, t->tm_mday,  ' ',

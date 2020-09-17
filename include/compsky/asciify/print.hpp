@@ -11,9 +11,10 @@ namespace compsky {
 namespace asciify {
 
 template<typename... Args>
-void write(FILE* f,  Args... args){
-    asciify(args...);
-    fwrite(BUF,  1,  (uintptr_t)ITR - (uintptr_t)BUF,  f);
+void write(char* const buf,  FILE* f,  Args... args){
+	char* itr = buf;
+	asciify(itr, args...);
+    fwrite(buf,  1,  (uintptr_t)itr - (uintptr_t)buf,  f);
 };
 
 } // END namespace compsky::asciify

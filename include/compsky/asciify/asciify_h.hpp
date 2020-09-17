@@ -12,7 +12,9 @@
 # include <QString>
 #endif
 
-#include "compsky/asciify/base.hpp"
+#include <vector>
+#include <array>
+
 #include "compsky/asciify/flags.hpp"
 #include "compsky/asciify/types.hpp"
 #include "compsky/asciify/utils.hpp"
@@ -23,86 +25,85 @@ namespace asciify {
 
 
 inline
-void asciify();
+void asciify(char*& ITR);
 
 /* Getter functions */
 template<typename... Args>
-size_t get_index(Args... args);
+size_t get_index(char*& ITR,  char*& BUF);
 
 template<typename C>
-void append(C c);
+void append(char*& ITR,  C c);
 
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
-void asciify(uint64_t t,  Args... args);
+void asciify(char*& ITR,  uint64_t t,  Args... args);
 template<typename... Args>
-void asciify(int64_t t,  Args... args);
+void asciify(char*& ITR,  int64_t t,  Args... args);
 template<typename... Args>
-void asciify(uint32_t t,  Args... args);
+void asciify(char*& ITR,  uint32_t t,  Args... args);
 template<typename... Args>
-void asciify(int32_t t,  Args... args);
+void asciify(char*& ITR,  int32_t t,  Args... args);
 template<typename... Args>
-void asciify(uint16_t t,  Args... args);
+void asciify(char*& ITR,  uint16_t t,  Args... args);
 template<typename... Args>
-void asciify(int16_t t,  Args... args);
+void asciify(char*& ITR,  int16_t t,  Args... args);
 template<typename... Args>
-void asciify(uint8_t t,  Args... args);
+void asciify(char*& ITR,  uint8_t t,  Args... args);
 template<typename... Args>
-void asciify(int8_t t,  Args... args);
+void asciify(char*& ITR,  int8_t t,  Args... args);
 
 #ifdef _WIN32
 template<typename... Args>
-void asciify(unsigned long t,  Args... args);
+void asciify(char*& ITR,  unsigned long t,  Args... args);
 // unsigned long is a different type than both uin32_t and uint64_t
 // Without this, you would get 'ambiguous overloaded function' errors in Visual Studio, as the cast would be equally valid for any integer.
 #endif
 
 template<typename... Args>
-void asciify(const char c,  Args... args);
+void asciify(char*& ITR,  const bool b,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const char c,  Args... args);
 // We want uintN_t to be translated into human-readable, but char to be pasted as its literal value
 // Unfortunately, uint8_t and char are usually the same type, so we cannot differentiate between them
 
-template<typename... Args>
-void asciify(const char* s,  Args... args);
+/*template<size_t sz,  typename... Args>
+void asciify(char*& ITR,  char(&str)[sz],  Args... args);*/
 
 template<typename... Args>
-void asciify(const char** s,  const int n,  Args... args);
+void asciify(char*& ITR,  const char* s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const char** s,  const int n,  Args... args);
 
 #ifdef QT_GUI_LIB
 template<typename... Args>
-void asciify(const QString& qs,  Args... args);
+void asciify(char*& ITR,  const QString& qs,  Args... args);
 #endif
 
 
 template<typename... Args>
-void asciify(flag::StrLen f,  const char* s,  const size_t sz,  Args... args);
+void asciify(char*& ITR,  const flag::Hex,  const uint8_t c,  Args... args);
+
+template<size_t sz,  typename... Args>
+void asciify(char*& ITR,  const flag::Hex,  const std::array<uint8_t, sz>& str,  Args... args);
+
+template<size_t sz,  typename... Args>
+void asciify(char*& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  const std::array<uint8_t, sz>& str,  Args... args);
+
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::StrLen,  const char* s,  const size_t sz,  Args... args);
 
 
 /* Base Integer Cases */
 template<typename T>
-void asciify_integer(T n);
-
-
-/* Initialise Buffer */
-inline
-void reset_index();
-
-template<typename... Args>
-void asciify(flag::ChangeBuffer f,  char* buf,  Args... args);
-
-template<typename... Args>
-void asciify(flag::ChangeBufferTmp f,  char* buf_tmp,  Args... args);
-
-template<typename... Args>
-void asciify(flag::ChangeBufferTmpCount f,  char* buf_tmp,  size_t* count,  Args... args);
-
-template<typename... Args>
-void asciify(flag::ChangeBufferTmpCountFrom f,  char* buf_tmp,  size_t* count,  Args... args);
+void asciify_integer(char*& ITR,  T n);
 
 
 
 template<typename T,  typename... Args>
-void asciify(flag::FillWithLeadingZeros f,  const int min_digits,  T n,  Args... args);
+void asciify(char*& ITR,  const flag::FillWithLeadingZeros,  const int min_digits,  T n,  Args... args);
 
 template<typename T>
 bool operator <(T t,  fake_type::Infinity x);
@@ -111,91 +112,146 @@ template<typename T>
 bool operator >(fake_type::Infinity x,  T t);
 
 template<typename Precision>
-void asciify_subzero(double d,  Precision precision);
+void asciify_subzero(char*& ITR,  double d,  Precision precision);
 
 template<typename T,  typename P,  typename... Args>
-void asciify_floaty(T d,  P precision);
+void asciify_floaty(char*& ITR,  T d,  P precision);
 
 template<typename T,  typename... Args>
-void asciify(double d,  T precision,  Args... args);
+void asciify(char*& ITR,  double d,  T precision,  Args... args);
 
 template<typename T,  typename... Args>
-void asciify(float f,  T precision,  Args... args);
+void asciify(char*& ITR,  float f,  T precision,  Args... args);
 
 template<typename T,  typename... Args>
-void asciify(flag::guarantee::BetweenZeroAndOneInclusive f,  double d,  T precision,  Args... args);
+void asciify(char*& ITR,  const flag::guarantee::BetweenZeroAndOneInclusive,  double d,  T precision,  Args... args);
 
 template<typename T,  typename... Args>
-void asciify(flag::guarantee::BetweenZeroAndOneExclusive f,  double d,  T precision,  Args... args);
+void asciify(char*& ITR,  const flag::guarantee::BetweenZeroAndOneExclusive,  double d,  T precision,  Args... args);
+
+template<typename Int,  typename... Args>
+void asciify(char*& ITR,  const flag::AlphaNumeric,  Int m,  Args... args);
 
 template<typename... Args>
-void asciify(flag::Escape f,  const char c,  const char* s,  Args... args);
+void asciify(char*& ITR,  const flag::EnvExpand,  char* s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  flag::Repeat,  const char c,  const char* s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::Escape,  const char c,  const flag::UntilNullOr,  const char d,  const char* s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::Escape,  const char c,  const char* s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::Escape,  const char c,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args);
 
 #ifdef QT_GUI_LIB
 template<typename... Args>
-void asciify(flag::Escape f,  const char c,  const QString& qs,  Args... args);
+void asciify(char*& ITR,  const flag::Escape,  const char c,  const QString& qs,  Args... args);
 #endif
 
 template<typename... Args>
-void asciify(void* ptr,  Args... args);
+void asciify(char*& ITR,  const flag::TerminatedBy f,  const char c,  const char* __restrict s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  void* ptr,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::Escape,  const char c,  const flag::TerminatedBy g,  const char t,  const char* __restrict s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::esc::DoubleQuote,  const char c,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::esc::DoubleQuote _f_esc_dblqt,  const flag::esc::URI_until_space::Unescape,  const flag::grammatical_case::Upper,  const char* s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::esc::URI_until_space::Unescape,  const flag::grammatical_case::Upper,  const char* s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::esc::SpacesAndNonAscii,  const char* const s,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::JSONEscape,  const char* const s,  Args... args);
+
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::NElements,  const size_t n,  const std::vector<const char*>& a,  Args... args);
+
+
+template<unsigned N,  typename... Args>
+void asciify(char*& ITR,  const flag::Zip<N> f,  const size_t n,  Args... args);
 
 
 
 
 /* Concatenation */
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  T t,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char* s,  const int sz,  T t,  Args... args);
 
 template<typename... Args>
-void asciify(flag::concat::Start e,  const char* s,  const int sz,  flag::concat::End f,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char* s,  const int sz,  const flag::concat::End,  Args... args);
 
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  const char** ss,  T n,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char* s,  const int sz,  const char** ss,  T n,  Args... args);
 
-#ifdef USE_VECTOR
 template<typename SZ,  typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args);
-#endif
+void asciify(char*& ITR,  const flag::concat::Start,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args);
 
 template<typename... Args>
-void asciify(flag::concat::Start e,  const char c,  flag::concat::End f,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char c,  const flag::concat::End,  Args... args);
 
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char c,  T t,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char c,  T t,  Args... args);
 
 template<typename T,  typename Precision,  typename... Args>
-void asciify(flag::concat::Start f,  const char c,  flag::guarantee::BetweenZeroAndOneInclusive g,  T t,  Precision precision,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char c,  const flag::guarantee::BetweenZeroAndOneInclusive,  T t,  Precision precision,  Args... args);
 
 template<typename T,  typename Precision,  typename... Args>
-void asciify(flag::concat::Start f,  const char c,  flag::guarantee::BetweenZeroAndOneExclusive g,  T t,  Precision precision,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char c,  const flag::guarantee::BetweenZeroAndOneExclusive,  T t,  Precision precision,  Args... args);
 
 
 /* Concatenation with other flag types */
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  T t,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char* s,  const int sz,  const flag::prefix::Start,  const char* ps,  const size_t psz,  T t,  Args... args);
 
 template<typename T,  typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  const char** ss,  T t,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char* s,  const int sz,  const flag::prefix::Start,  const char* ps,  const size_t psz,  const char** ss,  T t,  Args... args);
 
 template<typename... Args>
-void asciify(flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  flag::prefix::End h,  Args... args);
+void asciify(char*& ITR,  const flag::concat::Start,  const char* s,  const int sz,  const flag::prefix::Start,  const char* ps,  const size_t psz,  const flag::prefix::End,  Args... args);
 
 
 
 /* Prefixes */
 template<typename T,  typename... Args>
-void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const char** ss,  T n,  Args... args);
+void asciify(char*& ITR,  const flag::prefix::Start,  const char* s,  const size_t sz,  const char** ss,  T n,  Args... args);
 
 template<typename... Args>
-void asciify(flag::prefix::Start f,  const char* s,  const size_t sz,  const char* ss,  Args... args);
+void asciify(char*& ITR,  const flag::prefix::Start,  const char* s,  const size_t sz,  const char* ss,  Args... args);
 
 template<typename... Args>
-void asciify(flag::prefix::Start e,  const char* s,  const size_t sz,  flag::prefix::End f,  Args... args);
+void asciify(char*& ITR,  const flag::prefix::Start,  const char* s,  const size_t sz,  const flag::prefix::End,  Args... args);
 
 
 /* Convert to/from bases etc */
 template<typename Int,  typename... Args>
-void asciify(flag::to::AlphaNumeric f,  Int n,  Args... args);
+void asciify(char*& ITR,  const flag::to::AlphaNumeric,  Int n,  Args... args);
+
+
+
+/* Debug */
+template<typename... Args>
+void asciify(char*& ITR,  const flag::debug::PrintfStdOut f,  Args... args);
+
+
+// Copy into a fixed pointer (such as a fixed-length buffer)
+template<size_t sz,  typename... Args>
+void asciify(char(& buf)[sz],  Args... args);
+
+
 
 }
 } // END: namespace compsky::asciify

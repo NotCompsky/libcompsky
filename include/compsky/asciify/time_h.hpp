@@ -7,7 +7,7 @@ namespace asciify {
 constexpr static const char* day2str[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 template<typename... Args>
-void asciify(const tm* t,  Args... args);
+void asciify(char*& ITR,  const tm* t,  Args... args);
 
 }
 }
