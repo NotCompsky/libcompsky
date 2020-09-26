@@ -4,6 +4,7 @@
 
 #include <stdio.h> // for fprintf
 #include <iostream> // for std::cout
+#include <string> // for std::char_traits
 
 #include <compsky/asciify/flags.hpp>
 #include <compsky/mysql/query.hpp>
@@ -13,166 +14,151 @@
 #endif
 
 
-namespace compsky {
-namespace mysql {
+#define PROMPT_READ_INTO_AUTH_PTR(...) \
+	std::cout << __VA_ARGS__ << std::flush; \
+	_details::ef_reed(auth_ptr);
+#define CREATE_CFG_LINE(prompt, line_prefix) \
+	memcpy(auth_ptr, line_prefix, std::char_traits<char>::length(line_prefix)); \
+	auth_ptr += std::char_traits<char>::length(line_prefix); \
+	mysql_auth[i] = auth_ptr; \
+	PROMPT_READ_INTO_AUTH_PTR(prompt) \
+	auth_ptr_ENDS[i] = auth_ptr; \
+	++i
 
-#ifdef COMPILING_STATIC_LIB
-extern MYSQL* OBJ;
-extern char* MYSQL_AUTH[6];
-#else
-MYSQL* OBJ;
-char* MYSQL_AUTH[6];
-#endif
 
-MYSQL_RES* RES1;
-MYSQL_ROW ROW1;
-
-char* EMPTYSTR = {0};
-
-char* AUTH_PTR;
-
-void ef_reed(){
+namespace _details {
+static
+void ef_reed(char*& auth_ptr){
     char c;
     while((c = fgetc(stdin))){
         if (c != '\n'){
-            *AUTH_PTR = c;
-            ++AUTH_PTR;
+            *auth_ptr = c;
+            ++auth_ptr;
         } else return;
     }
 }
+}
+
+namespace _f {
+	constexpr static const compsky::asciify::flag::Escape esc;
+}
+
+namespace indx {
+	enum {
+		host,
+		path,
+		user,
+		pwrd,
+		dbnm,
+		port,
+		COUNT
+	};
+}
 
 
-void create_config(const char* stmts,  const char* permissions_str,  const char* env_var){
+namespace compsky {
+namespace mysql {
+
+
+
+void create_config(const char* const stmts,  const char* const permissions_str,  const char* const env_var){
+	MYSQL* mysql_obj;
+	char* mysql_auth[indx::COUNT];
+	
     std::cout << "* MySQL Configuration *" << std::endl;
     
-    std::cout << "Absolute file path to save the config file to (will NOT create folders/directories for you): ";
+    std::cout << "Absolute file path to save the config file to (will NOT create folders/directories for you): " << std::flush;
     
-    char* cfg_pth = asciify::BUF;
-    {
-    char c;
-    for(auto i = 0;  (c = fgetc(stdin));  ++i){
-        if (c != '\n')
-            *(asciify::BUF++) = c;
-        else break;
-    }
-    }
-    *(asciify::BUF++) = 0;
+    char buf[4096];
+	char* buf_itr = buf;
+	char* const cfg_pth = buf_itr;
+	_details::ef_reed(buf_itr);
+	*(buf_itr++) = 0;
     
-    char* auth = asciify::BUF;
-    memcpy(auth, "HOST: ", 6);
-    char* AUTH_PTR_ENDS[6];
-    AUTH_PTR = auth + 6;
-    MYSQL_AUTH[0] = AUTH_PTR;
+    char* auth = buf_itr;
+    char* auth_ptr_ENDS[indx::COUNT];
+    char* auth_ptr = auth;
     auto i = 0;
     
-  #ifdef _WIN32
-    std::cout << "Host (127.0.0.1 if it is on this machine): "; // localhost might refer to IPv6 ::1:
-  #else
-    std::cout << "Host (localhost if it is on this machine): "; // 127.0.0.1 causes issue with Unix socket // TODO: Check if this is also the issue with Windows named socket
-  #endif
-    ef_reed();
-    AUTH_PTR_ENDS[i] = AUTH_PTR;
-    memcpy(AUTH_PTR, "\nPATH: ", 7);
-    AUTH_PTR += 7;
-    MYSQL_AUTH[++i] = AUTH_PTR;
+	CREATE_CFG_LINE(
+	  #ifdef _WIN32
+		"Host (127.0.0.1 if it is on this machine): " // localhost might refer to IPv6 ::1:
+	  #else
+		"Host (localhost if it is on this machine): " // 127.0.0.1 causes issue with Unix socket // TODO: Check if this is also the issue with Windows named socket
+	  #endif
+		, "HOST: "
+	);
     
-    bool is_localhost = (strncmp(MYSQL_AUTH[i-1], "localhost", strlen("localhost")) == 0)  ||  (strncmp(MYSQL_AUTH[i-1], "127.0.0.1", strlen("127.0.0.1")) == 0);
+    bool is_localhost = (strncmp(mysql_auth[indx::host], "localhost", strlen("localhost")) == 0)  ||  (strncmp(mysql_auth[indx::host], "127.0.0.1", strlen("127.0.0.1")) == 0);
     
-    std::cout << "Socket file path or named pipe name (blank if not used)";
-  #ifdef _WIN32
-    std::cout << ": ";
-  #else
-    std::cout << "\nHint: you can run `mysql_config --socket` to find it, but it is probably `/var/run/mysqld/mysqld.sock`\nYou can set the location in the MySQL config file, which is probably `/etc/mysql/my.cnf` - restart the MySQL server service if you do.\nSocket file path: ";
-  #endif
-    // NOTE: We do not need to escape \\ in input strings
-    ef_reed();
-    
-    AUTH_PTR_ENDS[i] = AUTH_PTR;
-    memcpy(AUTH_PTR, "\nUSER: ", 7);
-    AUTH_PTR += 7;
-    MYSQL_AUTH[++i] = AUTH_PTR;
+	CREATE_CFG_LINE(
+		"Socket file path or named pipe name (a single '/' character if not used)"
+	  #ifdef _WIN32
+		": "
+	  #else
+		"\nHint: you can run `mysql_config --socket` to find it, but it is probably `/var/run/mysqld/mysqld.sock`\nYou can set the location in the MySQL config file, which is probably `/etc/mysql/my.cnf` - restart the MySQL server service if you do.\nSocket file path: "
+	  #endif
+		, "\nPATH: "
+	);
     
     std::cout << "A user will be now created for the program to use, that will only have access to the one database it uses:" << std::endl;
     
-    std::cout << "  Username: ";
-    ef_reed();
-    AUTH_PTR_ENDS[i] = AUTH_PTR;
-    memcpy(AUTH_PTR, "\nPWRD: ", 7);
-    AUTH_PTR += 7;
-    MYSQL_AUTH[++i] = AUTH_PTR;
+	CREATE_CFG_LINE("  Username: ", "\nUSER: ");
+	CREATE_CFG_LINE("  Password: ", "\nPWRD: ");
+	CREATE_CFG_LINE("Database name: ", "\nDBNM: ");
+	CREATE_CFG_LINE("MySQL Server port number (blank if not connecting via TCP/IP): ", "\nPORT: ");
     
-    std::cout << "  Password: ";
-    ef_reed();
-    AUTH_PTR_ENDS[i] = AUTH_PTR;
-    memcpy(AUTH_PTR, "\nDBNM: ", 7);
-    AUTH_PTR += 7;
-    MYSQL_AUTH[++i] = AUTH_PTR;
-    
-    std::cout << "Database name: ";
-    ef_reed();
-    AUTH_PTR_ENDS[i] = AUTH_PTR;
-    memcpy(AUTH_PTR, "\nPORT: ", 7);
-    AUTH_PTR += 7;
-    MYSQL_AUTH[++i] = AUTH_PTR;
-    
-    std::cout << "MySQL Server port number (blank if not connecting via TCP/IP): ";
-    ef_reed();
-    AUTH_PTR_ENDS[i] = AUTH_PTR;
-    *AUTH_PTR = '\n'; // Terminate port number calculation
+    *auth_ptr = '\n'; // Terminate port number calculation
+	std::cout << std::endl;
     
     FILE* cfg = fopen(cfg_pth, "wb");
-    fwrite(auth,  1,  (uintptr_t)AUTH_PTR + 1 - (uintptr_t)auth,  cfg);
+    fwrite(auth,  1,  (uintptr_t)auth_ptr + 1 - (uintptr_t)auth,  cfg);
     fclose(cfg);
     
-    for (auto j = 0;  j < 6;  ++j)
-        AUTH_PTR_ENDS[j][0] = 0;
-    for (auto j = 0;  j < 6;  ++j)
-        printf("MYSQL_AUTH[%d] = %s\n", j, MYSQL_AUTH[j]);
+    for (auto j = 0;  j < indx::COUNT;  ++j)
+        auth_ptr_ENDS[j][0] = 0;
+    for (auto j = 0;  j < indx::COUNT;  ++j)
+        printf("mysql_auth[%d] = %s\n", j, mysql_auth[j]);
     
     /* Now to login to the MySQL database with the root user */
     
-    const char* username = MYSQL_AUTH[2]; // User to grant permissions to
-    const char* password = MYSQL_AUTH[3]; // His password
+    const char* username = mysql_auth[indx::user]; // User to grant permissions to
+    const char* password = mysql_auth[indx::pwrd]; // His password
     
-    MYSQL_AUTH[2] = AUTH_PTR;
-    std::cout << "MySQL admin username: ";
-    ef_reed();
-    *AUTH_PTR = 0; // So we can write it out here:
-    ++AUTH_PTR;
+    mysql_auth[indx::user] = auth_ptr;
+	PROMPT_READ_INTO_AUTH_PTR("MySQL admin username: ")
+    *auth_ptr = 0; // So we can write it out here:
+    ++auth_ptr;
     
-    MYSQL_AUTH[3] = AUTH_PTR;
-    std::cout << "MySQL admin password (leave blank to use system socket authentication - i.e. if you can login to MySQL as `" << MYSQL_AUTH[2] << "` without a password): ";
-    ef_reed();
-    *AUTH_PTR = 0;
+    mysql_auth[indx::pwrd] = auth_ptr;
+	PROMPT_READ_INTO_AUTH_PTR("MySQL admin password (leave blank to use system socket authentication - i.e. if you can login to MySQL as `" << mysql_auth[indx::user] << "` without a password): ")
+    *auth_ptr = 0;
     
-    const char* db_name = MYSQL_AUTH[4];
+    const char* db_name = mysql_auth[indx::dbnm];
     
-    MYSQL_AUTH[4] = EMPTYSTR; // We haven't created the database yet, so cannot connect to it
+	mysql_auth[indx::dbnm] = nullptr; // Connect to 'null' database, since we haven't created our database yet
     
-    compsky::asciify::ITR = ++AUTH_PTR;
+    login_from_auth(mysql_obj, mysql_auth);
     
-    login_from_auth();
+    char* const mysql_exec_buffer = auth_ptr + 1; // Buffer for the following MySQL commands
     
-    exec("CREATE DATABASE IF NOT EXISTS `", db_name, "`");
+    exec(mysql_obj, mysql_exec_buffer, "CREATE DATABASE IF NOT EXISTS `", db_name, "`");
     
-    mysql_select_db(OBJ, db_name); // Set as current database
-    
-    /* The following is an alternative to using `mysql_set_server_option(OBJ, MYSQL_OPTION_MULTI_STATEMENTS_ON);`
-     * The reason it is used is that it is easier to debug the SQL commands individually
-     */
-    char* stmt = const_cast<char*>(stmts);
-    for (char* itr = stmt;  *itr != 0;  ++itr){
-        if (unlikely(*itr == ';')){
-            exec_buffer(stmt,  (uintptr_t)itr - (uintptr_t)stmt);
-            stmt = itr + 1;
-        }
-    }
-    
-    constexpr static const asciify::flag::Escape esc;
+    mysql_select_db(mysql_obj, db_name); // Set as current database
+	
+	if (stmts != nullptr){
+		const char* last_stmt = stmts;
+		for (const char* itr = stmts;  *itr != 0;  ++itr){
+			if (unlikely(*itr == ';')){
+				exec_buffer(mysql_obj,  last_stmt,  (uintptr_t)itr - (uintptr_t)last_stmt);
+				last_stmt = itr + 1;
+			}
+		}
+	}
     
     if (is_localhost){
-        exec("CREATE USER IF NOT EXISTS `", esc, '`', username, "`@`localhost` IDENTIFIED BY \"", esc, '"', password, "\"");
-        exec("GRANT ", permissions_str, " ON ", db_name, ".* TO `", esc, '`', username, "`@`localhost`");
+		exec(mysql_obj, mysql_exec_buffer, "CREATE USER IF NOT EXISTS `", _f::esc, '`', username, "`@`localhost` IDENTIFIED BY \"", _f::esc, '"', password, "\"");
+		exec(mysql_obj, mysql_exec_buffer, "GRANT ", permissions_str, " ON ", db_name, ".* TO `", _f::esc, '`', username, "`@`localhost`");
     } else {
         std::cout << "You must manually create the user `" << username << "` and grant him permissions: SELECT, INSERT, UPDATE on `" << db_name << "`" << std::endl;
     }
@@ -210,7 +196,8 @@ void create_config(const char* stmts,  const char* permissions_str,  const char*
     std::cout << "export " << env_var << "=" << cfg_pth << std::endl;
 #endif
     
-    exit_mysql();
+	wipe_auth(mysql_auth[0],  (uintptr_t)mysql_auth[indx::COUNT] - (uintptr_t)mysql_auth[0]);
+    mysql_close(mysql_obj);
 }
 
 } // END namespace compsky::mysql
