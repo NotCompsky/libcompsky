@@ -15,6 +15,8 @@ The absense of this copyright notices on some other files in this project does n
 #ifdef n_cached
 
 
+namespace compsky {
+namespace wangler {
 namespace cached_stuff {
 	// WARNING: This is only for functions whose results are guaranteed to be shorter than the max_buf_len.
 	// TODO: Invalidate caches when necessary (after data is modified)
@@ -59,6 +61,7 @@ namespace cached_stuff {
 		cached_IDs[indx].sz = sz;
 	}
 }
-
+}
+}
 
 #endif

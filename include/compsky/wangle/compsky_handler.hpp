@@ -1,10 +1,15 @@
 #pragma once
 
-#include <compsky/wangle/CStringCodec.h>
+#include "typedefs.hpp" // for str_typ
 #include <compsky/wangle/static_response.hpp>
 #include <compsky/wangle/jsonify.hpp>
 #include <compsky/wangle/cache.hpp>
 #include <string>
+#include <wangle/channel/Handler.h> // for HandlerAdapter
+
+
+namespace compsky {
+namespace wangler {
 
 
 namespace _r {
@@ -24,8 +29,15 @@ extern
 std::vector<std::string> banned_client_addrs;
 
 
+namespace _detail {
+	bool is_client_banned(const std::string& client_addr){
+		return (std::find(banned_client_addrs.begin(), banned_client_addrs.end(), client_addr) == banned_client_addrs.end());
+	}
+}
+
+
 template<size_t buf_sz,  class T>
-class CompskyHandler : public wangle::HandlerAdapter<const std::string_view,  const std::string_view> {
+class CompskyHandler : public ParentHandlerTyp {
   protected:
 	char* buf;
 	char* itr;
@@ -176,7 +188,7 @@ class CompskyHandler : public wangle::HandlerAdapter<const std::string_view,  co
 		*this->itr = 0;
 	}
 	
-	void asciify_request_address_info(const std::string_view msg){
+	void asciify_request_address_info(const str_typ msg){
 		this->reset_buf_index();
 		for(size_t i = 0;  i < msg.size()  &&  msg.data()[i] != '\n'; ++i){
 			this->asciify(msg.data()[i]);
@@ -195,18 +207,31 @@ class CompskyHandler : public wangle::HandlerAdapter<const std::string_view,  co
 	~CompskyHandler(){
 	}
 	
-	void read(Context* ctx,  const std::string_view msg) override {
+	void read(Context* ctx,  const str_typ msg) override {
 		this->asciify_request_address_info(msg);
 		const std::string client_addr = ctx->getPipeline()->getTransportInfo()->remoteAddr->getAddressStr();
 		fprintf(stderr,  "%s\t%s\n", client_addr.c_str(), this->buf);
 		fflush(stderr);
-		const std::string_view v = likely(std::find(banned_client_addrs.begin(), banned_client_addrs.end(), client_addr) == banned_client_addrs.end()) ? static_cast<T*>(this)->determine_response(msg.data()) : _r::banned_client;
+		const std::string_view v = likely(_detail::is_client_banned(client_addr)) ? static_cast<T*>(this)->determine_response(msg
+#ifdef COMPSKY_WANGLE_USE_STD_STRINGS
+			.c_str()
+#else
+			.data()
+#endif
+		) : _r::banned_client;
 		if (unlikely(v == _r::not_found)){
 			this->asciify_request_address_info(msg);
 			fprintf(stderr, "!!!WARNING!!! Nation-state cyber attack detected! IP %s has been BANNED for attempting to HACK at path %s\n", client_addr.c_str(), this->buf);
 			banned_client_addrs.push_back(client_addr);
 		}
-		static_cast<CStringCodec*>(this)->write(ctx, v);
+#ifdef COMPSKY_WANGLE_USE_STD_STRINGS
+		write(ctx, std::string(v.data(), v.size()));
+#else
+		write(ctx, v);
+#endif
 		close(ctx);
 	}
 };
+
+}
+}

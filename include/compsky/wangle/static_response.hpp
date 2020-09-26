@@ -31,6 +31,8 @@ The absense of this copyright notices on some other files in this project does n
 #define HEADER__RETURN_CODE__UNPROCESSABLE "HTTP/1.1 422 Unprocessable Entity\n"
 
 
+namespace compsky {
+namespace wangler {
 namespace _r {
 	constexpr static const std::string_view not_found =
 		HEADER__RETURN_CODE__NOT_FOUND
@@ -125,3 +127,5 @@ namespace _r {
 		"[]"
 	;
 } // namespace _r
+}
+}

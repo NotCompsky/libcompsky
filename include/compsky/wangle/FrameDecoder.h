@@ -26,12 +26,14 @@
 
 #include <wangle/codec/ByteToMessageDecoder.h>
 
-namespace wangle {
+
+namespace compsky {
+namespace wangler {
 
 /**
  * A decoder that passes the entire received IOBufQueue.
  */
-class FrameDecoder : public InboundHandler<folly::IOBufQueue&, std::unique_ptr<folly::IOBuf>> {
+class FrameDecoder : public wangle::InboundHandler<folly::IOBufQueue&, std::unique_ptr<folly::IOBuf>> {
  public:
 	void transportActive(Context* ctx) override {
 		transportActive_ = true;
@@ -71,4 +73,5 @@ class FrameDecoder : public InboundHandler<folly::IOBufQueue&, std::unique_ptr<f
 	std::unique_ptr<folly::IOBuf> result;
 };
 
-} // namespace wangle
+} // namespace wangler
+}

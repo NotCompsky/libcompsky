@@ -15,6 +15,8 @@ The absense of this copyright notices on some other files in this project does n
 #include <compsky/wangle/asciify_flags.hpp>
 
 
+namespace compsky {
+namespace wangler {
 namespace _r {
 		namespace flag {
 		struct Dict{};
@@ -166,3 +168,5 @@ namespace _r {
 		return sz;
 	}
 } // namespace _r
+}
+}

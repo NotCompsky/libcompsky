@@ -26,17 +26,19 @@
 
 #include <wangle/channel/Handler.h>
 #include <string_view>
+#include <iostream>
 
 
-namespace wangle {
+namespace compsky {
+namespace wangler {
 
 /*
  * CStringCodec converts a pipeline from IOBufs to const std::string_view*.
  */
-class CStringCodec : public Handler<std::unique_ptr<folly::IOBuf>, const std::string_view,
+class CStringCodec : public wangle::Handler<std::unique_ptr<folly::IOBuf>, const std::string_view,
                                    const std::string_view, std::unique_ptr<folly::IOBuf>> {
  public:
-  typedef typename Handler<
+  typedef typename wangle::Handler<
    std::unique_ptr<folly::IOBuf>, const std::string_view,
    const std::string_view, std::unique_ptr<folly::IOBuf>>::Context Context;
 
@@ -48,9 +50,30 @@ class CStringCodec : public Handler<std::unique_ptr<folly::IOBuf>, const std::st
   }
 
   folly::Future<folly::Unit> write(Context* ctx,  const std::string_view msg) override {
-		auto buf = folly::IOBuf::copyBuffer(msg.data(), msg.size());
+		constexpr size_t min_chunk_sz = 100;
+		size_t chunk_sz = 100 * 1024;
+		/*
+		 * The chunk size needs to become smaller for larger files.
+		 * Sending files in one go seems to be fine for files below a megabyte.
+		 * But for sending a 14MiB file, even a (constant) chunk_sz as low as 1000 regularly fails to deliver the file without truncation.
+		 * I have no idea why this is the case.
+		 * TODO: Fix this
+		 */
+		size_t sz = msg.size();
+		auto data = msg.data();
+		while(sz > chunk_sz){
+			auto buf = folly::IOBuf::copyBuffer(data, chunk_sz);
+			data += chunk_sz;
+			sz -= chunk_sz;
+			chunk_sz /= 2;
+			if (chunk_sz < min_chunk_sz)
+				chunk_sz = min_chunk_sz;
+			ctx->fireWrite(std::move(buf));
+		}
+		auto buf = folly::IOBuf::copyBuffer(data, sz);
 		return ctx->fireWrite(std::move(buf));
   }
 };
 
-} // namespace wangle
+} // namespace wangler
+}
