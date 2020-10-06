@@ -409,6 +409,14 @@ void asciify(char*& ITR,  flag::Escape f,  const char c,  const char* __restrict
     asciify(ITR, args...);
 };
 
+#ifdef LIBCOMPSKY_ICNLUDES_STRING_VIEW
+template<typename... Args>
+void asciify(char*& ITR,  flag::Escape f,  const char c,  const std::string_view s,  Args... args){
+	constexpr flag::StrLen _strlen;
+	asciify(ITR, f, c, _strlen, s.size(), s.data(), args...);
+};
+#endif
+
 template<typename... Args>
 void asciify(char*& ITR,  const flag::Escape,  const char c,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
 	size_t i = 0;
