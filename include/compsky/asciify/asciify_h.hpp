@@ -20,7 +20,8 @@
 #include "compsky/asciify/utils.hpp"
 
 
-#ifdef basic_string
+#if (defined COMPSKY_STD_STRING_VIEW || defined basic_string)
+# include <string_view>
 # define LIBCOMPSKY_INCLUDES_STRING_VIEW
 #else
 # warning "std::string_view treated as not defined"
