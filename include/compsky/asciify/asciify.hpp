@@ -409,7 +409,7 @@ void asciify(char*& ITR,  flag::Escape f,  const char c,  const char* __restrict
     asciify(ITR, args...);
 };
 
-#ifdef LIBCOMPSKY_ICNLUDES_STRING_VIEW
+#ifdef LIBCOMPSKY_INCLUDES_STRING_VIEW
 template<typename... Args>
 void asciify(char*& ITR,  flag::Escape f,  const char c,  const std::string_view s,  Args... args){
 	constexpr flag::StrLen _strlen;

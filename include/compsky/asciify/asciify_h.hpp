@@ -20,8 +20,8 @@
 #include "compsky/asciify/utils.hpp"
 
 
-#if (defined _GLIBCXX_STRING || defined basic_string)
-# define LIBCOMPSKY_ICNLUDES_STRING_VIEW
+#ifdef basic_string
+# define LIBCOMPSKY_INCLUDES_STRING_VIEW
 #else
 # warning "std::string_view treated as not defined"
 #endif
@@ -151,7 +151,7 @@ void asciify(char*& ITR,  const flag::Escape,  const char c,  const flag::UntilN
 template<typename... Args>
 void asciify(char*& ITR,  const flag::Escape,  const char c,  const char* s,  Args... args);
 
-#ifdef LIBCOMPSKY_ICNLUDES_STRING_VIEW
+#ifdef LIBCOMPSKY_INCLUDES_STRING_VIEW
 template<typename... Args>
 void asciify(char*& ITR,  const flag::Escape,  const char c,  const std::string_view s,  Args... args);
 #endif
