@@ -49,7 +49,6 @@ class FrameDecoder : public wangle::InboundHandler<folly::IOBufQueue&, std::uniq
 		constexpr size_t max_chainlength_length_set_by_lib = 2048;
 		size_t buf_chain_len;
 		
-		printf("buf.chainLength == %lu\n", buf.chainLength());
 		buf_chain_len = buf.chainLength();
 		// Just to tell everyone where it terminates
 		// TODO: Look into read-only methods to transfer knowledge of length of data
@@ -62,7 +61,7 @@ class FrameDecoder : public wangle::InboundHandler<folly::IOBufQueue&, std::uniq
 		}
 		
 		if (buf_chain_len != max_chainlength_length_set_by_lib){
-			this->result->coalesceWithHeadroomTailroom(0, 1);
+			this->result->coalesceWithHeadroomTailroom(0, 1); // WARNING: This pastes each chunk in the wrong order! // TODO: Fix
 			*this->result->writableTail() = 0;
 			ctx->fireRead(std::move(this->result));
 		}
