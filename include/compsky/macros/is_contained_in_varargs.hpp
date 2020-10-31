@@ -8,6 +8,6 @@
 
 #define IS_CONTAINED_IN_VARARGS(type, the_compared, the_comparing_tuple) \
 	/* lambda function only used to control the name of the compared object */ \
-	[](const type x)->bool { \
+	[](type const x)->bool { \
 		return (false BOOST_PP_SEQ_FOR_EACH(IS_CONTAINED_IN_VARARGS__X, _, the_comparing_tuple)); \
 	}(the_compared)
