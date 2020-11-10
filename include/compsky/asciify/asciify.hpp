@@ -409,6 +409,17 @@ void asciify(char*& ITR,  flag::Escape f,  const char c,  const char* __restrict
     asciify(ITR, args...);
 };
 
+template<typename... Args>
+void asciify(char*& ITR,  const flag::Escape3,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args){
+    while(*s != 0){
+        if (unlikely(*s == c1  ||  *s == c2  ||  *s == c3  ||  *s == '\\'))
+            *(ITR++) = '\\';
+        *(ITR++) = *s;
+        ++s;
+    }
+    asciify(ITR, args...);
+};
+
 #ifdef LIBCOMPSKY_INCLUDES_STRING_VIEW
 template<typename... Args>
 void asciify(char*& ITR,  const std::string_view s,  Args... args){

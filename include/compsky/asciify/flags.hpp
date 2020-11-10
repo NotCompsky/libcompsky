@@ -18,6 +18,7 @@ namespace flag {
 	struct EnvExpand{};
 	struct UntilNullOr{};
     struct Escape{};
+	struct Escape3{};
 	struct JSONEscape{};
 	struct Repeat{};
     struct StrLen{};
