@@ -18,7 +18,7 @@ The absense of this copyright notices on some other files in this project does n
 namespace compsky {
 namespace server {
 namespace _r {
-		namespace flag {
+	namespace flag {
 		struct Dict{};
 		struct Arr{};
 		
@@ -26,6 +26,11 @@ namespace _r {
 		struct QuoteAndEscape{};
 		struct QuoteNoEscape{};
 		struct NoQuote{};
+	}
+	
+	namespace _f {
+		constexpr compsky::asciify::flag::Escape esc;
+		constexpr compsky::asciify::flag::JSONEscape json_esc;
 	}
 	
 	template<size_t col_indx>
