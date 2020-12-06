@@ -79,7 +79,7 @@ private:
 		if (unlikely(e))
 			// If an error occurs then no new asynchronous operations are started, and all shared_ptr references to the connection object will disappear and the object will be destroyed automatically after this handler returns. The connection class's destructor closes the socket.
 			return;
-		this->request_handler_.handle_request(buffer_, bytes_transferred, this->response_buffers);
+		RequestHandler().handle_request(buffer_, bytes_transferred, this->response_buffers);
 		boost::asio::async_write(
 			socket_,
 			reply_.to_buffers(),
@@ -103,9 +103,6 @@ private:
 
 	/// Socket for the connection.
 	boost::asio::ip::tcp::socket socket_;
-
-	/// The handler used to process the incoming request.
-	RequestHandler request_handler_;
 
 	/// Buffer for incoming data.
 	boost::array<char, 8192> buffer_;
