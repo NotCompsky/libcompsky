@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 namespace compsky {
 namespace server {
 
-template<size_t thread_pool_size_,  class RequestHandler>
+template<size_t thread_pool_size_,  size_t req_buffer_sz,  class RequestHandler>
 class server : private boost::noncopyable {
 public:
 	explicit server(const std::string& port)
@@ -84,7 +84,7 @@ public:
 private:
 	/// Initiate an asynchronous accept operation.
 	void start_accept(){
-		new_connection_.reset(new connection(io_context_));
+		new_connection_.reset(new connection<req_buffer_sz, RequestHandler>(io_context_));
 		acceptor_.async_accept(
 			new_connection_->socket(),
 			boost::bind(
@@ -108,7 +108,7 @@ private:
 	boost::asio::io_context io_context_;
 	boost::asio::signal_set signals_;
 	boost::asio::ip::tcp::acceptor acceptor_;
-	boost::shared_ptr<connection<RequestHandler>> new_connection_;
+	boost::shared_ptr<connection<req_buffer_sz, RequestHandler>> new_connection_;
 };
 
 } // namespace server

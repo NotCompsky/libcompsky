@@ -45,7 +45,7 @@ namespace compsky {
 namespace server {
 
 /// Represents a single connection from a client.
-template<class RequestHandler>
+template<size_t req_buffer_sz,  class RequestHandler>
 class connection : public boost::enable_shared_from_this<connection>, private boost::noncopyable {
 public:
 	/// Construct a connection with the given io_context.
@@ -100,7 +100,7 @@ private:
 	
 	boost::asio::io_context::strand strand_; // Ensures the connection's handlers are not called concurrently
 	boost::asio::ip::tcp::socket socket_;
-	boost::array<char, 8192> request_buffer_;
+	boost::array<char, req_buffer_sz> request_buffer_;
 	std::vector<boost::asio::const_buffer>& response_buffers;
 };
 
