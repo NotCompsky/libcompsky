@@ -119,7 +119,7 @@ private:
 	boost::asio::ip::tcp::acceptor acceptor_;
 
 	/// The next connection to be accepted.
-	connection_ptr new_connection_;
+	boost::shared_ptr<connection> new_connection_;
 
 	/// The handler for all incoming requests.
 	RequestHandler request_handler_;
