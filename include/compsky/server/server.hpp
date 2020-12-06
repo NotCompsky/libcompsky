@@ -29,8 +29,6 @@ DEALINGS IN THE SOFTWARE.
 #pragma once
 
 #include <boost/asio.hpp>
-#include <string>
-#include <vector>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
@@ -44,9 +42,14 @@ namespace server {
 
 template<size_t thread_pool_size_,  size_t req_buffer_sz,  class RequestHandler>
 class Server : private boost::noncopyable {
-public:
-	explicit Server(const std::string_view& port)
-	, signals_(io_context_)
+ private:
+	boost::asio::io_context io_context_;
+	boost::asio::signal_set signals_;
+	boost::asio::ip::tcp::acceptor acceptor_;
+	boost::shared_ptr<Connection<req_buffer_sz, RequestHandler>> new_connection_;
+ public:
+	Server(const unsigned port_id)
+	: signals_(io_context_)
 	, acceptor_(io_context_)
 	, new_connection_()
 	{
@@ -60,8 +63,7 @@ public:
 	  #endif
 		signals_.async_wait(boost::bind(&Server::handle_stop, this));
 		
-		boost::asio::ip::tcp::resolver resolver(io_context_);
-		boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve("0.0.0.0", port).begin();
+		boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string("0.0.0.0"), port_id);
 		acceptor_.open(endpoint.protocol());
 		acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
 		acceptor_.bind(endpoint);
@@ -80,7 +82,7 @@ public:
 			threads[i]->join();
 	}
 
-private:
+ private:
 	/// Initiate an asynchronous accept operation.
 	void start_accept(){
 		new_connection_.reset(new Connection<req_buffer_sz, RequestHandler>(io_context_));
@@ -88,7 +90,7 @@ private:
 			new_connection_->socket(),
 			boost::bind(
 				&Server::handle_accept,
-			   this,
+				this,
 				boost::asio::placeholders::error
 			)
 		);
@@ -103,11 +105,6 @@ private:
 	void handle_stop(){
 		io_context_.stop();
 	}
-	
-	boost::asio::io_context io_context_;
-	boost::asio::signal_set signals_;
-	boost::asio::ip::tcp::acceptor acceptor_;
-	boost::shared_ptr<Connection<req_buffer_sz, RequestHandler>> new_connection_;
 };
 
 } // namespace server

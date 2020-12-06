@@ -65,7 +65,7 @@ public:
 			boost::asio::buffer(request_buffer_),
 			boost::asio::bind_executor(strand_,
 				boost::bind(
-					&Connection::handle_read, shared_from_this(),
+					&Connection::handle_read, this->shared_from_this(),
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred
 				)
@@ -82,10 +82,10 @@ private:
 		RequestHandler().handle_request(request_buffer_, bytes_transferred, this->response_buffers);
 		boost::asio::async_write(
 			socket_,
-			reply_.to_buffers(),
+			this->response_buffers,
 			boost::asio::bind_executor(
 				strand_,
-				boost::bind(&Connection::handle_write, shared_from_this(), boost::asio::placeholders::error)
+				boost::bind(&Connection::handle_write, this->shared_from_this(), boost::asio::placeholders::error)
 			)
 		);
 	}
@@ -101,7 +101,7 @@ private:
 	boost::asio::io_context::strand strand_; // Ensures the connection's handlers are not called concurrently
 	boost::asio::ip::tcp::socket socket_;
 	boost::array<char, req_buffer_sz> request_buffer_;
-	std::vector<boost::asio::const_buffer>& response_buffers;
+	std::vector<boost::asio::const_buffer> response_buffers;
 };
 
 } // namespace server
