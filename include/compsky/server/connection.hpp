@@ -46,10 +46,10 @@ namespace server {
 
 /// Represents a single connection from a client.
 template<size_t req_buffer_sz,  class RequestHandler>
-class connection : public boost::enable_shared_from_this<connection>, private boost::noncopyable {
+class Connection : public boost::enable_shared_from_this<Connection<req_buffer_sz, RequestHandler>>, private boost::noncopyable {
 public:
 	/// Construct a connection with the given io_context.
-	explicit connection(boost::asio::io_context& _io_context)
+	explicit Connection(boost::asio::io_context& _io_context)
 	: strand_(_io_context)
 	, socket_(_io_context)
 	{}
@@ -65,7 +65,7 @@ public:
 			boost::asio::buffer(request_buffer_),
 			boost::asio::bind_executor(strand_,
 				boost::bind(
-					&connection::handle_read, shared_from_this(),
+					&Connection::handle_read, shared_from_this(),
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred
 				)
@@ -85,7 +85,7 @@ private:
 			reply_.to_buffers(),
 			boost::asio::bind_executor(
 				strand_,
-				boost::bind(&connection::handle_write, shared_from_this(), boost::asio::placeholders::error)
+				boost::bind(&Connection::handle_write, shared_from_this(), boost::asio::placeholders::error)
 			)
 		);
 	}

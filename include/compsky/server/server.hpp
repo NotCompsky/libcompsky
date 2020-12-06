@@ -38,15 +38,14 @@ DEALINGS IN THE SOFTWARE.
 #include <compsky/macros/likely.hpp>
 #include "connection.hpp"
 
-// Example usage: compsky::server::Server<6>(port_id).run();
 
 namespace compsky {
 namespace server {
 
 template<size_t thread_pool_size_,  size_t req_buffer_sz,  class RequestHandler>
-class server : private boost::noncopyable {
+class Server : private boost::noncopyable {
 public:
-	explicit server(const std::string& port)
+	explicit Server(const std::string_view& port)
 	, signals_(io_context_)
 	, acceptor_(io_context_)
 	, new_connection_()
@@ -59,7 +58,7 @@ public:
 	  #ifdef SIGQUIT
 		signals_.add(SIGQUIT);
 	  #endif
-		signals_.async_wait(boost::bind(&server::handle_stop, this));
+		signals_.async_wait(boost::bind(&Server::handle_stop, this));
 		
 		boost::asio::ip::tcp::resolver resolver(io_context_);
 		boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve("0.0.0.0", port).begin();
@@ -84,11 +83,11 @@ public:
 private:
 	/// Initiate an asynchronous accept operation.
 	void start_accept(){
-		new_connection_.reset(new connection<req_buffer_sz, RequestHandler>(io_context_));
+		new_connection_.reset(new Connection<req_buffer_sz, RequestHandler>(io_context_));
 		acceptor_.async_accept(
 			new_connection_->socket(),
 			boost::bind(
-				&server::handle_accept,
+				&Server::handle_accept,
 			   this,
 				boost::asio::placeholders::error
 			)
@@ -108,7 +107,7 @@ private:
 	boost::asio::io_context io_context_;
 	boost::asio::signal_set signals_;
 	boost::asio::ip::tcp::acceptor acceptor_;
-	boost::shared_ptr<connection<req_buffer_sz, RequestHandler>> new_connection_;
+	boost::shared_ptr<Connection<req_buffer_sz, RequestHandler>> new_connection_;
 };
 
 } // namespace server
