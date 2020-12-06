@@ -388,6 +388,25 @@ void asciify(char*& ITR,  flag::Repeat,  const char c,  const char* s,  Args... 
 }
 
 template<typename... Args>
+void asciify(char*& ITR,  const flag::UntilNullOr,  const char d,  const char* s,  Args... args){
+	while((*s != 0) and (*s != d)){
+		*(ITR++) = *s;
+		++s;
+	}
+	asciify(ITR, args...);
+}
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::UntilNullOr,  const char d,  const std::string_view& v,  Args... args){
+	for(const char c : v){
+		if (c == d)
+			break;
+		*(ITR++) = c;
+	}
+	asciify(ITR, args...);
+}
+
+template<typename... Args>
 void asciify(char*& ITR,  const flag::Escape,  const char c,  const flag::UntilNullOr,  const char d,  const char* s,  Args... args){
 	while((*s != 0) and (*s != d)){
 		if (unlikely(*s == c  ||  *s == '\\'))

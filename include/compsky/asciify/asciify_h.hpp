@@ -147,6 +147,12 @@ template<typename... Args>
 void asciify(char*& ITR,  flag::Repeat,  const char c,  const char* s,  Args... args);
 
 template<typename... Args>
+void asciify(char*& ITR,  const flag::UntilNullOr,  const char d,  const std::string_view& v,  Args... args);
+
+template<typename... Args>
+void asciify(char*& ITR,  const flag::UntilNullOr,  const char d,  const char* s,  Args... args);
+
+template<typename... Args>
 void asciify(char*& ITR,  const flag::Escape,  const char c,  const flag::UntilNullOr,  const char d,  const char* s,  Args... args);
 
 template<typename... Args>
