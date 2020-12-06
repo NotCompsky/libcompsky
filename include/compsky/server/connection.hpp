@@ -36,8 +36,6 @@ DEALINGS IN THE SOFTWARE.
 #include <boost/enable_shared_from_this.hpp>
 #include <vector>
 #include <compsky/macros/likely.hpp>
-#include "reply.hpp"
-#include "request.hpp"
 
 
 // NOTE: RequestHandler must have a function:  void handle_request(boost::array<char, 8192>& req_buffer,  const size_t n_bytes_of_first_req_buffer,  std::vector<boost::asio::const_buffer>& response_buffers);
