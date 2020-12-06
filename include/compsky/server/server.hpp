@@ -37,21 +37,19 @@ DEALINGS IN THE SOFTWARE.
 #include <boost/shared_ptr.hpp>
 #include <compsky/macros/likely.hpp>
 #include "connection.hpp"
-#include "request_handler.hpp"
 
 // Example usage: compsky::server::Server<6>(port_id).run();
 
 namespace compsky {
 namespace server {
 
-template<size_t thread_pool_size_>
+template<size_t thread_pool_size_,  class RequestHandler>
 class server : private boost::noncopyable {
 public:
 	explicit server(const std::string& port)
 	, signals_(io_context_)
 	, acceptor_(io_context_)
 	, new_connection_()
-	, request_handler_(doc_root)
 	{
 		// Register to handle the signals that indicate when the server should exit.
 		// It is safe to register for the same signal multiple times in a program,
@@ -124,7 +122,7 @@ private:
 	connection_ptr new_connection_;
 
 	/// The handler for all incoming requests.
-	request_handler request_handler_;
+	RequestHandler request_handler_;
 };
 
 } // namespace server

@@ -38,17 +38,20 @@ DEALINGS IN THE SOFTWARE.
 #include <compsky/macros/likely.hpp>
 #include "reply.hpp"
 #include "request.hpp"
-#include "request_handler.hpp"
+
+
+// NOTE: RequestHandler must have a function:  void handle_request(boost::array<char, 8192>& req_buffer,  const size_t n_bytes_of_first_req_buffer,  std::vector<boost::asio::const_buffer>& response_buffers);
 
 
 namespace compsky {
 namespace server {
 
 /// Represents a single connection from a client.
+template<class RequestHandler>
 class connection : public boost::enable_shared_from_this<connection>, private boost::noncopyable {
 public:
 	/// Construct a connection with the given io_context.
-	explicit connection(boost::asio::io_context& _io_context,  request_handler& _handler)
+	explicit connection(boost::asio::io_context& _io_context,  RequestHandler& _handler)
 	: strand_(_io_context)
 	, socket_(_io_context)
 	, request_handler_(_handler)
@@ -105,7 +108,7 @@ private:
 	boost::asio::ip::tcp::socket socket_;
 
 	/// The handler used to process the incoming request.
-	request_handler& request_handler_;
+	RequestHandler& request_handler_;
 
 	/// Buffer for incoming data.
 	boost::array<char, 8192> buffer_;
