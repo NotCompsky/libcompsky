@@ -86,7 +86,7 @@ public:
 private:
 	/// Initiate an asynchronous accept operation.
 	void start_accept(){
-		new_connection_.reset(new connection(io_context_, request_handler_));
+		new_connection_.reset(new connection(io_context_));
 		acceptor_.async_accept(
 			new_connection_->socket(),
 			boost::bind(
@@ -119,10 +119,7 @@ private:
 	boost::asio::ip::tcp::acceptor acceptor_;
 
 	/// The next connection to be accepted.
-	boost::shared_ptr<connection> new_connection_;
-
-	/// The handler for all incoming requests.
-	RequestHandler request_handler_;
+	boost::shared_ptr<connection<RequestHandler>> new_connection_;
 };
 
 } // namespace server

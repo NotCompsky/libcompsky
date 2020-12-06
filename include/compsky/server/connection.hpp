@@ -51,10 +51,9 @@ template<class RequestHandler>
 class connection : public boost::enable_shared_from_this<connection>, private boost::noncopyable {
 public:
 	/// Construct a connection with the given io_context.
-	explicit connection(boost::asio::io_context& _io_context,  RequestHandler& _handler)
+	explicit connection(boost::asio::io_context& _io_context)
 	: strand_(_io_context)
 	, socket_(_io_context)
-	, request_handler_(_handler)
 	{}
 
 	/// Get the socket associated with the connection.
@@ -108,7 +107,7 @@ private:
 	boost::asio::ip::tcp::socket socket_;
 
 	/// The handler used to process the incoming request.
-	RequestHandler& request_handler_;
+	RequestHandler request_handler_;
 
 	/// Buffer for incoming data.
 	boost::array<char, 8192> buffer_;
@@ -116,8 +115,6 @@ private:
 	/// The reply to be sent back to the client.
 	std::vector<boost::asio::const_buffer>& response_buffers;
 };
-
-typedef boost::shared_ptr<connection> connection_ptr;
 
 } // namespace server
 } // namespace compsky
