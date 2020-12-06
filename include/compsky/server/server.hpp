@@ -26,63 +26,106 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef HTTP_SERVER3_SERVER_HPP
-#define HTTP_SERVER3_SERVER_HPP
+#pragma once
 
 #include <boost/asio.hpp>
 #include <string>
 #include <vector>
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <compsky/macros/likely.hpp>
 #include "connection.hpp"
 #include "request_handler.hpp"
 
-namespace http {
-namespace server3 {
+// Example usage: compsky::server::Server<6>(port_id).run();
 
-/// The top-level class of the HTTP server.
-class server
-  : private boost::noncopyable
-{
+namespace compsky {
+namespace server {
+
+template<size_t thread_pool_size_>
+class server : private boost::noncopyable {
 public:
-  /// Construct the server to listen on the specified TCP address and port, and
-  /// serve up files from the given directory.
-  explicit server(const std::string& address, const std::string& port,
-      const std::string& doc_root, std::size_t thread_pool_size);
+	explicit server(const std::string& port)
+	, signals_(io_context_)
+	, acceptor_(io_context_)
+	, new_connection_()
+	, request_handler_(doc_root)
+	{
+		// Register to handle the signals that indicate when the server should exit.
+		// It is safe to register for the same signal multiple times in a program,
+		// provided all registration for the specified signal is made through Asio.
+		signals_.add(SIGINT);
+		signals_.add(SIGTERM);
+	  #ifdef SIGQUIT
+		signals_.add(SIGQUIT);
+	  #endif
+		signals_.async_wait(boost::bind(&server::handle_stop, this));
+		
+		boost::asio::ip::tcp::resolver resolver(io_context_);
+		boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve("0.0.0.0", port).begin();
+		acceptor_.open(endpoint.protocol());
+		acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+		acceptor_.bind(endpoint);
+		acceptor_.listen();
 
-  /// Run the server's io_context loop.
-  void run();
+		start_accept();
+	}
+
+	/// Run the server's io_context loop.
+	void run(){
+		std::array<boost::shared_ptr<boost::thread>, thread_pool_size_> threads;
+		for (auto i = 0;  i < thread_pool_size_;  ++i){
+			boost::shared_ptr<boost::thread> thread(new boost::thread(
+				boost::bind(&boost::asio::io_context::run, &io_context_)));
+			threads[i] = thread;
+		}
+		for (auto i = 0;  i < thread_pool_size_;  ++i)
+			threads[i]->join();
+	}
 
 private:
-  /// Initiate an asynchronous accept operation.
-  void start_accept();
+	/// Initiate an asynchronous accept operation.
+	void start_accept(){
+		new_connection_.reset(new connection(io_context_, request_handler_));
+		acceptor_.async_accept(
+			new_connection_->socket(),
+			boost::bind(
+				&server::handle_accept,
+			   this,
+				boost::asio::placeholders::error
+			)
+		);
+	}
 
-  /// Handle completion of an asynchronous accept operation.
-  void handle_accept(const boost::system::error_code& e);
+	/// Handle completion of an asynchronous accept operation.
+	void handle_accept(const boost::system::error_code& e){
+		if (likely(not e))
+			new_connection_->start();
+		start_accept();
+	}
 
-  /// Handle a request to stop the server.
-  void handle_stop();
+	/// Handle a request to stop the server.
+	void handle_stop(){
+		io_context_.stop();
+	}
 
-  /// The number of threads that will call io_context::run().
-  std::size_t thread_pool_size_;
+	/// The io_context used to perform asynchronous operations.
+	boost::asio::io_context io_context_;
 
-  /// The io_context used to perform asynchronous operations.
-  boost::asio::io_context io_context_;
+	/// The signal_set is used to register for process termination notifications.
+	boost::asio::signal_set signals_;
 
-  /// The signal_set is used to register for process termination notifications.
-  boost::asio::signal_set signals_;
+	/// Acceptor used to listen for incoming connections.
+	boost::asio::ip::tcp::acceptor acceptor_;
 
-  /// Acceptor used to listen for incoming connections.
-  boost::asio::ip::tcp::acceptor acceptor_;
+	/// The next connection to be accepted.
+	connection_ptr new_connection_;
 
-  /// The next connection to be accepted.
-  connection_ptr new_connection_;
-
-  /// The handler for all incoming requests.
-  request_handler request_handler_;
+	/// The handler for all incoming requests.
+	request_handler request_handler_;
 };
 
-} // namespace server3
-} // namespace http
-
-#endif // HTTP_SERVER3_SERVER_HPP
+} // namespace server
+} // namespace compsky

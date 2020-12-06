@@ -26,71 +26,95 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef HTTP_SERVER3_CONNECTION_HPP
-#define HTTP_SERVER3_CONNECTION_HPP
+#pragma once
 
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <vector>
+#include <compsky/macros/likely.hpp>
 #include "reply.hpp"
 #include "request.hpp"
 #include "request_handler.hpp"
-#include "request_parser.hpp"
 
-namespace http {
-namespace server3 {
+
+namespace compsky {
+namespace server {
 
 /// Represents a single connection from a client.
-class connection
-  : public boost::enable_shared_from_this<connection>,
-    private boost::noncopyable
-{
+class connection : public boost::enable_shared_from_this<connection>, private boost::noncopyable {
 public:
-  /// Construct a connection with the given io_context.
-  explicit connection(boost::asio::io_context& io_context,
-      request_handler& handler);
+	/// Construct a connection with the given io_context.
+	explicit connection(boost::asio::io_context& _io_context,  request_handler& _handler)
+	: strand_(_io_context)
+	, socket_(_io_context)
+	, request_handler_(_handler)
+	{}
 
-  /// Get the socket associated with the connection.
-  boost::asio::ip::tcp::socket& socket();
+	/// Get the socket associated with the connection.
+	boost::asio::ip::tcp::socket& socket(){
+		return socket_;
+	}
 
-  /// Start the first asynchronous operation for the connection.
-  void start();
+	/// Start the first asynchronous operation for the connection.
+	void start(){
+		socket_.async_read_some(
+			boost::asio::buffer(buffer_),
+			boost::asio::bind_executor(strand_,
+				boost::bind(
+					&connection::handle_read, shared_from_this(),
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred
+				)
+			)
+		);
+	}
 
 private:
-  /// Handle completion of a read operation.
-  void handle_read(const boost::system::error_code& e,
-      std::size_t bytes_transferred);
+	/// Handle completion of a read operation.
+	void handle_read(const boost::system::error_code& e,  const std::size_t bytes_transferred){
+		if (unlikely(e))
+			// If an error occurs then no new asynchronous operations are started, and all shared_ptr references to the connection object will disappear and the object will be destroyed automatically after this handler returns. The connection class's destructor closes the socket.
+			return;
+		this->request_handler_.handle_request(buffer_, bytes_transferred, this->response_buffers);
+		boost::asio::async_write(
+			socket_,
+			reply_.to_buffers(),
+			boost::asio::bind_executor(
+				strand_,
+				boost::bind(&connection::handle_write, shared_from_this(), boost::asio::placeholders::error)
+			)
+		);
+	}
+	
+	void handle_write(const boost::system::error_code& e){
+		if (unlikely(e))
+			return;
+		// Initiate graceful connection closure.
+		boost::system::error_code ignored_ec;
+		socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+	}
 
-  /// Handle completion of a write operation.
-  void handle_write(const boost::system::error_code& e);
+	/// Strand to ensure the connection's handlers are not called concurrently.
+	boost::asio::io_context::strand strand_;
 
-  /// Strand to ensure the connection's handlers are not called concurrently.
-  boost::asio::io_context::strand strand_;
+	/// Socket for the connection.
+	boost::asio::ip::tcp::socket socket_;
 
-  /// Socket for the connection.
-  boost::asio::ip::tcp::socket socket_;
+	/// The handler used to process the incoming request.
+	request_handler& request_handler_;
 
-  /// The handler used to process the incoming request.
-  request_handler& request_handler_;
+	/// Buffer for incoming data.
+	boost::array<char, 8192> buffer_;
 
-  /// Buffer for incoming data.
-  boost::array<char, 8192> buffer_;
-
-  /// The incoming request.
-  request request_;
-
-  /// The parser for the incoming request.
-  request_parser request_parser_;
-
-  /// The reply to be sent back to the client.
-  reply reply_;
+	/// The reply to be sent back to the client.
+	std::vector<boost::asio::const_buffer>& response_buffers;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;
 
-} // namespace server3
-} // namespace http
-
-#endif // HTTP_SERVER3_CONNECTION_HPP
+} // namespace server
+} // namespace compsky
