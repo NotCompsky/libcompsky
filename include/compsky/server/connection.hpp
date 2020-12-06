@@ -62,7 +62,7 @@ public:
 	/// Start the first asynchronous operation for the connection.
 	void start(){
 		socket_.async_read_some(
-			boost::asio::buffer(buffer_),
+			boost::asio::buffer(request_buffer_),
 			boost::asio::bind_executor(strand_,
 				boost::bind(
 					&connection::handle_read, shared_from_this(),
@@ -79,7 +79,7 @@ private:
 		if (unlikely(e))
 			// If an error occurs then no new asynchronous operations are started, and all shared_ptr references to the connection object will disappear and the object will be destroyed automatically after this handler returns. The connection class's destructor closes the socket.
 			return;
-		RequestHandler().handle_request(buffer_, bytes_transferred, this->response_buffers);
+		RequestHandler().handle_request(request_buffer_, bytes_transferred, this->response_buffers);
 		boost::asio::async_write(
 			socket_,
 			reply_.to_buffers(),
@@ -97,17 +97,10 @@ private:
 		boost::system::error_code ignored_ec;
 		socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 	}
-
-	/// Strand to ensure the connection's handlers are not called concurrently.
-	boost::asio::io_context::strand strand_;
-
-	/// Socket for the connection.
+	
+	boost::asio::io_context::strand strand_; // Ensures the connection's handlers are not called concurrently
 	boost::asio::ip::tcp::socket socket_;
-
-	/// Buffer for incoming data.
-	boost::array<char, 8192> buffer_;
-
-	/// The reply to be sent back to the client.
+	boost::array<char, 8192> request_buffer_;
 	std::vector<boost::asio::const_buffer>& response_buffers;
 };
 

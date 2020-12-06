@@ -70,13 +70,11 @@ public:
 
 		start_accept();
 	}
-
-	/// Run the server's io_context loop.
+	
 	void run(){
 		std::array<boost::shared_ptr<boost::thread>, thread_pool_size_> threads;
 		for (auto i = 0;  i < thread_pool_size_;  ++i){
-			boost::shared_ptr<boost::thread> thread(new boost::thread(
-				boost::bind(&boost::asio::io_context::run, &io_context_)));
+			boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_context::run, &io_context_)));
 			threads[i] = thread;
 		}
 		for (auto i = 0;  i < thread_pool_size_;  ++i)
@@ -96,29 +94,20 @@ private:
 			)
 		);
 	}
-
-	/// Handle completion of an asynchronous accept operation.
+	
 	void handle_accept(const boost::system::error_code& e){
 		if (likely(not e))
 			new_connection_->start();
 		start_accept();
 	}
-
-	/// Handle a request to stop the server.
+	
 	void handle_stop(){
 		io_context_.stop();
 	}
-
-	/// The io_context used to perform asynchronous operations.
+	
 	boost::asio::io_context io_context_;
-
-	/// The signal_set is used to register for process termination notifications.
 	boost::asio::signal_set signals_;
-
-	/// Acceptor used to listen for incoming connections.
 	boost::asio::ip::tcp::acceptor acceptor_;
-
-	/// The next connection to be accepted.
 	boost::shared_ptr<connection<RequestHandler>> new_connection_;
 };
 
