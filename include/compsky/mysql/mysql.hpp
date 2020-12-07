@@ -3,9 +3,9 @@
 
 #include "compsky/mysql/mysql.h" // for mysql.h
 #include "compsky/mysql/except.hpp" // for compsky::mysql::except
+#include "compsky/os/read.hpp"
 
 #include <string.h> // for strlen
-#include <stdio.h> // for fopen, fread
 #ifndef _WIN32
 # include <sys/mman.h> // for mmap, munmap
 #endif
@@ -34,20 +34,18 @@ namespace flag {
 }
 
 
-inline
-void init_auth(char* const buf,  const size_t buf_sz,  char* mysql_auth[6],  const char* const fp){
+template<size_t buf_sz>
+void init_auth(char (&buf)[buf_sz],  char* mysql_auth[6],  const char* const fp){
 	// Reads contents of 'fp' into 'buf', and then parses it into the string array 'mysql_auth'
 	if (unlikely(fp == nullptr))
 		throw except::Nullptr();
-    FILE* f = fopen(fp, "rb");
 	
-	if (unlikely(f == 0))
+	compsky::os::ReadOnlyFile f(fp);
+	
+	if (unlikely(f.is_null()))
 		throw except::FileOpen(fp);
 	
-    if (unlikely(fread(buf, 1, buf_sz, f) == 0)){
-		fclose(f);
-		throw except::FileRead(fp);
-	}
+	f.read_into_buf(buf, buf_sz);
 	
     auto n_lines = 0;
     mysql_auth[0] = buf + 6;
@@ -58,7 +56,6 @@ void init_auth(char* const buf,  const size_t buf_sz,  char* mysql_auth[6],  con
             mysql_auth[++n_lines] = itr;
         }
 	}
-    fclose(f);
 }
 
 inline
@@ -94,10 +91,10 @@ void login_from_auth(MYSQL*& mysql_obj,  char* mysql_auth[6]){
 		throw except::ConnectToServer(user, pwrd, host, port_n, path);
 }
 
-inline
-void init(MYSQL*& mysql_obj,  char* const buf,  const size_t buf_sz,  const char* const fp){
+template<size_t buf_sz>
+void init(MYSQL*& mysql_obj,  char (&buf)[buf_sz],  const char* const fp){
 	char* mysql_auth[6];
-    init_auth(buf, buf_sz, mysql_auth, fp);
+	init_auth(buf, mysql_auth, fp);
     login_from_auth(mysql_obj, mysql_auth);
 }
 
