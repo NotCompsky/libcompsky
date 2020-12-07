@@ -79,15 +79,19 @@ private:
 		if (unlikely(e))
 			// If an error occurs then no new asynchronous operations are started, and all shared_ptr references to the connection object will disappear and the object will be destroyed automatically after this handler returns. The connection class's destructor closes the socket.
 			return;
-		RequestHandler().handle_request(request_buffer_, bytes_transferred, this->response_buffers);
-		boost::asio::async_write(
-			socket_,
-			this->response_buffers,
-			boost::asio::bind_executor(
-				strand_,
-				boost::bind(&Connection::handle_write, this->shared_from_this(), boost::asio::placeholders::error)
-			)
-		);
+		this->response_buffers.clear();
+		RequestHandler request_handler;
+		{
+			request_handler.handle_request(request_buffer_, bytes_transferred, this->response_buffers);
+			boost::asio::async_write(
+				socket_,
+				this->response_buffers,
+				boost::asio::bind_executor(
+					strand_,
+					boost::bind(&Connection::handle_write, this->shared_from_this(), boost::asio::placeholders::error)
+				)
+			);
+		}
 	}
 	
 	void handle_write(const boost::system::error_code& e){
