@@ -3,9 +3,9 @@
 
 #include "compsky/mysql/mysql.h" // for mysql.h
 #include "compsky/mysql/except.hpp" // for compsky::mysql::except
-#include "compsky/os/read.hpp"
 
 #include <string.h> // for strlen
+#include <stdio.h> // for fopen, fread
 #ifndef _WIN32
 # include <sys/mman.h> // for mmap, munmap
 #endif
@@ -62,13 +62,15 @@ void init_auth(char (&buf)[buf_sz],  MySQLAuth& mysql_auth,  const char* const f
 	// Reads contents of 'fp' into 'buf', and then parses it into the string array 'mysql_auth'
 	if (unlikely(fp == nullptr))
 		throw except::Nullptr();
+    FILE* f = fopen(fp, "rb");
 	
-	compsky::os::ReadOnlyFile f(fp);
-	
-	if (unlikely(f.is_null()))
+	if (unlikely(f == 0))
 		throw except::FileOpen(fp);
 	
-	f.read_into_buf(buf, buf_sz);
+    if (unlikely(fread(buf, 1, buf_sz, f) == 0)){
+		fclose(f);
+		throw except::FileRead(fp);
+	}
 	
     auto n_lines = 0;
     mysql_auth[0] = buf + 6;
@@ -79,6 +81,7 @@ void init_auth(char (&buf)[buf_sz],  MySQLAuth& mysql_auth,  const char* const f
             mysql_auth[++n_lines] = itr;
         }
 	}
+    fclose(f);
 }
 
 inline
