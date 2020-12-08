@@ -34,31 +34,8 @@ namespace flag {
 }
 
 
-struct MySQLAuth {
-	union {
-		char* bufs[6];
-		struct {
-			char* host;
-			char* path;
-			char* user;
-			char* pwrd;
-			char* dbnm;
-			char* port;
-		};
-	};
-	const char* operator[](int i) const {
-		// Implements the override for ? = MySQLAuth[i]
-		return this->bufs[i];
-	}
-	char*& operator[](int i){
-		// Implements the override for MySQLAuth[i] = ?
-		return this->bufs[i];
-	}
-};
-
-
 template<size_t buf_sz>
-void init_auth(char (&buf)[buf_sz],  MySQLAuth& mysql_auth,  const char* const fp){
+void init_auth(char (&buf)[buf_sz],  char* mysql_auth[6],  const char* const fp){
 	// Reads contents of 'fp' into 'buf', and then parses it into the string array 'mysql_auth'
 	if (unlikely(fp == nullptr))
 		throw except::Nullptr();
@@ -85,39 +62,41 @@ void init_auth(char (&buf)[buf_sz],  MySQLAuth& mysql_auth,  const char* const f
 }
 
 inline
-void login_from_auth(MYSQL*& mysql_obj,  const MySQLAuth mysql_auth){
-	const char* path = mysql_auth.path;
-	const char* pwrd = mysql_auth.pwrd;
+void login_from_auth(MYSQL*& mysql_obj,  char* mysql_auth[6]){
+    const char* host = mysql_auth[0];
+    const char* path = mysql_auth[1];
+    const char* user = mysql_auth[2];
+    const char* pwrd = mysql_auth[3];
+    const char* dbnm = mysql_auth[4];
+    
     if ((path[0] == '/') and (path[1] == 0))
         path = NULL;
     if (pwrd[0] == 0)
         pwrd = NULL;
     
     unsigned int port_n = 0;
-	char* itr = mysql_auth.port;
+    char* itr = mysql_auth[5];
     while (*itr >= '0'  &&  *itr <= '9'){
         port_n *= 10;
         port_n += *itr - '0'; // Integers are continuous in every realistic character encoding
         ++itr;
     }
 	
-#ifdef DEBUG
-	printf("STUFF\nhost %s\nuser %s\npwrd %s\ndbnm %s\nport %u\npath %s\n", mysql_auth.host, mysql_auth.user, pwrd, mysql_auth.dbnm, port_n, path);
+	printf("STUFF\nhost %s\nuser %s\npwrd %s\ndbnm %s\nport %u\npath %s\n", host, user, pwrd, dbnm, port_n, path);
 	fflush(stdout);
-#endif
     
     mysql_obj = mysql_init(NULL);
 	
     if (unlikely(!mysql_obj))
 		throw except::OOM();
     
-    if (unlikely(!mysql_real_connect(mysql_obj, mysql_auth.host, mysql_auth.user, pwrd, mysql_auth.dbnm, port_n, path, 0)))
-		throw except::ConnectToServer(mysql_auth.user, pwrd, mysql_auth.host, port_n, path);
+    if (unlikely(!mysql_real_connect(mysql_obj, host, user, pwrd, dbnm, port_n, path, 0)))
+		throw except::ConnectToServer(user, pwrd, host, port_n, path);
 }
 
 template<size_t buf_sz>
 void init(MYSQL*& mysql_obj,  char (&buf)[buf_sz],  const char* const fp){
-	MySQLAuth mysql_auth;
+	char* mysql_auth[6];
 	init_auth(buf, mysql_auth, fp);
     login_from_auth(mysql_obj, mysql_auth);
 }
