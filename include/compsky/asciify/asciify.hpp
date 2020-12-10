@@ -14,20 +14,21 @@ namespace asciify {
 namespace _detail {
 
 
-inline
-void put(char* const ITR,  const char c){
-	*ITR = c;
+template<typename Str>
+void put(Str ITR,  const char c){
+	if constexpr (std::is_same<Str, char*>::value)
+		*ITR = c;
 }
-inline
-void put(char* const ITR,  const char* const str){
-	memcpy(ITR, str, std::char_traits<char>::length(str));
+template<typename Str>
+void put(Str ITR,  const char* const str){
+	if constexpr (std::is_same<Str, char*>::value)
+		memcpy(ITR, str, std::char_traits<char>::length(str));
 }
-inline
-void put(char* const ITR,  const std::string_view v){
-	memcpy(ITR, v.data(), v.size());
+template<typename Str>
+void put(Str ITR,  const std::string_view v){
+	if constexpr (std::is_same<Str, char*>::value)
+		memcpy(ITR, v.data(), v.size());
 }
-template<typename T>
-void put(const char* const ITR,  const T&){}
 
 
 template<typename Str>
