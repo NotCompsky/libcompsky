@@ -103,14 +103,6 @@ void asciify(char*& ITR,  const char c,  Args... args){
     return asciify(ITR,  args...);
 };
 
-/*template<size_t sz,  typename... Args>
-void asciify(char*& ITR,  char(&str)[sz],  Args... args){
-#warning "Using template<size_t>"
-	memcpy(ITR, str, sz);
-	ITR += sz;
-	asciify(ITR, args...);
-}*/
-
 template<typename... Args>
 void asciify(char*& ITR,  const char* __restrict s,  Args... args){
     memcpy(ITR, s, strlen(s));
@@ -133,33 +125,6 @@ void asciify(char*& ITR,  const QString& qs,  Args... args){
     return asciify(ITR,  s, args...);
 };
 #endif
-
-/*
-template<typename T,  typename... Args>
-void asciify(char*& ITR,  T t,  Args... args){
-    if constexpr (
-        // I am told: ‘if constexpr’ only available with -std=c++1z or -std=gnu++1z
-        // But it *greatly* simplifies the code
-        (std::is_same<T, uint64_t>::value) ||
-        (std::is_same<T, int64_t>::value) ||
-        (std::is_same<T, uint32_t>::value) ||
-        (std::is_same<T, int32_t>::value) ||
-        (std::is_same<T, uint16_t>::value) ||
-        (std::is_same<T, int16_t>::value) ||
-        (std::is_same<T, uint8_t>::value) ||
-        (std::is_same<T, int8_t>::value)
-    ){
-        asciify_integer(ITR, t);
-        return asciify(ITR,  args...);
-    }
-    if constexpr (
-        (std::is_same<T, const char*>::value)
-    ){
-        asciify(ITR, t);
-        return asciify(ITR,  args...);
-    }
-};
-*/
 
 inline
 void asciify_hex(const char map[16],  char*& ITR,  const uint8_t c){
@@ -211,7 +176,6 @@ void asciify(char*& ITR,  flag::StrLen f,  const char* __restrict s,  const size
 /* Base Integer Cases */
 template<unsigned base = 10,  typename T>
 void asciify_integer(char*& ITR,  T n){
-	printf("asciify_integer<%u> %u == %c\n", base, (unsigned)n, (char)n);
 	char* const _itr = ITR;
 	if (n < 0){
 		*(ITR++) = '-';
@@ -232,7 +196,6 @@ void asciify_integer(char*& ITR,  T n){
     } while (n != 0);
     ITR += n_digits;
 	*ITR = 0;
-	printf(">>>%s<<<\n", _itr);
 	if (n == 100)
 		exit(33);
 };
