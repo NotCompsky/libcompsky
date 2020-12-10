@@ -160,7 +160,7 @@ namespace _r {
 	
 	template<size_t col_indx,  typename... Args>
 	size_t strlens(MYSQL_ROW row, const flag::QuoteAndEscape,  Args... args){
-		return 1 + compsky::asciify::asciify_strlen(_f::esc, strlen(row[col_indx])) + 1 + 1 + strlens<col_indx+1>(row, args...);
+		return 1 + compsky::asciify::asciify_strlen(_f::esc, '"', row[col_indx]) + 1 + 1 + strlens<col_indx+1>(row, args...);
 	}
 	
 	template<size_t col_indx,  typename... Args>
