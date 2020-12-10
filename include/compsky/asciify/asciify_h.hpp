@@ -54,7 +54,7 @@ void asciify(Str& ITR,  unsigned long t,  Args... args);
 // Without this, you would get 'ambiguous overloaded function' errors in Visual Studio, as the cast would be equally valid for any integer.
 #endif
 
-template<typename Str,  unsigned base = 10,  typename Int,  typename... Args>
+template<unsigned base = 10,  typename Str,  typename Int,  typename... Args>
 void asciify(Str& ITR,  const flag::FillWithLeadingZeros,  Int min_n_digits,  const int n,  Args... args);
 
 template<typename Str,  typename... Args>
@@ -95,7 +95,7 @@ void asciify(Str& ITR,  const flag::StrLen,  const char* s,  const size_t sz,  A
 
 
 /* Base Integer Cases */
-template<typename Str,  unsigned base = 10,  typename T>
+template<unsigned base = 10,  typename Str,  typename T>
 void asciify_integer(Str& ITR,  T n);
 
 
@@ -160,13 +160,13 @@ void asciify(Str& ITR,  const flag::Escape,  const char c,  const QString& qs,  
 #endif
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::TerminatedBy f,  const char c,  const char* __restrict s,  Args... args);
+void asciify(Str& ITR,  const flag::TerminatedBy f,  const char c,  const char* s,  Args... args);
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  void* ptr,  Args... args);
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::TerminatedBy g,  const char t,  const char* __restrict s,  Args... args);
+void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::TerminatedBy g,  const char t,  const char* s,  Args... args);
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::esc::DoubleQuote,  const char c,  Args... args);
