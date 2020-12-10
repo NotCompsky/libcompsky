@@ -116,12 +116,6 @@ bool operator <(T t,  fake_type::Infinity x);
 template<typename T>
 bool operator >(fake_type::Infinity x,  T t);
 
-template<typename Precision>
-void asciify_subzero(char*& ITR,  double d,  Precision precision);
-
-template<typename T,  typename P,  typename... Args>
-void asciify_floaty(char*& ITR,  T d,  P precision);
-
 template<typename T,  typename... Args>
 void asciify(char*& ITR,  double d,  T precision,  Args... args);
 
