@@ -16,7 +16,11 @@ namespace flag {
         struct End{};
     }
 	struct EnvExpand{};
-	struct UntilNullOr{};
+	struct [[deprecated("Use compsky::asciify::flag::until::NullOr instead")]] UntilNullOr{};
+	namespace until {
+		struct NullOr{};
+		struct NullOrNthChar{};
+	}
     struct Escape{};
 	struct Escape3{};
 	struct JSONEscape{};
