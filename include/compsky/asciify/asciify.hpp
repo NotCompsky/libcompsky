@@ -76,6 +76,22 @@ void asciify(char*& ITR,  unsigned long t,  Args... args){
 };
 #endif
 
+template<unsigned base = 10,  typename Int,  typename... Args>
+void asciify(char*& ITR,  const flag::FillWithLeadingZeros,  Int min_n_digits,  const int n,  Args... args){
+	Int m = n;
+	do {
+		if (min_n_digits == 0)
+			break;
+		--min_n_digits;
+	} while (m /= base);
+	while(min_n_digits != 0){
+		asciify(ITR, '0');
+		--min_n_digits;
+	}
+	asciify_integer<base>(ITR, n);
+	asciify(ITR, args...);
+}
+
 template<typename... Args>
 void asciify(char*& ITR,  const bool b,  Args... args){
 	return asciify(ITR,  b ? "True" : "False",  args...);
@@ -193,31 +209,36 @@ void asciify(char*& ITR,  flag::StrLen f,  const char* __restrict s,  const size
 
 
 /* Base Integer Cases */
-template<typename T>
+template<unsigned base = 10,  typename T>
 void asciify_integer(char*& ITR,  T n){
+	printf("asciify_integer<%u> %u == %c\n", base, (unsigned)n, (char)n);
+	char* const _itr = ITR;
 	if (n < 0){
 		*(ITR++) = '-';
 		return asciify_integer(ITR, -n);
 	}
-    auto n_digits = count_digits(n);
+    auto n_digits = count_digits<base>(n);
     auto i = n_digits;
     ITR += i;
     do {
-        *(--ITR) = '0' + (n % 10);
-        n /= 10;
+		static_assert(base <= 10 + 26);
+		if constexpr(base <= 10){
+			*(--ITR) = '0' + (n % base);
+		} else if constexpr(base <= 10 + 26){
+			const char c = (n % base);
+			*(--ITR) = (c <= 10) ? '0' + c : 'a' + c - 10;
+		}
+		n /= base;
     } while (n != 0);
     ITR += n_digits;
+	*ITR = 0;
+	printf(">>>%s<<<\n", _itr);
+	if (n == 100)
+		exit(33);
 };
 
 
 
-template<typename T,  typename... Args>
-void asciify(char*& ITR,  flag::FillWithLeadingZeros f,  const int min_digits,  T n,  Args... args){
-    int n_digits = count_digits(n);
-    for (auto i = n_digits;  i < min_digits;  ++i)
-        *(ITR++) = '0';
-    asciify(ITR, n, args...);
-};
 
 template<typename T>
 bool operator <(T t,  fake_type::Infinity x){
@@ -640,71 +661,39 @@ void asciify(char*& ITR,  const flag::esc::SpacesAndNonAscii,  const char* s,  A
 
 template<typename... Args>
 void asciify(char*& ITR,  const flag::JSONEscape,  const char* s,  Args... args){
-	/*constexpr static const char _map[128] = {
-		['\b'] = 'b',
-		['\f'] = 'f',
-		['\n'] = 'n',
-		['\r'] = 'r',
-		['\t'] = 't',
-		['\\'] = '\\',
-		['"'] = '"',
-	};*/ // TODO: Wait 10 years for "non-trivial" designated initialisation to be supported
-	char* const _itr = ITR;
 	while(true){
 		const char c = *(s++);
 		switch(c){
 			case 0:
 				return asciify(ITR, args...);
+			case '"':
+			case '\\':
+				asciify(ITR, '\\');
+				*(ITR++) = c;
+				break;
 			case '\n':
-				*(ITR++) = '\\';
-				*(ITR++) = 'n';
+				asciify(ITR, '\\', 'n');
+				break;
+			case '\r':
+				asciify(ITR, '\\', 'r');
 				break;
 			case '\t':
-				*(ITR++) = '\\';
-				*(ITR++) = 't';
+				asciify(ITR, '\\', 't');
 				break;
-			case '\\':
-			case '"':
-				*(ITR++) = '\\';
-				*(ITR++) = c;
+			case '\b':
+				asciify(ITR, '\\', 'b');
 				break;
-			case 'a' ... 'z':
-			case 'A' ... 'Z':
-			case '0' ... '9':
-			case ' ':
-			case '!':
-			case '\'':
-			case '#':
-			case '$':
-			case '%':
-			case '&':
-			case '(':
-			case ')':
-			case '*':
-			case '+':
-			case ',':
-			case '-':
-			case '.':
-			case '/':
-			case ':':
-			case ';':
-			case '<':
-			case '=':
-			case '>':
-			case '?':
-			case '@':
-			case '[':
-			case ']':
-			case '^':
-			case '_':
-			case '`':
-			case '{':
-			case '|':
-			case '}':
-			case '~':
-				*(ITR++) = c;
+			case '\f':
+				asciify(ITR, '\\', 'f');
 				break;
+			// case 0x01 ... 0x1f: // Compiler whines about duplicate cases.
 			default:
+				if (unlikely((0x01 <= c) and (c <= 0x1f))){
+					asciify(ITR, '\\', 'u');
+					constexpr flag::FillWithLeadingZeros _f_lpad;
+					asciify<16>(ITR, _f_lpad, 4, c);
+				} else
+					*(ITR++) = c;
 				break;
 		}
 	}

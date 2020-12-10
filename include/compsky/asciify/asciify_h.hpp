@@ -67,6 +67,9 @@ void asciify(char*& ITR,  unsigned long t,  Args... args);
 // Without this, you would get 'ambiguous overloaded function' errors in Visual Studio, as the cast would be equally valid for any integer.
 #endif
 
+template<unsigned base = 10,  typename Int,  typename... Args>
+void asciify(char*& ITR,  const flag::FillWithLeadingZeros,  Int min_n_digits,  const int n,  Args... args);
+
 template<typename... Args>
 void asciify(char*& ITR,  const bool b,  Args... args);
 
@@ -105,13 +108,10 @@ void asciify(char*& ITR,  const flag::StrLen,  const char* s,  const size_t sz, 
 
 
 /* Base Integer Cases */
-template<typename T>
+template<unsigned base = 10,  typename T>
 void asciify_integer(char*& ITR,  T n);
 
 
-
-template<typename T,  typename... Args>
-void asciify(char*& ITR,  const flag::FillWithLeadingZeros,  const int min_digits,  T n,  Args... args);
 
 template<typename T>
 bool operator <(T t,  fake_type::Infinity x);
