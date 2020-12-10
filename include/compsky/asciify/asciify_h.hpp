@@ -39,9 +39,6 @@ void asciify(char*& ITR);
 template<typename... Args>
 size_t get_index(char*& ITR,  char*& BUF);
 
-template<typename C>
-void append(char*& ITR,  C c);
-
 /* Base Case to Override (must precede Base Cases) */
 template<typename... Args>
 void asciify(char*& ITR,  uint64_t t,  Args... args);
