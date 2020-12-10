@@ -136,6 +136,8 @@ namespace _r {
 	size_t strlens(MYSQL_ROW row, const flag::QuoteNoEscape,  Args... args);
 	template<size_t col_indx,  typename... Args>
 	size_t strlens(MYSQL_ROW row, const flag::QuoteAndEscape,  Args... args);
+	template<size_t col_indx,  typename... Args>
+	size_t strlens(MYSQL_ROW row, const flag::QuoteAndJSONEscape,  Args... args);
 	
 	template<typename Int>
 	size_t strlens_int(Int m){
@@ -158,7 +160,12 @@ namespace _r {
 	
 	template<size_t col_indx,  typename... Args>
 	size_t strlens(MYSQL_ROW row, const flag::QuoteAndEscape,  Args... args){
-		return 1 + 2*strlen(row[col_indx]) + 1 + 1 + strlens<col_indx+1>(row, args...);
+		return 1 + compsky::asciify::asciify_strlen(_f::esc, strlen(row[col_indx])) + 1 + 1 + strlens<col_indx+1>(row, args...);
+	}
+	
+	template<size_t col_indx,  typename... Args>
+	size_t strlens(MYSQL_ROW row, const flag::QuoteAndJSONEscape,  Args... args){
+		return 1 + compsky::asciify::asciify_strlen(_f::json_esc, const_cast<const char*>(row[col_indx])) + 1 + 1 + strlens<col_indx+1>(row, args...);
 	}
 	
 	
