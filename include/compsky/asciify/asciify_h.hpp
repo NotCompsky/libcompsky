@@ -14,18 +14,11 @@
 
 #include <vector>
 #include <array>
+#include <string_view>
 
 #include "compsky/asciify/flags.hpp"
 #include "compsky/asciify/types.hpp"
 #include "compsky/asciify/utils.hpp"
-
-
-#if (defined COMPSKY_STD_STRING_VIEW || defined basic_string)
-# include <string_view>
-# define LIBCOMPSKY_INCLUDES_STRING_VIEW
-#else
-# warning "std::string_view treated as not defined"
-#endif
 
 
 namespace compsky {
@@ -151,13 +144,11 @@ void asciify(Str& ITR,  const flag::Escape,  const char c,  const char* s,  Args
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape3,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args);
 
-#ifdef LIBCOMPSKY_INCLUDES_STRING_VIEW
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const std::string_view s,  Args... args);
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c,  const std::string_view s,  Args... args);
-#endif
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args);

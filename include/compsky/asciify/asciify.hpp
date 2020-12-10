@@ -13,6 +13,28 @@ namespace compsky {
 namespace asciify {
 
 
+namespace _detail {
+
+
+inline
+void put(char* const ITR,  const char c){
+	*ITR = c;
+}
+inline
+void put(char* const ITR,  const char* const str){
+	memcpy(ITR, str, std::char_traits<char>::length(str));
+}
+inline
+void put(char* const ITR,  const std::string_view v){
+	memcpy(ITR, v.data(), v.size());
+}
+template<typename T>
+void put(const char* const ITR,  const T&){}
+
+
+} // namespace _detail
+
+
 template<typename Str>
 void asciify(Str& ITR){};
 
@@ -94,13 +116,13 @@ void asciify(Str& ITR,  const bool b,  Args... args){
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const char c,  Args... args){
-    *(ITR++) = c;
+	_detail::put(ITR++, c);
     return asciify(ITR,  args...);
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const char* __restrict s,  Args... args){
-    memcpy(ITR, s, strlen(s));
+void asciify(Str& ITR,  const char* s,  Args... args){
+	_detail::put(ITR, s);
     ITR += strlen(s);
     return asciify(ITR,  args...);
 };
@@ -123,8 +145,8 @@ void asciify(Str& ITR,  const QString& qs,  Args... args){
 
 inline
 void asciify_hex(const char map[16],  Str& ITR,  const uint8_t c){
-	*(ITR++) = map[((uint8_t)c & 0xf0) >> 4];
-	*(ITR++) = map[ (uint8_t)c & 0x0f ];
+	_detail::put(ITR++, map[((uint8_t)c & 0xf0) >> 4]);
+	_detail::put(ITR++, map[ (uint8_t)c & 0x0f ]);
 }
 
 template<typename Str,  size_t sz>
@@ -162,7 +184,7 @@ void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  flag::StrLen f,  const char* __restrict s,  const size_t sz,  Args... args){
 	// WARNING: Not sure the __restrict is viable here, probably depends on whether args expansion contains another cstring
-    memcpy(ITR,  s,  sz);
+	_detail::put(ITR, std::string_view(s, sz));
     ITR += sz;
     asciify(ITR, args...);
 };
@@ -173,7 +195,7 @@ template<typename Str,  unsigned base = 10,  typename T>
 void asciify_integer(Str& ITR,  T n){
 	char* const _itr = ITR;
 	if (n < 0){
-		*(ITR++) = '-';
+		_detail::put(ITR++, '-');
 		return asciify_integer(ITR, -n);
 	}
     auto n_digits = count_digits<base>(n);
@@ -182,17 +204,14 @@ void asciify_integer(Str& ITR,  T n){
     do {
 		static_assert(base <= 10 + 26);
 		if constexpr(base <= 10){
-			*(--ITR) = '0' + (n % base);
+			_detail::put(--ITR,  '0' + (n % base));
 		} else if constexpr(base <= 10 + 26){
 			const char c = (n % base);
-			*(--ITR) = (c <= 10) ? '0' + c : 'a' + c - 10;
+			_detail::put(--ITR,  (c <= 10) ? '0' + c : 'a' + c - 10);
 		}
 		n /= base;
     } while (n != 0);
     ITR += n_digits;
-	*ITR = 0;
-	if (n == 100)
-		exit(33);
 };
 
 
@@ -268,7 +287,7 @@ void asciify(Str& ITR,  flag::AlphaNumeric f,  Int m,  Args... args){
 	ITR += n_digits;
 	do {
 		char digit = m % 36;
-		*(--ITR) = digit + ((digit<10) ? '0' : 'a' - 10);
+		_detail::put(--ITR,  digit + ((digit<10) ? '0' : 'a' - 10));
 		m /= 36;
 	} while (m != 0);
 	ITR += n_digits;
@@ -316,7 +335,7 @@ void asciify(Str& ITR,  flag::EnvExpand f,  char* s,  Args... args){
 				throw UnescapedDollar();
 			}
 		}
-		*(ITR++) = *s;
+		_detail::put(ITR++, *s);
 		++s;
 	}
 	asciify(ITR, args...);
@@ -359,8 +378,8 @@ template<typename Str,  typename... Args>
 void asciify(Str& ITR,  flag::Repeat,  const char c,  const char* s,  Args... args){
 	while(*s != 0){
 		if (*s == c)
-			*(ITR++) = c;
-		*(ITR++) = *s;
+			_detail::put(ITR++, c);
+		_detail::put(ITR++, *s);
 		++s;
 	}
 	asciify(ITR, args...);
@@ -369,7 +388,7 @@ void asciify(Str& ITR,  flag::Repeat,  const char c,  const char* s,  Args... ar
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::until::NullOrNthChar,  size_t limit,  const char* s,  Args... args){
 	while((*s != 0) and (limit-- != 0)){
-		*(ITR++) = *s;
+		_detail::put(ITR++, *s);
 		++s;
 	}
 	asciify(ITR, args...);
@@ -378,7 +397,7 @@ void asciify(Str& ITR,  const flag::until::NullOrNthChar,  size_t limit,  const 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
 	while((*s != 0) and (*s != d)){
-		*(ITR++) = *s;
+		_detail::put(ITR++, *s);
 		++s;
 	}
 	asciify(ITR, args...);
@@ -389,7 +408,7 @@ void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const std::st
 	for(const char c : v){
 		if (c == d)
 			break;
-		*(ITR++) = c;
+		_detail::put(ITR++, c);
 	}
 	asciify(ITR, args...);
 }
@@ -398,8 +417,8 @@ template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
 	while((*s != 0) and (*s != d)){
 		if (unlikely(*s == c  ||  *s == '\\'))
-			*(ITR++) = '\\';
-		*(ITR++) = *s;
+			_detail::put(ITR++, '\\');
+		_detail::put(ITR++, *s);
 		++s;
 	}
 	asciify(ITR, args...);
@@ -409,8 +428,8 @@ template<typename Str,  typename... Args>
 void asciify(Str& ITR,  flag::Escape f,  const char c,  const char* __restrict s,  Args... args){
     while(*s != 0){
         if (unlikely(*s == c  ||  *s == '\\'))
-            *(ITR++) = '\\';
-        *(ITR++) = *s;
+            _detail::put(ITR++, '\\');
+        _detail::put(ITR++, *s);
         ++s;
     }
     asciify(ITR, args...);
@@ -420,14 +439,13 @@ template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape3,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args){
     while(*s != 0){
         if (unlikely(*s == c1  ||  *s == c2  ||  *s == c3  ||  *s == '\\'))
-            *(ITR++) = '\\';
-        *(ITR++) = *s;
+            _detail::put(ITR++, '\\');
+        _detail::put(ITR++, *s);
         ++s;
     }
     asciify(ITR, args...);
 };
 
-#ifdef LIBCOMPSKY_INCLUDES_STRING_VIEW
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const std::string_view s,  Args... args){
 	constexpr flag::StrLen _strlen;
@@ -439,7 +457,6 @@ void asciify(Str& ITR,  flag::Escape f,  const char c,  const std::string_view s
 	constexpr flag::StrLen _strlen;
 	asciify(ITR, f, c, _strlen, s.size(), s.data(), args...);
 };
-#endif
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
@@ -447,8 +464,8 @@ void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::StrLen, 
 	while(i < sz){
 		const char _c = s[i];
 		if (unlikely(_c == c  ||  _c == '\\'))
-			*(ITR++) = '\\';
-		*(ITR++) = _c;
+			_detail::put(ITR++, '\\');
+		_detail::put(ITR++, _c);
 		++i;
     }
     asciify(ITR, args...);
@@ -468,7 +485,7 @@ void asciify(Str& ITR,  const flag::Escape,  const char c,  const QString& qs,  
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::TerminatedBy,  const char c,  const char* __restrict s,  Args... args){
 	while(*s != c){
-		*(ITR++) = *s;
+		_detail::put(ITR++, *s);
 		++s;
 	}
 	asciify(ITR, args...);
@@ -479,8 +496,8 @@ template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::TerminatedBy,  const char t,  const char* __restrict s,  Args... args){
 	while(*s != t){
 		if (unlikely(*s == c  ||  *s == '\\'))
-			*(ITR++) = '\\';
-		*(ITR++) = *s;
+			_detail::put(ITR++, '\\');
+		_detail::put(ITR++, *s);
 		++s;
 	}
 	asciify(ITR, args...);
@@ -627,7 +644,7 @@ void asciify(Str& ITR,  const flag::JSONEscape,  const char* s,  Args... args){
 			case '"':
 			case '\\':
 				asciify(ITR, '\\');
-				*(ITR++) = c;
+				_detail::put(ITR++, c);
 				break;
 			case '\n':
 				asciify(ITR, '\\', 'n');
@@ -651,7 +668,7 @@ void asciify(Str& ITR,  const flag::JSONEscape,  const char* s,  Args... args){
 					constexpr flag::FillWithLeadingZeros _f_lpad;
 					asciify<16>(ITR, _f_lpad, 4, c);
 				} else
-					*(ITR++) = c;
+					_detail::put(ITR++, c);
 				break;
 		}
 	}
@@ -660,14 +677,14 @@ void asciify(Str& ITR,  const flag::JSONEscape,  const char* s,  Args... args){
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  void* ptr,  Args... args){
-    *(ITR++) = '0';
-    *(ITR++) = 'x';
+	_detail::put(ITR++, '0');
+	_detail::put(ITR++, 'x');
     uintptr_t n = (uintptr_t)ptr;
     auto n_digits = count_digits(n);
-    for (char* itr = ITR + n_digits;  itr != ITR;  ){
+    for (Str itr = ITR + n_digits;  itr != ITR;  ){
         const uint8_t m = (n % 16);
         const char c  =  (m < 10)  ?  '0' + m  :  'a' + m - 10;
-        *(--itr) = c;
+		_detail::put(--itr, c);
         n /= 16;
     }
     ITR += n_digits;
@@ -873,7 +890,7 @@ void asciify(Str& ITR,  flag::to::AlphaNumeric f,  Int n,  Args... args){
     
     do {
         const char digit = n % 36;
-        *(--ITR) = digit + ((digit<10) ? '0' : 'a' - 10);
+		_detail::put(--ITR,  digit + ((digit<10) ? '0' : 'a' - 10));
         n /= 36;
     } while (n != 0);
     
@@ -899,6 +916,16 @@ void asciify(char(& buf)[sz],  Args... args){
 	// Don't actually care about the array size (yet) - only used to avoid compiler whining about ambigious overloads.
 	char* itr = buf;
 	asciify(itr, args...);
+}
+
+
+template<typename... Args>
+std::size_t asciify_strlen(Args... args){
+	// Dry run asciify - get the length of the string that would be written by asciify, without writing
+	const char* const buf = 0;
+	const char* itr = buf;
+	asciify(buf, args...);
+	return (uintptr_t)itr;
 }
 
 
