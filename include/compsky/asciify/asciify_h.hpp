@@ -23,6 +23,7 @@
 
 namespace compsky {
 namespace asciify {
+namespace _detail {
 
 
 template<typename Str>
@@ -253,12 +254,8 @@ template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::debug::PrintfStdOut f,  Args... args);
 
 
-// Copy into a fixed pointer (such as a fixed-length buffer)
-template<size_t sz,  typename... Args>
-void asciify(char(& buf)[sz],  Args... args);
 
-
-
+} // namespace _detail
 }
 } // END: namespace compsky::asciify
 

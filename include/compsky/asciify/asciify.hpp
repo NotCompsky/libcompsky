@@ -11,8 +11,6 @@
 
 namespace compsky {
 namespace asciify {
-
-
 namespace _detail {
 
 
@@ -30,9 +28,6 @@ void put(char* const ITR,  const std::string_view v){
 }
 template<typename T>
 void put(const char* const ITR,  const T&){}
-
-
-} // namespace _detail
 
 
 template<typename Str>
@@ -143,7 +138,7 @@ void asciify(Str& ITR,  const QString& qs,  Args... args){
 };
 #endif
 
-inline
+template<typename Str>
 void asciify_hex(const char map[16],  Str& ITR,  const uint8_t c){
 	_detail::put(ITR++, map[((uint8_t)c & 0xf0) >> 4]);
 	_detail::put(ITR++, map[ (uint8_t)c & 0x0f ]);
@@ -910,12 +905,15 @@ void asciify(Str& ITR,  const flag::debug::PrintfStdOut,  Args... args){
 };
 
 
+} // namespace _detail
+
+
 
 template<size_t sz,  typename... Args>
 void asciify(char(& buf)[sz],  Args... args){
 	// Don't actually care about the array size (yet) - only used to avoid compiler whining about ambigious overloads.
 	char* itr = buf;
-	asciify(itr, args...);
+	_detail::asciify(itr, args...);
 }
 
 
@@ -924,7 +922,7 @@ std::size_t asciify_strlen(Args... args){
 	// Dry run asciify - get the length of the string that would be written by asciify, without writing
 	const char* const buf = 0;
 	const char* itr = buf;
-	asciify(buf, args...);
+	_detail::asciify(buf, args...);
 	return (uintptr_t)itr;
 }
 
