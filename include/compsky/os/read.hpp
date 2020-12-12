@@ -11,8 +11,8 @@ namespace compsky {
 namespace os {
 
 
-template<size_t buf_sz>
-bool read_from_file(const fileid_typ file_id,  char (&buf)[buf_sz],  const size_t n_bytes){
+inline
+bool read_from_file(const fileid_typ file_id,  char* buf,  const size_t n_bytes){
   #ifdef _WIN32
 	return (unlikely(fread(buf, n_bytes, 1, file_id) != 1));
   #else
