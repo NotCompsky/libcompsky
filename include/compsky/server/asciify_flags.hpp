@@ -24,6 +24,7 @@ namespace _f {
 	constexpr static const StrLen strlen;
 	constexpr static const JSONEscape json_esc;
 	constexpr static const Repeat repeat;
+	constexpr static const Zip<2> zip2;
 	constexpr static const Zip<3> zip3;
 	constexpr static const NElements n_elements;
 	constexpr static const Hex hex;
