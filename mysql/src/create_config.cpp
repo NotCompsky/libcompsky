@@ -63,7 +63,7 @@ namespace mysql {
 
 void create_config(const char* const stmts,  const char* const permissions_str,  const char* const env_var){
 	MYSQL* mysql_obj;
-	char* mysql_auth[indx::COUNT];
+	MySQLAuth mysql_auth;
 	
     std::cout << "* MySQL Configuration *" << std::endl;
     
@@ -89,7 +89,7 @@ void create_config(const char* const stmts,  const char* const permissions_str, 
 		, "HOST: "
 	);
     
-    bool is_localhost = (strncmp(mysql_auth[indx::host], "localhost", strlen("localhost")) == 0)  ||  (strncmp(mysql_auth[indx::host], "127.0.0.1", strlen("127.0.0.1")) == 0);
+    bool is_localhost = (strncmp(mysql_auth.host, "localhost", strlen("localhost")) == 0)  ||  (strncmp(mysql_auth.host, "127.0.0.1", strlen("127.0.0.1")) == 0);
     
 	CREATE_CFG_LINE(
 		"Socket file path or named pipe name (a single '/' character if not used)"
@@ -120,23 +120,23 @@ void create_config(const char* const stmts,  const char* const permissions_str, 
     for (auto j = 0;  j < indx::COUNT;  ++j)
         printf("mysql_auth[%d] = %s\n", j, mysql_auth[j]);
     
-    /* Now to login to the MySQL database with the root user */
+    /* Now to login to the MySQL database with the root user *
     
-    const char* username = mysql_auth[indx::user]; // User to grant permissions to
-    const char* password = mysql_auth[indx::pwrd]; // His password
+    const char* username = mysql_auth.user; // User to grant permissions to
+    const char* password = mysql_auth.pwrd; // His password
     
-    mysql_auth[indx::user] = auth_ptr;
+    mysql_auth.user = auth_ptr;
 	PROMPT_READ_INTO_AUTH_PTR("MySQL admin username: ")
     *auth_ptr = 0; // So we can write it out here:
     ++auth_ptr;
     
-    mysql_auth[indx::pwrd] = auth_ptr;
-	PROMPT_READ_INTO_AUTH_PTR("MySQL admin password (leave blank to use system socket authentication - i.e. if you can login to MySQL as `" << mysql_auth[indx::user] << "` without a password): ")
+    mysql_auth.pwrd = auth_ptr;
+	PROMPT_READ_INTO_AUTH_PTR("MySQL admin password (leave blank to use system socket authentication - i.e. if you can login to MySQL as `" << mysql_auth.user << "` without a password): ")
     *auth_ptr = 0;
     
-    const char* db_name = mysql_auth[indx::dbnm];
+    const char* db_name = mysql_auth.dbnm;
     
-	mysql_auth[indx::dbnm] = nullptr; // Connect to 'null' database, since we haven't created our database yet
+	mysql_auth.dbnm = nullptr; // Connect to 'null' database, since we haven't created our database yet
     
     login_from_auth(mysql_obj, mysql_auth);
     
