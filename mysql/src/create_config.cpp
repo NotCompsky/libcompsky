@@ -120,7 +120,7 @@ void create_config(const char* const stmts,  const char* const permissions_str, 
     for (auto j = 0;  j < indx::COUNT;  ++j)
         printf("mysql_auth[%d] = %s\n", j, mysql_auth[j]);
     
-    /* Now to login to the MySQL database with the root user *
+    /* Now to login to the MySQL database with the root user */
     
     const char* username = mysql_auth.user; // User to grant permissions to
     const char* password = mysql_auth.pwrd; // His password
