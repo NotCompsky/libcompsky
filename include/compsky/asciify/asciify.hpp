@@ -689,8 +689,8 @@ void asciify(Str& ITR,  void* ptr,  Args... args){
 
 
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::NElements,  const size_t n,  const std::vector<const char*>& a,  Args... args){
+template<typename Str,  typename T,  typename... Args>
+void asciify(Str& ITR,  const flag::NElements,  const size_t n,  const std::vector<T>& a,  Args... args){
 	for (size_t i = 0;  i < n;  ++i){
 		asciify(ITR, a.at(i));
 	}

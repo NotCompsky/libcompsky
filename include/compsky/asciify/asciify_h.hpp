@@ -184,8 +184,8 @@ template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::JSONEscape,  const char* const s,  Args... args);
 
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::NElements,  const size_t n,  const std::vector<const char*>& a,  Args... args);
+template<typename Str,  typename T,  typename... Args>
+void asciify(Str& ITR,  const flag::NElements,  const size_t n,  const std::vector<T>& a,  Args... args);
 
 
 template<typename Str,  unsigned N,  typename... Args>
