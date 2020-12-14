@@ -21,6 +21,16 @@ fileid_typ open_file_for_reading(const char* const file_path){
 
 
 inline
+fileid_typ open_file_for_writing(const char* const file_path){
+  #ifdef _WIN32
+	return fopen(file_path, "wb");
+  #else
+	return open(file_path, O_WRONLY);
+  #endif
+}
+
+
+inline
 void close_file_handle(const fileid_typ fd){
   #ifdef _WIN32
 	fclose(fd);
