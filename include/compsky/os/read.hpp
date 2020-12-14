@@ -36,7 +36,8 @@ class ReadOnlyFile {
 	{}
 	
 	~ReadOnlyFile(){
-		compsky::os::close_file_handle(this->f_id);
+		if (not this->is_null())
+			compsky::os::close_file_handle(this->f_id);
 	}
 	
 	bool is_null() const {
