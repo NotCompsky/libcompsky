@@ -5,6 +5,7 @@
 #ifndef _WIN32
 # include <unistd.h>
 #endif
+#include <compsky/asciify/asciify.hpp>
 
 
 namespace compsky {
@@ -20,8 +21,8 @@ bool write_n_bytes(const fileid_typ file_id,  const char* io_buf,  const size_t 
   #endif
 }
 
-template<size_t buf_sz,  typename... Args>
-bool write_to_file(const fileid_typ file_id,  char (&buf)[buf_sz],  Args&&... args){
+template<typename... Args>
+bool write_to_file(const fileid_typ file_id,  char* buf,  Args&&... args){
 	char* itr = buf;
 	compsky::asciify::asciify(itr, args...);
 	write_n_bytes(file_id, buf,  (uintptr_t)itr - (uintptr_t)buf);
@@ -58,6 +59,10 @@ class WriteOnlyFile {
 	template<typename... Args>
 	bool write(Args&&... args){
 		return write_to_file(this->f_id, args...);
+	}
+	
+	bool write_from_buffer(const char* buf,  const size_t n_bytes){
+		return write_n_bytes(this->f_id, buf, n_bytes);
 	}
 };
 
