@@ -33,8 +33,7 @@ class ResponseGeneration {
 	char* buf;
 	char* itr;
 	
-	MYSQL_RES* res;
-	MYSQL_RES* res2;
+	MYSQL_RES* res[2];
 	MYSQL_ROW row;
 	
 	constexpr
@@ -62,30 +61,26 @@ class ResponseGeneration {
 	void asciify(Args... args){
 		compsky::asciify::asciify(this->itr,  args...);
 	};
-
 	
-	template<typename... Args>
+	template<size_t i = 0,  typename... Args>
 	bool mysql_assign_next_row(Args... args){
-		return compsky::mysql::assign_next_row(this->res, &this->row, args...);
-	}
-	
-	template<typename... Args>
-	bool mysql_assign_next_row2(Args... args){
 		// WARNING: Shares row.
-		return compsky::mysql::assign_next_row(this->res2, &this->row, args...);
+		return compsky::mysql::assign_next_row(this->res[i], &this->row, args...);
 	}
 	
-	template<typename... Args>
+	template<size_t i = 0,  typename... Args>
 	bool mysql_assign_next_row__no_free(Args... args){
-		return compsky::mysql::assign_next_row__no_free(this->res, &this->row, args...);
+		return compsky::mysql::assign_next_row__no_free(this->res[i], &this->row, args...);
 	}
 	
+	template<size_t i = 0>
 	void mysql_free_res(){
-		mysql_free_result(this->res);
+		mysql_free_result(this->res[i]);
 	}
 	
-	void mysql_seek(const int i){
-		mysql_data_seek(this->res, i);
+	template<size_t i = 0>
+	void mysql_seek(const int j){
+		mysql_data_seek(this->res[i], j);
 	}
 	
 	std::string_view get_buf_as_string_view(){
@@ -99,13 +94,13 @@ class ResponseGeneration {
 #endif
 	
 	
-	template<typename... Args>
+	template<size_t i = 0,  typename... Args>
 	char* get_itr_from_buf(std::nullptr_t,  const char* const _headers,  Args... args){
 		size_t sz = 0; // NOTE: If there is a free(): corrupted chunk error, it is probably because strlens has calculated the wrong size for the container.
 		
 		sz += std::char_traits<char>::length(_headers);
 		sz += 1;
-		sz += _r::get_size_of_json_response_rows_from_sql_res(this->res, &this->row, args...);
+		sz += _r::get_size_of_json_response_rows_from_sql_res(this->res[i], &this->row, args...);
 		sz += 1;
 		sz += 1;
 		
@@ -126,24 +121,24 @@ class ResponseGeneration {
 		*buf = const_cast<const char*>(itr);
 	}
 	
-	template<typename ArrOrDict,  typename... Args>
+	template<size_t i = 0,  typename ArrOrDict,  typename... Args>
 	bool asciify_json_response_rows(char*& itr,  const ArrOrDict f_arr_or_dict,  Args... args){
-		_r::asciify_json_response_rows_from_sql_res(this->res, &this->row, itr, f_arr_or_dict, args...);
+		_r::asciify_json_response_rows_from_sql_res(this->res[i], &this->row, itr, f_arr_or_dict, args...);
 		const bool rc = (likely(*(itr - 1) == ','));
 		if (rc)
 			--itr;
 		return rc;
 	}
 	
-	template<typename ArrOrDict,  typename... Args>
+	template<size_t i = 0,  typename ArrOrDict,  typename... Args>
 	bool init_json_rows(char*& itr,  const ArrOrDict _flag,  Args... args){
 		compsky::asciify::asciify(itr, _r::opener_symbol(_flag));
-		const bool rc = this->asciify_json_response_rows(itr, _flag, args...);
+		const bool rc = this->asciify_json_response_rows<i>(itr, _flag, args...);
 		*(itr++) = _r::closer_symbol(_flag);
 		return rc;
 	}
 	
-	template<typename StackdBuf,  typename MallocdBuf,  typename ArrOrDict,  typename... Args>
+	template<size_t i = 0,  typename StackdBuf,  typename MallocdBuf,  typename ArrOrDict,  typename... Args>
 	void init_json(const StackdBuf stacked_itr,  const ArrOrDict _flag,  MallocdBuf mallocd_dst,  Args... args){
 		/*
 		 * stacked_itr is either nullptr or this->itr
@@ -156,7 +151,7 @@ class ResponseGeneration {
 		
 		compsky::asciify::asciify(itr, _r::json_init);
 		this->mysql_seek(0); // Reset to first result
-		this->init_json_rows(itr, _flag, args...);
+		this->init_json_rows<i>(itr, _flag, args...);
 		*itr = 0;
 		
 		this->set_buf_to_itr(mallocd_dst, itr_init);
@@ -172,10 +167,10 @@ class ResponseGeneration {
 		this->begin_json_response(this->itr);
 	}
 	
-	template<typename... Args>
+	template<size_t i = 0,  typename... Args>
 	void write_json_list_response_into_buf(Args... args){
 		this->begin_json_response();
-		this->init_json_rows(this->itr, _r::flag::arr, args...);
+		this->init_json_rows<i>(this->itr, _r::flag::arr, args...);
 		*this->itr = 0;
 	}
 };
