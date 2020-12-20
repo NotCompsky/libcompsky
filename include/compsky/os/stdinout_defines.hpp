@@ -18,7 +18,7 @@ namespace compsky {
 namespace os {
 
 
-typedef typeof(STDOUT_FILE_ID) fileid_typ;
+typedef decltype(STDOUT_FILE_ID) fileid_typ;
 
 
 }
