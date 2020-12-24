@@ -12,7 +12,7 @@ The absense of this copyright notices on some other files in this project does n
 */
 #pragma once
 
-#include <compsky/wangle/asciify_flags.hpp>
+#include "asciify_flags.hpp"
 
 
 namespace compsky {
