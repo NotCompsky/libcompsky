@@ -16,6 +16,8 @@ The absense of this copyright notices on some other files in this project does n
 #include <compsky/asciify/asciify.hpp>
 
 
+namespace compsky {
+namespace server {
 namespace _f {
 	using namespace compsky::asciify::flag;
 	constexpr static const Escape esc;
@@ -33,4 +35,6 @@ namespace _f {
 	constexpr static const esc::SpacesAndNonAscii esc_spaces_and_non_ascii;
 	constexpr static const esc::URI_until_space::Unescape unescape_URI_until_space;
 	constexpr static const until::NullOr until;
+}
+}
 }
