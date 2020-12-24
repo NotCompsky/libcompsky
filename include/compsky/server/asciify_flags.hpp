@@ -32,5 +32,5 @@ namespace _f {
 	constexpr static const grammatical_case::Upper upper_case;
 	constexpr static const esc::SpacesAndNonAscii esc_spaces_and_non_ascii;
 	constexpr static const esc::URI_until_space::Unescape unescape_URI_until_space;
-	constexpr static const UntilNullOr until;
+	constexpr static const until::NullOr until;
 }
