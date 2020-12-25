@@ -896,16 +896,6 @@ void asciify(Str& ITR,  flag::to::AlphaNumeric f,  Int n,  Args... args){
 };
 
 
-
-/* Debug */
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::debug::PrintfStdOut,  Args... args){
-	char* const buf = ITR;
-	asciify(ITR, args...);
-	printf("%s\n", buf);
-};
-
-
 } // namespace _detail
 
 

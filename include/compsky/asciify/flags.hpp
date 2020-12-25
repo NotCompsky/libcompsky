@@ -4,9 +4,6 @@
 namespace compsky {
 namespace asciify {
 namespace flag {
-	namespace debug {
-		struct PrintfStdOut{};
-	}
     namespace concat {
         struct Start{};
         struct End{};

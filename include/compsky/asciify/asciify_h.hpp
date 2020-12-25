@@ -249,12 +249,6 @@ void asciify(Str& ITR,  const flag::to::AlphaNumeric,  Int n,  Args... args);
 
 
 
-/* Debug */
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::debug::PrintfStdOut f,  Args... args);
-
-
-
 } // namespace _detail
 }
 } // END: namespace compsky::asciify
