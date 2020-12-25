@@ -92,11 +92,12 @@ void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  
 template<typename Str,  size_t sz,  typename... Args>
 void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args);
 
-template<
-	typename Str,  typename... Chars,  size_t sz,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args);
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args);
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c,  const char c2,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args);
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c,  const char c2,  const char c3,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args);
 
 
 template<typename Str,  typename... Args>
@@ -145,39 +146,44 @@ void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const std::st
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const char* s,  Args... args);
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::until::NullOr,  const char d,  const char* s,  Args... args);
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::until::NullOr,  const char d,  const char* s,  Args... args);
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::until::NullOr,  const char d,  const char* s,  Args... args);
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::until::NullOr,  const char d,  const char* s,  Args... args);
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const char* s,  Args... args);
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char* s,  Args... args);
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char* s,  Args... args);
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args);
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const std::string_view s,  Args... args);
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const std::string_view s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const std::string_view s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const std::string_view s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const std::string_view s,  Args... args);
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args);
 
 #ifdef QT_GUI_LIB
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const QChar, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const QString& qs,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QString& s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QString& s,  Args... args);
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QChar c3,  const QString& s,  Args... args);
 #endif
 
 template<typename Str,  typename... Args>

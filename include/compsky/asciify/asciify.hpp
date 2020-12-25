@@ -200,11 +200,8 @@ void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& s
 	}
 }
 
-template<
-	typename Str,  typename... Chars,  size_t sz,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
+template<typename... Chars,  typename Str,  size_t sz,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
 	for (const uint8_t c : str){
 		if (c == 0)
 			asciify(ITR, '\\', '0');
@@ -213,6 +210,18 @@ void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::esc::N
 		else
 			asciify(ITR, c);
 	}
+}
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+	asciify_escape<char>(ITR, c1, f, str, args...);
+}
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, f, str, args...);
+}
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, c3, f, str, args...);
 }
 
 
@@ -448,11 +457,8 @@ void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const std::st
 	asciify(ITR, args...);
 }
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
 	while((*s != 0) and (*s != d)){
 		if (unlikely(_detail::is_eq(*s, chars...)))
 			_detail::put(ITR++, '\\');
@@ -461,12 +467,21 @@ void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::until:
 	}
 	asciify(ITR, args...);
 }
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::until::NullOr f,  const char d,  const char* s,  Args... args){
+	asciify_escape<char>(ITR, c1, f, d, s, args...);
+}
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::until::NullOr f,  const char d,  const char* s,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, f, d, s, args...);
+}
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::until::NullOr f,  const char d,  const char* s,  Args... args){
+	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, d, s, args...);
+}
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const char* s,  Args... args){
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const char* s,  Args... args){
     while(*s != 0){
 		if (unlikely(_detail::is_eq(*s, '\\', chars...)))
             _detail::put(ITR++, '\\');
@@ -475,6 +490,18 @@ void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const char* s,  Ar
     }
     asciify(ITR, args...);
 };
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char* s,  Args... args){
+	asciify_escape<char>(ITR, c1, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char* s,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args){
+	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
+}
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const std::string_view s,  Args... args){
@@ -482,20 +509,26 @@ void asciify(Str& ITR,  const std::string_view s,  Args... args){
 	asciify(ITR, _strlen, s.data(), s.size(), args...);
 };
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape f,  Chars... chars,  const std::string_view s,  Args... args){
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const std::string_view s,  Args... args){
 	constexpr flag::StrLen _strlen;
-	asciify(ITR, f, chars..., _strlen, s.size(), s.data(), args...);
+	asciify_escape(ITR, chars..., _strlen, s.size(), s.data(), args...);
 };
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const std::string_view s,  Args... args){
+	asciify_escape<char>(ITR, c1, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const std::string_view s,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const std::string_view s,  Args... args){
+	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
+}
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
 	size_t i = 0;
 	while(i < sz){
 		const char _c = s[i];
@@ -506,13 +539,22 @@ void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::StrLen
     }
     asciify(ITR, args...);
 };
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args... args){
+	asciify_escape<char>(ITR, c1, f, sz, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, f, sz, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args... args){
+	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, sz, s, args...);
+}
 
 #ifdef QT_GUI_LIB
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const QChar, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const QString& qs,  Args... args){
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const QString& qs,  Args... args){
 	size_t i = 0;
 	while(i < sz){
 		const QChar _c = qs.at(i);
@@ -523,6 +565,18 @@ void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const QString& qs,
 	}
 	asciify(ITR, args...);
 };
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QString& s,  Args... args){
+	asciify_escape<QChar>(ITR, c1, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QString& s,  Args... args){
+	asciify_escape<QChar, QChar>(ITR, c1, c2, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QChar c3,  const QString& s,  Args... args){
+	asciify_escape<QChar, QChar, QChar>(ITR, c1, c2, c3, s, args...);
+}
 #endif
 
 
@@ -536,11 +590,8 @@ void asciify(Str& ITR,  const flag::TerminatedBy,  const char c,  const char* s,
 };
 
 
-template<
-	typename Str,  typename... Chars,  typename... Args,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
-void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::TerminatedBy,  const char t,  const char* s,  Args... args){
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::TerminatedBy,  const char t,  const char* s,  Args... args){
 	while(*s != t){
 		if (unlikely(_detail::is_eq(*s, '\\', chars...)))
 			_detail::put(ITR++, '\\');
@@ -549,6 +600,18 @@ void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::Termin
 	}
 	asciify(ITR, args...);
 };
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::TerminatedBy f,  const char t,  const char* s,  Args... args){
+	asciify_escape<char>(ITR, c1, f, t, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::TerminatedBy f,  const char t,  const char* s,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, f, t, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::TerminatedBy f,  const char t,  const char* s,  Args... args){
+	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, t, s, args...);
+}
 
 
 template<typename Str,  typename... Args>
