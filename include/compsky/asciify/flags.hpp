@@ -44,6 +44,7 @@ namespace flag {
 		}
 		struct SpacesAndNonAscii{};
 		struct DoubleQuote{};
+		struct Null{};
 	}
     namespace ensure {
         struct BetweenZeroAndOneInclusive{};

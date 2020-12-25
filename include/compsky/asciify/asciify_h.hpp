@@ -89,6 +89,12 @@ void asciify(Str& ITR,  const flag::Hex,  const std::array<uint8_t, sz>& str,  A
 template<typename Str,  size_t sz,  typename... Args>
 void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  const std::array<uint8_t, sz>& str,  Args... args);
 
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args);
+
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char d,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args);
+
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::StrLen,  const char* s,  const size_t sz,  Args... args);

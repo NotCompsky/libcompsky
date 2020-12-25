@@ -176,6 +176,30 @@ void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  
 	asciify(ITR, args...);
 }
 
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
+	for (const uint8_t c : str){
+		if (unlikey(c == 0))
+			asciify(ITR, '\\', '0');
+		else if (unlikely(c == '\\'))
+			asciify(ITR, '\\', '\\');
+		else
+			asciify(ITR, c);
+	}
+}
+
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char d,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
+	for (const uint8_t c : str){
+		if (unlikey(c == 0))
+			asciify(ITR, '\\', '0');
+		else if (unlikely((c == '\\') or (c == d)))
+			asciify(ITR, '\\', c);
+		else
+			asciify(ITR, c);
+	}
+}
+
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  flag::StrLen f,  const char* s,  const size_t sz,  Args... args){
