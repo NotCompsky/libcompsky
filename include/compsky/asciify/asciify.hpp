@@ -488,15 +488,15 @@ void asciify_escape(Str& ITR,  Chars... chars,  const char* s,  Args... args){
     asciify(ITR, args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char*& s,  Args... args){
 	asciify_escape<char>(ITR, c1, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char*& s,  Args... args){
 	asciify_escape<char, char>(ITR, c1, c2, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const char*& s,  Args... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
 }
 
