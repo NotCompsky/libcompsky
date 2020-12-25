@@ -34,10 +34,7 @@ inline
 bool is_eq(const char c){
 	return false;
 }
-template<
-	typename... Chars,
-	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
->
+template<typename... Chars> // NOTE: All are char, but some may have different types (char, const char, char&...)
 bool is_eq(const char c,  const char c1,  Chars... chars){
 	return (c == c1) or is_eq(c, chars...);
 }
