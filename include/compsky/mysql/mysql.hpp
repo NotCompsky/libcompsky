@@ -97,11 +97,6 @@ void login_from_auth(MYSQL*& mysql_obj,  const MySQLAuth mysql_auth){
         port_n += *itr - '0'; // Integers are continuous in every realistic character encoding
         ++itr;
     }
-	
-#ifdef DEBUG
-	printf("STUFF\nhost %s\nuser %s\npwrd %s\ndbnm %s\nport %u\npath %s\n", mysql_auth.host, mysql_auth.user, pwrd, mysql_auth.dbnm, port_n, path);
-	fflush(stdout);
-#endif
     
     mysql_obj = mysql_init(NULL);
 	
@@ -132,9 +127,6 @@ void wipe_auth(char* const buf,  const size_t buf_sz){
 
 inline
 void exec_buffer(MYSQL* const obj,  const char* const s,  const size_t sz){
-#ifdef DEBUG
-	printf("EXEC: %.*s\n", (int)sz, s);
-#endif
     if (likely(mysql_real_query(obj, s, sz) == 0))
         return;
 	throw except::SQLExec(s, sz);
@@ -147,9 +139,6 @@ void exec_buffer(MYSQL* const obj,  const char* s){
 
 inline
 void query_buffer(MYSQL* const obj,  MYSQL_RES*& res,  const char* const s,  const size_t sz){
-#ifdef DEBUG
-	printf("QRY: %.*s\n", (int)sz, s);
-#endif
     if (likely(mysql_real_query(obj, s, sz) == 0)){
         res = mysql_store_result(obj);
         return;
