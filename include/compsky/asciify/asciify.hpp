@@ -200,12 +200,15 @@ void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& s
 	}
 }
 
-template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char d,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
+template<
+	typename Str,  typename... Chars,  size_t sz,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
 	for (const uint8_t c : str){
 		if (c == 0)
 			asciify(ITR, '\\', '0');
-		else if ((c == '\\') or (c == d))
+		else if (_detail::is_eq(c, '\\', chars...))
 			asciify(ITR, '\\', c);
 		else
 			asciify(ITR, c);
@@ -445,10 +448,13 @@ void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const std::st
 	asciify(ITR, args...);
 }
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
+template<
+	typename Str,  typename... Chars,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
 	while((*s != 0) and (*s != d)){
-		if (unlikely(*s == c  ||  *s == '\\'))
+		if (unlikely(_detail::is_eq(*s, chars...)))
 			_detail::put(ITR++, '\\');
 		_detail::put(ITR++, *s);
 		++s;
@@ -460,7 +466,7 @@ template<
 	typename Str,  typename... Chars,  typename... Args,
 	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
 >
-void asciify(Str& ITR,  flag::Escape,  Chars... chars,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const char* s,  Args... args){
     while(*s != 0){
 		if (unlikely(_detail::is_eq(*s, '\\', chars...)))
             _detail::put(ITR++, '\\');
@@ -476,18 +482,24 @@ void asciify(Str& ITR,  const std::string_view s,  Args... args){
 	asciify(ITR, _strlen, s.data(), s.size(), args...);
 };
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::Escape f,  const char c,  const std::string_view s,  Args... args){
+template<
+	typename Str,  typename... Chars,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  const flag::Escape f,  Chars... chars,  const std::string_view s,  Args... args){
 	constexpr flag::StrLen _strlen;
-	asciify(ITR, f, c, _strlen, s.size(), s.data(), args...);
+	asciify(ITR, f, chars..., _strlen, s.size(), s.data(), args...);
 };
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
+template<
+	typename Str,  typename... Chars,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
 	size_t i = 0;
 	while(i < sz){
 		const char _c = s[i];
-		if (unlikely(_c == c  ||  _c == '\\'))
+		if (unlikely(_detail::is_eq(_c, '\\', chars...)))
 			_detail::put(ITR++, '\\');
 		_detail::put(ITR++, _c);
 		++i;
@@ -496,12 +508,20 @@ void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::StrLen, 
 };
 
 #ifdef QT_GUI_LIB
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c,  const QString& qs,  Args... args){
-    const QByteArray ba = qs.toLocal8Bit();
-    const char* s = ba.data();
-	constexpr static const flag::Escape f; // Why not reuse the parameter? I worry that the compiler might not realise that it is entirely unused if it is referred to by multiple functions.
-    asciify(ITR, f, c, s, args...);
+template<
+	typename Str,  typename... Chars,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const QChar, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const QString& qs,  Args... args){
+	size_t i = 0;
+	while(i < sz){
+		const QChar _c = qs.at(i);
+		if (unlikely(_detail::is_eq(_c, QChar('\\'), chars...)))
+			_detail::put(ITR++, '\\');
+		_detail::put(ITR++, _c);
+		++i;
+	}
+	asciify(ITR, args...);
 };
 #endif
 
@@ -516,10 +536,13 @@ void asciify(Str& ITR,  const flag::TerminatedBy,  const char c,  const char* s,
 };
 
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::TerminatedBy,  const char t,  const char* s,  Args... args){
+template<
+	typename Str,  typename... Chars,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  const flag::Escape,  Chars... chars,  const flag::TerminatedBy,  const char t,  const char* s,  Args... args){
 	while(*s != t){
-		if (unlikely(*s == c  ||  *s == '\\'))
+		if (unlikely(_detail::is_eq(*s, '\\', chars...)))
 			_detail::put(ITR++, '\\');
 		_detail::put(ITR++, *s);
 		++s;
