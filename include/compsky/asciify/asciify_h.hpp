@@ -145,11 +145,11 @@ void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const char* s
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::until::NullOr,  const char d,  const char* s,  Args... args);
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c,  const char* s,  Args... args);
-
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape3,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args);
+template<
+	typename Str,  typename... Chars,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  const flag::Escape,  Chars... c,  const char* s,  Args... args);
 
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const std::string_view s,  Args... args);

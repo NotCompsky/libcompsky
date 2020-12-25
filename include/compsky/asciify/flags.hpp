@@ -19,7 +19,7 @@ namespace flag {
 		struct NullOrNthChar{};
 	}
     struct Escape{};
-	struct Escape3{};
+	struct [[deprecated("Use Escape instead")]] Escape3{};
 	struct JSONEscape{};
 	struct Repeat{};
     struct StrLen{};

@@ -30,6 +30,18 @@ void put(Str ITR,  const std::string_view v){
 		memcpy(ITR, v.data(), v.size());
 }
 
+inline
+bool is_eq(const char c){
+	return false;
+}
+template<
+	typename... Chars,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+bool is_eq(const char c,  const char c1,  Chars... chars){
+	return (c == c1) or is_eq(c, chars...);
+}
+
 
 template<typename Str>
 void asciify(Str& ITR){};
@@ -179,9 +191,9 @@ void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  
 template<typename Str,  size_t sz,  typename... Args>
 void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
 	for (const uint8_t c : str){
-		if (unlikey(c == 0))
+		if (c == 0)
 			asciify(ITR, '\\', '0');
-		else if (unlikely(c == '\\'))
+		else if (c == '\\')
 			asciify(ITR, '\\', '\\');
 		else
 			asciify(ITR, c);
@@ -191,9 +203,9 @@ void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& s
 template<typename Str,  size_t sz,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char d,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
 	for (const uint8_t c : str){
-		if (unlikey(c == 0))
+		if (c == 0)
 			asciify(ITR, '\\', '0');
-		else if (unlikely((c == '\\') or (c == d)))
+		else if ((c == '\\') or (c == d))
 			asciify(ITR, '\\', c);
 		else
 			asciify(ITR, c);
@@ -444,21 +456,13 @@ void asciify(Str& ITR,  const flag::Escape,  const char c,  const flag::until::N
 	asciify(ITR, args...);
 }
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::Escape f,  const char c,  const char* s,  Args... args){
+template<
+	typename Str,  typename... Chars,  typename... Args,
+	std::enable_if_t<(std::is_same_v<const char, Chars>&&...), bool> = true
+>
+void asciify(Str& ITR,  flag::Escape,  Chars... chars,  const char* s,  Args... args){
     while(*s != 0){
-        if (unlikely(*s == c  ||  *s == '\\'))
-            _detail::put(ITR++, '\\');
-        _detail::put(ITR++, *s);
-        ++s;
-    }
-    asciify(ITR, args...);
-};
-
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape3,  const char c1,  const char c2,  const char c3,  const char* s,  Args... args){
-    while(*s != 0){
-        if (unlikely(*s == c1  ||  *s == c2  ||  *s == c3  ||  *s == '\\'))
+		if (unlikely(_detail::is_eq(*s, '\\', chars...)))
             _detail::put(ITR++, '\\');
         _detail::put(ITR++, *s);
         ++s;
