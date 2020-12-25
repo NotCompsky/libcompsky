@@ -503,30 +503,6 @@ void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  con
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
 }
 
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const std::string_view s,  Args... args){
-	constexpr flag::StrLen _strlen;
-	asciify(ITR, _strlen, s.data(), s.size(), args...);
-};
-
-template<typename... Chars,  typename Str,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const std::string_view s,  Args... args){
-	constexpr flag::StrLen _strlen;
-	asciify_escape(ITR, chars..., _strlen, s.size(), s.data(), args...);
-};
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const std::string_view s,  Args... args){
-	asciify_escape<char>(ITR, c1, s, args...);
-}
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const std::string_view s,  Args... args){
-	asciify_escape<char, char>(ITR, c1, c2, s, args...);
-}
-template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const std::string_view s,  Args... args){
-	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
-}
-
 template<typename... Chars,  typename Str,  typename... Args>
 void asciify_escape(Str& ITR,  Chars... chars,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
 	size_t i = 0;
@@ -550,6 +526,30 @@ void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  con
 template<typename Str,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, sz, s, args...);
+}
+
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const std::string_view s,  Args... args){
+	constexpr flag::StrLen _strlen;
+	asciify(ITR, _strlen, s.data(), s.size(), args...);
+};
+
+template<typename... Chars,  typename Str,  typename... Args>
+void asciify_escape(Str& ITR,  Chars... chars,  const std::string_view s,  Args... args){
+	constexpr flag::StrLen _strlen;
+	asciify_escape<Chars...>(ITR, chars..., _strlen, s.size(), s.data(), args...);
+};
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const std::string_view s,  Args... args){
+	asciify_escape<char>(ITR, c1, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const std::string_view s,  Args... args){
+	asciify_escape<char, char>(ITR, c1, c2, s, args...);
+}
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const std::string_view s,  Args... args){
+	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
 }
 
 #ifdef QT_GUI_LIB
