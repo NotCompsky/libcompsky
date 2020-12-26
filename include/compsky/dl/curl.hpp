@@ -2,8 +2,7 @@
 
 #ifdef USE_LIBCURL
 
-#include "mimetype.hpp"
-#include "read_request.hpp" // for SKIP_TO_HEADER
+#include <compsky/macros/str_parsing.hpp> // for SKIP_TO_HEADER
 #include <curl/curl.h>
 #include <cstring> // for memccpy
 #include <string_view>
@@ -92,11 +91,11 @@ class Curl {
 		return this->perform(url);
 	}
 	
-	bool copy_mimetype(char* buf){
+	bool copy_mimetype(char* buf,  const std::size_t max_bytes){
 		char* _mimetype = nullptr;
 		const auto curl_rc2 = curl_easy_getinfo(this->obj, CURLINFO_CONTENT_TYPE, &_mimetype);
 		if (_mimetype and not curl_rc2)
-			memccpy(buf, _mimetype, 0, MAX_MIMETYPE_SZ);
+			memccpy(buf, _mimetype, 0, max_bytes);
 		return (_mimetype and not curl_rc2);
 	}
 	
@@ -105,7 +104,7 @@ class Curl {
 		if (user_agent == nullptr)
 			return true;
 		memccpy(user_agent_buf,  user_agent - 11,  '\r',  1000);
-		replace_first_instance_of(user_agent_buf, '\r', '\0');
+		compsky::str::replace_first_instance_of(user_agent_buf, '\r', '\0');
 		
 		this->headers.set_headers(
 			user_agent_buf,
