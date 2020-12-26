@@ -185,22 +185,11 @@ void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  
 	asciify(ITR, args...);
 }
 
-template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
-	for (const uint8_t c : str){
-		if (c == 0)
-			asciify(ITR, '\\', '0');
-		else if (c == '\\')
-			asciify(ITR, '\\', '\\');
-		else
-			asciify(ITR, c);
-	}
-}
-
 template<typename... Chars,  typename Str,  size_t sz,  typename... Args>
 void asciify_escape(Str& ITR,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
+	char* _itr = ITR;
 	for (const uint8_t _c : str){
-		const char c = (char)_c;
+		const char c = static_cast<char>(_c);
 		if (c == 0)
 			asciify(ITR, '\\', '0');
 		else if (_detail::is_eq(c, '\\', chars...))
@@ -208,6 +197,10 @@ void asciify_escape(Str& ITR,  Chars... chars,  const flag::esc::Null,  const st
 		else
 			asciify(ITR, c);
 	}
+}
+template<typename Str,  size_t sz,  typename... Args>
+void asciify(Str& ITR,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+	asciify_escape<>(ITR, f, str, args...);
 }
 template<typename Str,  size_t sz,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
@@ -219,7 +212,7 @@ void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  con
 }
 template<typename Str,  size_t sz,  typename... Args>
 void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
-	asciify_escape<char, char>(ITR, c1, c2, c3, f, str, args...);
+	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, str, args...);
 }
 
 
