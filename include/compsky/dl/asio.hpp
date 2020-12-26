@@ -31,7 +31,7 @@ const std::string_view get_url_conn_data(std::string_view const url,  bool& is_h
 
 
 template<typename Url,  typename Mimetype>
-size_t dl(Url const url,  char*& dst_buf,  const char* const dst_pth,  Mimetype mimetype){
+size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  const char* const dst_pth,  Mimetype mimetype){
 	// dst_buf_orig is used to temporarily construct the request string, and stores the response string
 	
 	constexpr bool is_copying_to_file = std::is_same<char**, Mimetype>::value;
@@ -49,24 +49,7 @@ size_t dl(Url const url,  char*& dst_buf,  const char* const dst_pth,  Mimetype 
 	if (unlikely(err))
 		return 0;
 	
-	char* itr = dst_buf_orig;
-	compsky::asciify::asciify(
-		itr,
-		"GET ", url, " HTTP/1.1\r\n",
-		"Host: ", host, "\r\n"
-		"Accept: */*\r\n"
-		"Connection: close\r\n"
-		"User-Agent: " USER_AGENT "\r\n"
-		"Accept-Language: en-GB,en;q=0.5\r\n"
-		// TODO: Accept gzip, which makes it less obviously automated. "Accept-Encoding: gzip, deflate, br\r\n"
-		"Upgrade-Insecure-Requests: 1\r\n"
-		"DNT: 1\r\n"
-		"Pragma: no-cache\r\n"
-		"Cache-Control: no-cache\r\n"
-		"TE: Trailers\r\n"
-		"\r\n"
-	);
-	boost::asio::const_buffer request(dst_buf_orig,  (uintptr_t)itr - (uintptr_t)dst_buf_orig);
+	boost::asio::const_buffer request(request_str);
 	
 	constexpr size_t max_bytes_to_read = HANDLER_BUF_SZ - 1;
 	size_t n_bytes_read;
