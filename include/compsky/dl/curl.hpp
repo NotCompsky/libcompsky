@@ -10,6 +10,10 @@
 #include <compsky/asciify/asciify.hpp>
 
 
+namespace compsky {
+namespace dl {
+
+
 template<size_t sz>
 class CurlSList {
   public:
@@ -119,5 +123,8 @@ class Curl {
 		return false;
 	}
 };
+
+} // namespace dl
+} // namespace compsky
 
 #endif // USE_LIBCURL
