@@ -199,7 +199,8 @@ void asciify(Str& ITR,  const flag::esc::Null,  const std::array<uint8_t, sz>& s
 
 template<typename... Chars,  typename Str,  size_t sz,  typename... Args>
 void asciify_escape(Str& ITR,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
-	for (const uint8_t c : str){
+	for (const uint8_t _c : str){
+		const char c = (char)_c;
 		if (c == 0)
 			asciify(ITR, '\\', '0');
 		else if (_detail::is_eq(c, '\\', chars...))
