@@ -27,6 +27,54 @@ const std::string_view get_url_conn_data(std::string_view const url,  bool& is_h
 	return get_url_conn_data(url.data(), is_https);
 }
 
+enum ResponseCode {
+	invalid,
+	ok,
+	redirect,
+	partial
+};
+
+inline
+ResponseCode get_response_code(const char* response){
+	switch(response_itr[1]){
+		case '2':
+			switch(response_itr[2]){
+				case '0':
+					switch(response_itr[3]){
+						case '0':
+							// OK
+							return ResponseCode::ok;
+						case '6':
+							// TODO: Deal with partial response
+							return ResponseCode::partial;
+						default:
+							return ResponseCode::invalid;
+					}
+				default:
+					return ResponseCode::invalid;
+			}
+		case '3':
+			switch(response_itr[2]){
+				case '0':
+					switch(response_itr[3]){
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '7':
+						case '8':
+							return ResponseCode::redirect;
+						default:
+							return ResponseCode::invalid;
+					}
+				default:
+					return ResponseCode::invalid;
+			}
+		default:
+			return ResponseCode::invalid;
+	}
+}
+
 } // namespace _detail
 
 
@@ -92,46 +140,18 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	if (unlikely(not IS_STR_EQL(response_itr,9,"HTTP/1.1 ")))
 		return 0;
 	
-	switch(response_itr[1]){
-		case '2':
-			switch(response_itr[2]){
-				case '0':
-					switch(response_itr[3]){
-						case '0':
-							// OK
-							goto break_out_of_many_loops;
-						case '6':
-							// TODO: Deal with partial response
-							return 0;
-						default:
-							return 0;
-					}
-				default:
-					return 0;
-			}
-		case '3':
-			switch(response_itr[2]){
-				case '0':
-					switch(response_itr[3]){
-						case '1':
-						case '2':
-						case '3':
-						case '4':
-						case '7':
-						case '8': {
-							const std::string_view redirect_url = STRING_VIEW_FROM_UP_TO(12, "\r\nLocation: ")(response_itr, '\r');
-							return dl(redirect_url, request_str, dst_buf, dst_pth, mimetype);
-						}
-						default:
-							return 0;
-					}
-				default:
-					return 0;
-			}
-		default:
+	switch(_detail::get_response_code(response_itr)){
+		case _detail::ResponseCode::ok:
+			break;
+		case _detail::ResponseCode::redirect: {
+			const std::string_view redirect_url = STRING_VIEW_FROM_UP_TO(12, "\r\nLocation: ")(response_itr, '\r');
+			return dl(redirect_url, request_str, dst_buf, dst_pth, mimetype);
+		}
+		case _detail::ResponseCode::partial:
+			return 0; // TODO: Implement
+		case _detail::ResponseCode::invalid:
 			return 0;
 	}
-	break_out_of_many_loops:
 	
 	dst_buf_orig[n_bytes_read] = 0;
 	
