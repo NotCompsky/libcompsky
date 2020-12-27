@@ -49,7 +49,7 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	if (unlikely(err))
 		return 0;
 	
-	boost::asio::const_buffer request(request_str);
+	boost::asio::const_buffer request(request_str.data(), request_str.size());
 	
 	constexpr size_t max_bytes_to_read = HANDLER_BUF_SZ - 1;
 	size_t n_bytes_read;
@@ -120,7 +120,7 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 						case '7':
 						case '8': {
 							const std::string_view redirect_url = STRING_VIEW_FROM_UP_TO(12, "\r\nLocation: ")(response_itr, '\r');
-							return dl(redirect_url, dst_buf, dst_pth, mimetype);
+							return dl(redirect_url, request_str, dst_buf, dst_pth, mimetype);
 						}
 						default:
 							return 0;
