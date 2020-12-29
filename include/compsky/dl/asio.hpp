@@ -4,6 +4,7 @@
 #include <compsky/str/parse.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
+#include <compsky/utils/ptrdiff.hpp>
 
 
 namespace compsky {
@@ -140,6 +141,9 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	if (unlikely(not IS_STR_EQL(response_itr,9,"HTTP/1.1 ")))
 		return 0;
 	
+	size_t byte_offset = 0;
+	size_t n_bytes = 0;
+	
 	switch(_detail::get_response_code(response_itr)){
 		case _detail::ResponseCode::ok:
 			break;
@@ -147,8 +151,22 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 			const std::string_view redirect_url = STRING_VIEW_FROM_UP_TO(12, "\r\nLocation: ")(response_itr, '\r');
 			return dl(redirect_url, request_str, dst_buf, dst_pth, mimetype);
 		}
-		case _detail::ResponseCode::partial:
-			return 0; // TODO: Implement
+		case _detail::ResponseCode::partial: {
+			if (SKIP_TO_HEADER("Content-Type: multipart/byteranges")(response_itr) != nullptr)
+				// Is a multipart response
+				return 0; // TODO: Implement
+			const char* const range_from = SKIP_TO_HEADER("Content-Range: bytes ")(response_itr);
+			size_t to;
+			if (unlikely(compsky::http::header::get_range_from(range_from, byte_offset, to) != compsky::http::header::valid))
+				return 0;
+			if constexpr(not is_copying_to_file){
+				if (unlikely(to >= HANDLER_BUF_SZ))
+					// Would overflow our buffer
+					return 0;
+			}
+			n_bytes = to - byte_offset;
+			break;
+		}
 		case _detail::ResponseCode::invalid:
 			return 0;
 	}
@@ -156,6 +174,7 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	dst_buf_orig[n_bytes_read] = 0;
 	
 	char* const start_of_content = const_cast<char*>(SKIP_TO_HTTP_CONTENT(dst_buf_orig));
+	n_bytes = n_bytes_read - utils::ptrdiff(start_of_content, dst_buf_orig);
 	if constexpr (not is_copying_to_file)
 		dst_buf = start_of_content;
 	
@@ -167,12 +186,10 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 		compsky::os::WriteOnlyFile f(dst_pth);
 		if (unlikely(f.is_null()))
 			return 0;
-		do {
-			f.write_from_buffer(dst_buf_orig, n_bytes_read);
-		} while(n_bytes_read == max_bytes_to_read);
+		f.write_from_buffer_at_offset(dst_buf_orig, n_bytes, byte_offset);
 	}
 	
-	return n_bytes_read;
+	return n_bytes;
 }
 
 
