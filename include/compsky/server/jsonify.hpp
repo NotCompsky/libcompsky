@@ -26,6 +26,9 @@ namespace _r {
 		struct QuoteAndEscape{};
 		struct QuoteNoEscape{};
 		struct NoQuote{};
+		
+		template<size_t n>
+		struct Union{};
 	}
 	
 	namespace _f {
@@ -47,6 +50,9 @@ namespace _r {
 	template<size_t col_indx,  typename... Args>
 	void asciify_json_list_response_entry(char*& itr,  MYSQL_ROW row,  const flag::QuoteAndJSONEscape,  Args... args);
 	
+	template<size_t col_indx,  size_t n_rows,  typename... Args>
+	void asciify_json_list_response_entry(char*& itr,  MYSQL_ROW row,  const flag::Union<n_rows>,  const flag::QuoteNoEscape,  Args... args);
+	
 	template<size_t col_indx,  typename... Args>
 	void asciify_json_list_response_entry(char*& itr,  MYSQL_ROW row,  const flag::NoQuote,  Args... args){
 		compsky::asciify::asciify(itr, row[col_indx], ',');
@@ -65,6 +71,15 @@ namespace _r {
 	template<size_t col_indx,  typename... Args>
 	void asciify_json_list_response_entry(char*& itr,  MYSQL_ROW row,  const flag::QuoteAndJSONEscape,  Args... args){
 		compsky::asciify::asciify(itr, '"', _f::json_esc, row[col_indx], '"', ',');
+		asciify_json_list_response_entry<col_indx+1>(itr, row, args...);
+	}
+	
+	template<size_t col_indx,  size_t n_rows,  typename... Args>
+	void asciify_json_list_response_entry(char*& itr,  MYSQL_ROW row,  const flag::Union<n_rows>,  const flag::QuoteNoEscape,  Args... args){
+		compsky::asciify::asciify(itr, '"');
+		for (size_t i = 0;  i < n_rows;  ++i)
+			compsky::asciify::asciify(itr, row[col_indx]);
+		compsky::asciify::asciify(itr, '"', ',');
 		asciify_json_list_response_entry<col_indx+1>(itr, row, args...);
 	}
 	
