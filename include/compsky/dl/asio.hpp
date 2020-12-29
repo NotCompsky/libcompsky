@@ -81,6 +81,8 @@ ResponseCode get_response_code(const char* response){
 
 template<typename Url,  typename Mimetype>
 size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  const char* const dst_pth,  Mimetype mimetype){
+	// WARNING: This assumes that no response will be larger than the dst_buf - which should be at least 10 MiB
+	
 	// dst_buf_orig is used to temporarily construct the request string, and stores the response string
 	
 	constexpr bool is_copying_to_file = std::is_same<char**, Mimetype>::value;
