@@ -2,6 +2,8 @@
 
 #include <compsky/macros/str2switch.hpp>
 #include <compsky/macros/likely.hpp>
+#include <compsky/utils/ptrdiff.hpp>
+#include <compsky/utils/nullstrview.hpp>
 
 
 #define IS_STR_EQL(str_to_be_tested,length,name) \
@@ -45,11 +47,22 @@
 			return str + 1; \
 		} \
 	}
+#define SKIP_TO_AFTER_SUBSTR(length,name) \
+	/* Returns a pointer to the character immediately AFTER the substr */ \
+	[](const char* str)->const char* { \
+		while(*str != 0){ \
+			if (likely(not IS_STR_EQL(str,length,name))) continue; \
+			return str + 1; \
+		} \
+		return nullptr; \
+	}
 #define STRING_VIEW_FROM_UP_TO(length,name) \
 	[](const char* str,  const char c)->const std::string_view { \
-		str = SKIP_TO_AFTER_SUBSTR__NONULLTERMINATE(length,name)(str); \
+		str = SKIP_TO_AFTER_SUBSTR(length,name)(str); \
+		if(str == nullptr) \
+			return compsky::utils::nullstrview; \
 		const char* const begin = str; \
 		while(*str != c) \
 			++str; \
-		return std::string_view(begin,  (uintptr_t)str - (uintptr_t)begin); \
+		return std::string_view(begin,  utils::ptrdiff(str, begin)); \
 	}
