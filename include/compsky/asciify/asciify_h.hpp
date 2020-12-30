@@ -15,6 +15,7 @@
 #include <vector>
 #include <array>
 #include <string_view>
+#include <tuple>
 
 #include "compsky/asciify/flags.hpp"
 #include "compsky/asciify/types.hpp"
@@ -280,6 +281,14 @@ void asciify(Str& ITR,  const flag::prefix::Start,  const char* s,  const size_t
 /* Convert to/from bases etc */
 template<typename Str,  typename Int,  typename... Args>
 void asciify(Str& ITR,  const flag::to::AlphaNumeric,  Int n,  Args&&... args);
+
+
+/* dl::asio */
+template<typename Derived,  typename Orig>
+class ExtendWithBuf;
+
+template<typename Str,  typename Derived,  typename Orig,  typename... Args>
+void asciify(Str& ITR,  const ExtendWithBuf<Derived, Orig>& cookies,  Args&&... args);
 
 
 

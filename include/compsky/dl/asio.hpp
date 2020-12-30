@@ -15,17 +15,29 @@ namespace asio {
 namespace _detail {
 
 inline
-const std::string_view get_url_conn_data(const char* url,  bool& is_https){
+void split_url(const char* url,  bool& is_https,  std::string_view& host,  std::string_view& path){
 	const char* url_itr = url - 1;
 	is_https = (IS_STR_EQL(url_itr,5,"https"));
 	// url_itr is how either past https (if it is https://...) or past http (if it is http://)
 	const char* const host_start = url_itr + 1 + 3;
-	return std::string_view(host_start,  compsky::str::count_until(host_start, '/'));
+	host = std::string_view(host_start,  compsky::str::count_until(host_start, '/'));
+	path = std::string_view(host.end(),  strlen(host_start + host.size()));
 }
 
 inline
-const std::string_view get_url_conn_data(std::string_view const url,  bool& is_https){
-	return get_url_conn_data(url.data(), is_https);
+void split_url(std::string_view const url,  bool& is_https,  std::string_view& host,  std::string_view& path){
+	const char* url_itr = url.data() - 1;
+	is_https = (IS_STR_EQL(url_itr,5,"https"));
+	// url_itr is how either past https (if it is https://...) or past http (if it is http://)
+	const char* const host_start = url_itr + 1 + 3;
+	host = std::string_view(host_start,  compsky::str::count_until(host_start, '/'));
+	path = std::string_view(host.data() + host.size(),  url.size() - utils::ptrdiff(host.data(), url.data()));
+}
+
+template<typename... Args>
+void split_url(std::tuple<Args...> url,  bool& is_https,  std::string_view& host,  std::string_view& path){
+	// WARNING: Assumes that the first parameter of url is a string beginning https://HOST/
+	return split_url(std::get<0>(url), is_https, host, path);
 }
 
 enum ResponseCode {
@@ -37,11 +49,11 @@ enum ResponseCode {
 
 inline
 ResponseCode get_response_code(const char* response){
-	switch(response_itr[1]){
+	switch(response[0]){
 		case '2':
-			switch(response_itr[2]){
+			switch(response[1]){
 				case '0':
-					switch(response_itr[3]){
+					switch(response[2]){
 						case '0':
 							// OK
 							return ResponseCode::ok;
@@ -55,9 +67,9 @@ ResponseCode get_response_code(const char* response){
 					return ResponseCode::invalid;
 			}
 		case '3':
-			switch(response_itr[2]){
+			switch(response[1]){
 				case '0':
-					switch(response_itr[3]){
+					switch(response[2]){
 						case '1':
 						case '2':
 						case '3':
@@ -76,11 +88,36 @@ ResponseCode get_response_code(const char* response){
 	}
 }
 
+
+template<typename Orig>
+class CookiesAndAppendedCookies : public compsky::asciify::_detail::ExtendWithBuf<CookiesAndAppendedCookies<Orig>, Orig> {
+ public:
+	const char* separator() const {
+		return "; ";
+	}
+	template<typename A,  typename B>
+	CookiesAndAppendedCookies(const A& a,  const B& b)
+	: compsky::asciify::_detail::ExtendWithBuf<CookiesAndAppendedCookies<Orig>, Orig>::ExtendWithBuf(a, b)
+	{}
+};
+
+
+template<typename Orig,  typename T>
+struct StructToDetTyp {
+	typedef CookiesAndAppendedCookies<Orig> typ;
+};
+template<typename Orig,  typename T>
+struct StructToDetTyp<CookiesAndAppendedCookies<Orig>, T> {
+	typedef CookiesAndAppendedCookies<Orig> typ;
+};
+
+
+
 } // namespace _detail
 
 
-template<typename Url,  typename Mimetype>
-size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  const char* const dst_pth,  Mimetype mimetype){
+template<typename Path,  typename Cookies,  typename Mimetype,  typename... RequestStrArgs>
+size_t dl(char* const req_str_buf,  const size_t req_str_buf_sz,  char*& dst_buf,  const char* const dst_pth,  Mimetype mimetype,  const char* const method,  bool is_https,  std::string_view host,  Path path,  Cookies cookies,  RequestStrArgs&&... request_str_args){
 	// WARNING: This assumes that no response will be larger than the dst_buf - which should be at least 10 MiB
 	
 	// dst_buf_orig is used to temporarily construct the request string, and stores the response string
@@ -89,8 +126,6 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	
 	char* dst_buf_orig = dst_buf;
 	
-	bool is_https;
-	const std::string_view host = _detail::get_url_conn_data(url, is_https);
 	const std::string_view port = is_https ? "443" : "80";
 	
 	boost::asio::io_service io_service;
@@ -100,9 +135,17 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	if (unlikely(err))
 		return 0;
 	
-	boost::asio::const_buffer request(request_str.data(), request_str.size());
+	char* req_str_itr = req_str_buf;
+	compsky::asciify::asciify(req_str_itr, method, ' ', path, " HTTP/1.1");
+	if constexpr(not std::is_same<std::nullptr_t, Cookies>::value)
+		compsky::asciify::asciify(req_str_itr, "\r\nCookies: ", cookies);
+	compsky::asciify::asciify(req_str_itr, "\r\n", request_str_args...);
 	
-	constexpr size_t max_bytes_to_read = HANDLER_BUF_SZ - 1;
+	printf("\n\nreq_str_buf first 500 chars: %.500s\n", req_str_buf);
+	
+	boost::asio::const_buffer  request(req_str_buf,  utils::ptrdiff(req_str_itr, req_str_buf));
+	
+	const std::size_t max_bytes_to_read = req_str_buf_sz - 1;
 	size_t n_bytes_read;
 	
 	if (is_https){
@@ -137,7 +180,7 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	}
 	
 	
-	printf("dst_buf_orig first 1000 chars: %.1000s\n", dst_buf_orig);
+	printf("\n\ndst_buf_orig first 1000 chars: %.1000s\n", dst_buf_orig);
 	
 	const char* response_itr = dst_buf_orig - 1;
 	if (unlikely(not IS_STR_EQL(response_itr,9,"HTTP/1.1 ")))
@@ -146,18 +189,34 @@ size_t dl(Url const url,  const std::string_view request_str,  char*& dst_buf,  
 	size_t byte_offset = 0;
 	size_t n_bytes = 0;
 	
-	switch(_detail::get_response_code(response_itr)){
+	switch(_detail::get_response_code(response_itr + 1)){
 		case _detail::ResponseCode::ok:
 			break;
 		case _detail::ResponseCode::redirect: {
+			const char* _http_itr = response_itr;
+			typename compsky::dl::asio::_detail::StructToDetTyp<Cookies, Cookies>::typ _cookies(cookies, req_str_buf);
+			while(true){
+				const std::string_view set_cookie = STRING_VIEW_FROM_UP_TO(14, "\r\nset-cookie: ")(_http_itr, ';');
+				printf("set_cookie == %.*s\n", (int)set_cookie.size(), set_cookie.data()); fflush(stdout);
+				if (set_cookie == utils::nullstrview)
+					break;
+				_cookies.append(set_cookie);
+				_http_itr = set_cookie.data() + 1;
+			}
+			printf("Following redirect\n"); fflush(stdout);
 			const std::string_view redirect_url = STRING_VIEW_FROM_UP_TO(12, "\r\nLocation: ")(response_itr, '\r');
-			return dl(redirect_url, request_str, dst_buf, dst_pth, mimetype);
+			std::string_view new_path;
+			if (redirect_url.at(0) == '/')
+				new_path = redirect_url;
+			else
+				_detail::split_url(redirect_url, is_https, host, new_path);
+			return (unlikely(redirect_url == compsky::utils::nullstrview)) ? 0 : dl(_cookies.after(), req_str_buf_sz - _cookies.size(), dst_buf, dst_pth, mimetype, method, is_https, host, new_path, _cookies, request_str_args...);
 		}
 		case _detail::ResponseCode::partial: {
-			if (SKIP_TO_HEADER("Content-Type: multipart/byteranges")(response_itr) != nullptr)
+			if (SKIP_TO_HEADER(34, "Content-Type: multipart/byteranges")(response_itr) != nullptr)
 				// Is a multipart response
 				return 0; // TODO: Implement
-			const char* const range_from = SKIP_TO_HEADER("Content-Range: bytes ")(response_itr);
+			const char* const range_from = SKIP_TO_HEADER(21, "Content-Range: bytes ")(response_itr);
 			size_t to;
 			if (unlikely(compsky::http::header::get_range_from(range_from, byte_offset, to) != compsky::http::header::valid))
 				return 0;

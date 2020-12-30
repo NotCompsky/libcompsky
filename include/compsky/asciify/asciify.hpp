@@ -7,6 +7,7 @@
 #include <stdexcept> // for std::runtime_error
 #include <vector>
 #include "compsky/macros/likely.hpp"
+#include <compsky/utils/ptrdiff.hpp>
 
 
 namespace compsky {
@@ -97,6 +98,11 @@ void asciify(Str& ITR,  unsigned long t,  Args&&... args){
     return asciify(ITR,  args...);
 };
 #endif
+
+template<typename Str,  typename... Args1,  typename... Args2>
+void asciify(Str& ITR,  std::tuple<Args1...> tpl,  Args2&&... args2){
+	std::apply([&](auto &&... args) { asciify(ITR, args..., args2...); }, tpl); // !!!
+}
 
 template<unsigned base = 10,  typename Str,  typename Int,  typename... Args>
 void asciify(Str& ITR,  const flag::FillWithLeadingZeros,  Int min_n_digits,  const int n,  Args&&... args){
@@ -999,6 +1005,57 @@ void asciify(Str& ITR,  flag::to::AlphaNumeric f,  Int n,  Args&&... args){
     
     asciify(ITR, args...);
 };
+
+
+/* dl::asio */
+
+template<typename Derived,  typename Orig>
+class ExtendWithBuf {
+ private:
+	Orig orig_cookies;
+	char* const buf;
+	char* end;
+ public:
+	ExtendWithBuf(const Orig& old,  char* _buf)
+	: orig_cookies(old)
+	, buf(_buf)
+	, end(_buf)
+	{}
+	
+	ExtendWithBuf(const ExtendWithBuf& old,  char*)
+	: orig_cookies(old.orig_cookies)
+	, buf(old.buf)
+	, end(old.buf)
+	{}
+	
+	char* after() const {
+		return this->end + 1;
+	}
+	
+	size_t size() const {
+		return utils::ptrdiff(this->end, this->buf);
+	}
+	
+	std::string_view new_as_view() const {
+		return std::string_view(this->buf, this->size());
+	}
+	
+	auto separator() const {
+		return static_cast<const Derived*>(this)->separator();
+	}
+	
+	void append(const std::string_view even_more_cookies){
+		asciify(this->end, this->separator(), even_more_cookies);
+		printf("cookies == %.*s\n", (int)this->size(), this->buf);
+	}
+};
+
+template<typename Str,  typename Derived,  typename Orig,  typename... Args>
+void asciify(Str& ITR,  const ExtendWithBuf<Derived, Orig>& cookies,  Args&&... args){
+	if constexpr(not std::is_same<std::nullptr_t, Orig>::value)
+		asciify(ITR, cookies.orig_cookies);
+	asciify(ITR, cookies.new_as_view(), args...);
+}
 
 
 } // namespace _detail

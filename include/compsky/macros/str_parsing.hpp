@@ -64,5 +64,5 @@
 		const char* const begin = str; \
 		while(*str != c) \
 			++str; \
-		return std::string_view(begin,  utils::ptrdiff(str, begin)); \
+		return std::string_view(begin,  compsky::utils::ptrdiff(str, begin)); \
 	}
