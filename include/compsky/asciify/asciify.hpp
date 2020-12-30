@@ -51,55 +51,55 @@ size_t get_index(Str const ITR,  Str const BUF){
 
 /* Base Case to Override (must precede Base Cases) */
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  uint64_t t,  Args... args){
+void asciify(Str& ITR,  uint64_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  int64_t t,  Args... args){
+void asciify(Str& ITR,  int64_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  uint32_t t,  Args... args){
+void asciify(Str& ITR,  uint32_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  int32_t t,  Args... args){
+void asciify(Str& ITR,  int32_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  uint16_t t,  Args... args){
+void asciify(Str& ITR,  uint16_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  int16_t t,  Args... args){
+void asciify(Str& ITR,  int16_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  uint8_t t,  Args... args){
+void asciify(Str& ITR,  uint8_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  int8_t t,  Args... args){
+void asciify(Str& ITR,  int8_t t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 #ifdef _WIN32
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  unsigned long t,  Args... args){
+void asciify(Str& ITR,  unsigned long t,  Args&&... args){
     asciify_integer(ITR, t);
     return asciify(ITR,  args...);
 };
 #endif
 
 template<unsigned base = 10,  typename Str,  typename Int,  typename... Args>
-void asciify(Str& ITR,  const flag::FillWithLeadingZeros,  Int min_n_digits,  const int n,  Args... args){
+void asciify(Str& ITR,  const flag::FillWithLeadingZeros,  Int min_n_digits,  const int n,  Args&&... args){
 	Int m = n;
 	do {
 		if (min_n_digits == 0)
@@ -115,25 +115,25 @@ void asciify(Str& ITR,  const flag::FillWithLeadingZeros,  Int min_n_digits,  co
 }
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const bool b,  Args... args){
+void asciify(Str& ITR,  const bool b,  Args&&... args){
 	return asciify(ITR,  b ? "True" : "False",  args...);
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const char c,  Args... args){
+void asciify(Str& ITR,  const char c,  Args&&... args){
 	_detail::put(ITR++, c);
     return asciify(ITR,  args...);
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const char* s,  Args... args){
+void asciify(Str& ITR,  const char* s,  Args&&... args){
 	_detail::put(ITR, s);
     ITR += strlen(s);
     return asciify(ITR,  args...);
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const char** ss,  const int n,  Args... args){
+void asciify(Str& ITR,  const char** ss,  const int n,  Args&&... args){
     for (auto i = 0;  i < n;  ++i)
         asciify(ITR, ss[i]);
     return asciify(ITR,  args...);
@@ -141,7 +141,7 @@ void asciify(Str& ITR,  const char** ss,  const int n,  Args... args){
 
 #ifdef QT_GUI_LIB
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const QString& qs,  Args... args){
+void asciify(Str& ITR,  const QString& qs,  Args&&... args){
     const QByteArray ba = qs.toLocal8Bit();
     const char* s = ba.data();
     return asciify(ITR,  s, args...);
@@ -162,7 +162,7 @@ void asciify_hex(const char map[16],  Str& ITR,  const std::array<uint8_t, sz>& 
 }
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Hex,  const uint8_t c,  Args... args){
+void asciify(Str& ITR,  const flag::Hex,  const uint8_t c,  Args&&... args){
 	unsigned n = 0;
 	constexpr static const char map[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 	asciify_hex(map, ITR, c);
@@ -170,7 +170,7 @@ void asciify(Str& ITR,  const flag::Hex,  const uint8_t c,  Args... args){
 }
 
 template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::Hex,  const std::array<uint8_t, sz>& str,  Args... args){
+void asciify(Str& ITR,  const flag::Hex,  const std::array<uint8_t, sz>& str,  Args&&... args){
 	unsigned n = 0;
 	constexpr static const char map[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 	asciify_hex(map, ITR, str);
@@ -178,7 +178,7 @@ void asciify(Str& ITR,  const flag::Hex,  const std::array<uint8_t, sz>& str,  A
 }
 
 template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  const std::array<uint8_t, sz>& str,  Args... args){
+void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  const std::array<uint8_t, sz>& str,  Args&&... args){
 	unsigned n = 0;
 	constexpr static const char map[16] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 	asciify_hex(map, ITR, str);
@@ -186,7 +186,7 @@ void asciify(Str& ITR,  const flag::grammatical_case::Lower,  const flag::Hex,  
 }
 
 template<typename... Chars,  typename Str,  size_t sz,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args... args){
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::esc::Null,  const std::array<uint8_t, sz>& str,  Args&&... args){
 	char* _itr = ITR;
 	for (const uint8_t _c : str){
 		const char c = static_cast<char>(_c);
@@ -199,25 +199,25 @@ void asciify_escape(Str& ITR,  Chars... chars,  const flag::esc::Null,  const st
 	}
 }
 template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+void asciify(Str& ITR,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args&&... args){
 	asciify_escape<>(ITR, f, str, args...);
 }
 template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args&&... args){
 	asciify_escape<char>(ITR, c1, f, str, args...);
 }
 template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args&&... args){
 	asciify_escape<char, char>(ITR, c1, c2, f, str, args...);
 }
 template<typename Str,  size_t sz,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::esc::Null f,  const std::array<uint8_t, sz>& str,  Args&&... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, str, args...);
 }
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::StrLen f,  const char* s,  const size_t sz,  Args... args){
+void asciify(Str& ITR,  flag::StrLen f,  const char* s,  const size_t sz,  Args&&... args){
 	// WARNING: Not sure the is viable here, probably depends on whether args expansion contains another cstring
 	_detail::put(ITR, std::string_view(s, sz));
     ITR += sz;
@@ -285,19 +285,19 @@ void asciify_floaty(Str& ITR,  T d,  P precision){
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  double d,  T precision,  Args... args){
+void asciify(Str& ITR,  double d,  T precision,  Args&&... args){
     asciify_floaty(ITR, d, precision);
     asciify(ITR, args...);
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  float f,  T precision,  Args... args){
+void asciify(Str& ITR,  float f,  T precision,  Args&&... args){
     asciify_floaty(ITR, f, precision);
     asciify(ITR, args...);
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::guarantee::BetweenZeroAndOneInclusive f,  double d,  T precision,  Args... args){
+void asciify(Str& ITR,  flag::guarantee::BetweenZeroAndOneInclusive f,  double d,  T precision,  Args&&... args){
     asciify(ITR, (char)('0' + (char)d),  '.');
     d -= (char)d;
     asciify_subzero(ITR, d, precision);
@@ -305,14 +305,14 @@ void asciify(Str& ITR,  flag::guarantee::BetweenZeroAndOneInclusive f,  double d
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::guarantee::BetweenZeroAndOneExclusive f,  double d,  T precision,  Args... args){
+void asciify(Str& ITR,  flag::guarantee::BetweenZeroAndOneExclusive f,  double d,  T precision,  Args&&... args){
     asciify(ITR, "0.");
     asciify_subzero(ITR, d, precision);
     asciify(ITR, args...);
 };
 
 template<typename Str,  typename Int,  typename... Args>
-void asciify(Str& ITR,  flag::AlphaNumeric f,  Int m,  Args... args){
+void asciify(Str& ITR,  flag::AlphaNumeric f,  Int m,  Args&&... args){
 	size_t n_digits = 0;
 	Int n = m;
 	do {
@@ -345,7 +345,7 @@ struct PrematureNullByte : public std::runtime_error {
 	{}
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::EnvExpand f,  char* s,  Args... args){
+void asciify(Str& ITR,  flag::EnvExpand f,  char* s,  Args&&... args){
 	while(*s != 0){
 		if (unlikely(*s == '$')){
 			++s;
@@ -377,7 +377,7 @@ void asciify(Str& ITR,  flag::EnvExpand f,  char* s,  Args... args){
 };
 #ifdef QT_GUI_LIB
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::EnvExpand f,  const QString& s,  Args... args){
+void asciify(Str& ITR,  flag::EnvExpand f,  const QString& s,  Args&&... args){
 	for(auto i = 0;  i < s.size();  ){
 		if (unlikely(s.at(i) == QChar('$'))){
 			++i;
@@ -410,7 +410,7 @@ void asciify(Str& ITR,  flag::EnvExpand f,  const QString& s,  Args... args){
 #endif
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::Repeat,  const char c,  const char* s,  Args... args){
+void asciify(Str& ITR,  flag::Repeat,  const char c,  const char* s,  Args&&... args){
 	while(*s != 0){
 		if (*s == c)
 			_detail::put(ITR++, c);
@@ -421,7 +421,7 @@ void asciify(Str& ITR,  flag::Repeat,  const char c,  const char* s,  Args... ar
 }
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::until::NullOrNthChar,  size_t limit,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::until::NullOrNthChar,  size_t limit,  const char* s,  Args&&... args){
 	while((*s != 0) and (limit-- != 0)){
 		_detail::put(ITR++, *s);
 		++s;
@@ -430,7 +430,7 @@ void asciify(Str& ITR,  const flag::until::NullOrNthChar,  size_t limit,  const 
 }
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const char* s,  Args&&... args){
 	while((*s != 0) and (*s != d)){
 		_detail::put(ITR++, *s);
 		++s;
@@ -439,7 +439,7 @@ void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const char* s
 }
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const std::string_view& v,  Args... args){
+void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const std::string_view& v,  Args&&... args){
 	for(const char c : v){
 		if (c == d)
 			break;
@@ -449,7 +449,7 @@ void asciify(Str& ITR,  const flag::until::NullOr,  const char d,  const std::st
 }
 
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const flag::until::NullOr,  const char d,  const char* s,  Args... args){
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::until::NullOr,  const char d,  const char* s,  Args&&... args){
 	while((*s != 0) and (*s != d)){
 		if (unlikely(_detail::is_eq(*s, chars...)))
 			_detail::put(ITR++, '\\');
@@ -459,20 +459,20 @@ void asciify_escape(Str& ITR,  Chars... chars,  const flag::until::NullOr,  cons
 	asciify(ITR, args...);
 }
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::until::NullOr f,  const char d,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::until::NullOr f,  const char d,  const char* s,  Args&&... args){
 	asciify_escape<char>(ITR, c1, f, d, s, args...);
 }
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::until::NullOr f,  const char d,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::until::NullOr f,  const char d,  const char* s,  Args&&... args){
 	asciify_escape<char, char>(ITR, c1, c2, f, d, s, args...);
 }
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::until::NullOr f,  const char d,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::until::NullOr f,  const char d,  const char* s,  Args&&... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, d, s, args...);
 }
 
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const char* s,  Args... args){
+void asciify_escape(Str& ITR,  Chars... chars,  const char* s,  Args&&... args){
     while(*s != 0){
 		if (unlikely(_detail::is_eq(*s, '\\', chars...)))
             _detail::put(ITR++, '\\');
@@ -482,20 +482,20 @@ void asciify_escape(Str& ITR,  Chars... chars,  const char* s,  Args... args){
     asciify(ITR, args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char*& s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char*& s,  Args&&... args){
 	asciify_escape<char>(ITR, c1, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char*& s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char*& s,  Args&&... args){
 	asciify_escape<char, char>(ITR, c1, c2, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const char*& s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const char*& s,  Args&&... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
 }
 
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const flag::StrLen,  const size_t sz,  const char* const s,  Args... args){
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::StrLen,  const size_t sz,  const char* const s,  Args&&... args){
 	size_t i = 0;
 	while(i < sz){
 		const char _c = s[i];
@@ -507,45 +507,45 @@ void asciify_escape(Str& ITR,  Chars... chars,  const flag::StrLen,  const size_
     asciify(ITR, args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args&&... args){
 	asciify_escape<char>(ITR, c1, f, sz, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args&&... args){
 	asciify_escape<char, char>(ITR, c1, c2, f, sz, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::StrLen f,  const size_t sz,  const char* const s,  Args&&... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, sz, s, args...);
 }
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const std::string_view s,  Args... args){
+void asciify(Str& ITR,  const std::string_view s,  Args&&... args){
 	constexpr flag::StrLen _strlen;
 	asciify(ITR, _strlen, s.data(), s.size(), args...);
 };
 
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const std::string_view s,  Args... args){
+void asciify_escape(Str& ITR,  Chars... chars,  const std::string_view s,  Args&&... args){
 	constexpr flag::StrLen _strlen;
 	asciify_escape<Chars...>(ITR, chars..., _strlen, s.size(), s.data(), args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const std::string_view s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const std::string_view s,  Args&&... args){
 	asciify_escape<char>(ITR, c1, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const std::string_view s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const std::string_view s,  Args&&... args){
 	asciify_escape<char, char>(ITR, c1, c2, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const std::string_view s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const std::string_view s,  Args&&... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, s, args...);
 }
 
 #ifdef QT_GUI_LIB
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const QString& qs,  Args... args){
+void asciify_escape(Str& ITR,  Chars... chars,  const QString& qs,  Args&&... args){
 	size_t i = 0;
 	while(i < sz){
 		const QChar _c = qs.at(i);
@@ -557,22 +557,22 @@ void asciify_escape(Str& ITR,  Chars... chars,  const QString& qs,  Args... args
 	asciify(ITR, args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QString& s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QString& s,  Args&&... args){
 	asciify_escape<QChar>(ITR, c1, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QString& s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QString& s,  Args&&... args){
 	asciify_escape<QChar, QChar>(ITR, c1, c2, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QChar c3,  const QString& s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const QChar c1,  const QChar c2,  const QChar c3,  const QString& s,  Args&&... args){
 	asciify_escape<QChar, QChar, QChar>(ITR, c1, c2, c3, s, args...);
 }
 #endif
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::TerminatedBy,  const char c,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::TerminatedBy,  const char c,  const char* s,  Args&&... args){
 	while(*s != c){
 		_detail::put(ITR++, *s);
 		++s;
@@ -582,7 +582,7 @@ void asciify(Str& ITR,  const flag::TerminatedBy,  const char c,  const char* s,
 
 
 template<typename... Chars,  typename Str,  typename... Args>
-void asciify_escape(Str& ITR,  Chars... chars,  const flag::TerminatedBy,  const char t,  const char* s,  Args... args){
+void asciify_escape(Str& ITR,  Chars... chars,  const flag::TerminatedBy,  const char t,  const char* s,  Args&&... args){
 	while(*s != t){
 		if (unlikely(_detail::is_eq(*s, '\\', chars...)))
 			_detail::put(ITR++, '\\');
@@ -592,21 +592,21 @@ void asciify_escape(Str& ITR,  Chars... chars,  const flag::TerminatedBy,  const
 	asciify(ITR, args...);
 };
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::TerminatedBy f,  const char t,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const flag::TerminatedBy f,  const char t,  const char* s,  Args&&... args){
 	asciify_escape<char>(ITR, c1, f, t, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::TerminatedBy f,  const char t,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const flag::TerminatedBy f,  const char t,  const char* s,  Args&&... args){
 	asciify_escape<char, char>(ITR, c1, c2, f, t, s, args...);
 }
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::TerminatedBy f,  const char t,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::Escape,  const char c1,  const char c2,  const char c3,  const flag::TerminatedBy f,  const char t,  const char* s,  Args&&... args){
 	asciify_escape<char, char, char>(ITR, c1, c2, c3, f, t, s, args...);
 }
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::esc::DoubleQuote,  const char c,  Args... args){
+void asciify(Str& ITR,  const flag::esc::DoubleQuote,  const char c,  Args&&... args){
 	if (c == '"')
 		asciify(ITR, '\\');
 	asciify(ITR, c);
@@ -614,7 +614,7 @@ void asciify(Str& ITR,  const flag::esc::DoubleQuote,  const char c,  Args... ar
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::esc::DoubleQuote _esc_dblqt,  const flag::esc::URI_until_space::Unescape,  const flag::grammatical_case::Upper,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::esc::DoubleQuote _esc_dblqt,  const flag::esc::URI_until_space::Unescape,  const flag::grammatical_case::Upper,  const char* s,  Args&&... args){
 	while(true){
 		char c = *(s++);
 		char d;
@@ -665,7 +665,7 @@ void asciify(Str& ITR,  const flag::esc::DoubleQuote _esc_dblqt,  const flag::es
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::esc::URI_until_space::Unescape,  const flag::grammatical_case::Upper,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::esc::URI_until_space::Unescape,  const flag::grammatical_case::Upper,  const char* s,  Args&&... args){
 	while(true){
 		char c = *(s++);
 		char d;
@@ -714,7 +714,7 @@ void asciify(Str& ITR,  const flag::esc::URI_until_space::Unescape,  const flag:
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::esc::SpacesAndNonAscii,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::esc::SpacesAndNonAscii,  const char* s,  Args&&... args){
 	constexpr static const flag::Hex f_hex;
 	while(true){
 		const char c = *(s++);
@@ -736,7 +736,7 @@ void asciify(Str& ITR,  const flag::esc::SpacesAndNonAscii,  const char* s,  Arg
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  const flag::JSONEscape,  const char* s,  Args... args){
+void asciify(Str& ITR,  const flag::JSONEscape,  const char* s,  Args&&... args){
 	while(true){
 		const char c = *(s++);
 		switch(c){
@@ -777,7 +777,7 @@ void asciify(Str& ITR,  const flag::JSONEscape,  const char* s,  Args... args){
 
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  void* ptr,  Args... args){
+void asciify(Str& ITR,  void* ptr,  Args&&... args){
 	_detail::put(ITR++, '0');
 	_detail::put(ITR++, 'x');
     uintptr_t n = (uintptr_t)ptr;
@@ -795,7 +795,7 @@ void asciify(Str& ITR,  void* ptr,  Args... args){
 
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  const flag::NElements,  const size_t n,  const std::vector<T>& a,  Args... args){
+void asciify(Str& ITR,  const flag::NElements,  const size_t n,  const std::vector<T>& a,  Args&&... args){
 	for (size_t i = 0;  i < n;  ++i){
 		asciify(ITR, a.at(i));
 	}
@@ -816,7 +816,7 @@ template<unsigned N>
 struct Zipper {
 	template<typename Str,  typename T,  typename... Args>
 	static
-	void zip(Str& ITR,  const size_t indx,  const T& iterable_or_singleton,  Args... args){
+	void zip(Str& ITR,  const size_t indx,  const T& iterable_or_singleton,  Args&&... args){
 		zip_item_at_index(ITR, iterable_or_singleton, indx);
 		Zipper<N-1>::zip(ITR, indx, args...);
 	}
@@ -826,14 +826,14 @@ template<>
 struct Zipper<0> {
 	template<typename Str,  typename... Args>
 	static
-	void zip(Str& ITR,  Args... args){}
+	void zip(Str& ITR,  Args&&... args){}
 };
 
 template<unsigned N>
 struct Skipper {
 	template<typename Str,  typename T,  typename... Args>
 	static
-	void skip_then_asciify(Str& ITR,  T,  Args... args){
+	void skip_then_asciify(Str& ITR,  T,  Args&&... args){
 		Skipper<N-1>::skip_then_asciify(ITR, args...);
 	}
 };
@@ -842,14 +842,14 @@ template<>
 struct Skipper<0> {
 	template<typename Str,  typename... Args>
 	static
-	void skip_then_asciify(Str& ITR,  Args... args){
+	void skip_then_asciify(Str& ITR,  Args&&... args){
 		asciify(ITR, args...);
 	}
 };
 
 
 template<typename Str,  unsigned N,  typename... Args>
-void asciify(Str& ITR,  const flag::Zip<N> f,  const size_t n,  Args... args){
+void asciify(Str& ITR,  const flag::Zip<N> f,  const size_t n,  Args&&... args){
 	for (size_t i = 0;  i < n;  ++i){
 		Zipper<N>::zip(ITR, i, args...);
 	}
@@ -861,7 +861,7 @@ void asciify(Str& ITR,  const flag::Zip<N> f,  const size_t n,  Args... args){
 
 /* Concatenation */
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  T t,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  T t,  Args&&... args){
     asciify(ITR, t);
     constexpr static const flag::StrLen g;
     asciify(ITR, g, s, sz);
@@ -869,14 +869,14 @@ void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  T
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start e,  const char* s,  const int sz,  flag::concat::End f,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start e,  const char* s,  const int sz,  flag::concat::End f,  Args&&... args){
     // Overrides previous (more general) template
     ITR -= sz;
     asciify(ITR, args...);
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  const char** ss,  T n,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  const char** ss,  T n,  Args&&... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ITR, ss[i]);
@@ -886,7 +886,7 @@ void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  c
 };
 
 template<typename Str,  typename SZ,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  SZ sz,  const std::vector<const char*>& ss,  T n,  Args&&... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ITR, ss[i]);
@@ -896,27 +896,27 @@ void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  SZ sz,  const st
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start e,  const char c,  flag::concat::End f,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start e,  const char c,  flag::concat::End f,  Args&&... args){
     --ITR;
     asciify(ITR, args...);
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char c,  T t,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char c,  T t,  Args&&... args){
     asciify(ITR, t);
     asciify(ITR, c);
     asciify(ITR, f, c, args...);
 };
 
 template<typename Str,  typename T,  typename Precision,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char c,  flag::guarantee::BetweenZeroAndOneInclusive g,  T t,  Precision precision,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char c,  flag::guarantee::BetweenZeroAndOneInclusive g,  T t,  Precision precision,  Args&&... args){
     asciify(ITR, g, t, precision);
     asciify(ITR, c);
     asciify(ITR, f, c, args...);
 };
 
 template<typename Str,  typename T,  typename Precision,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char c,  flag::guarantee::BetweenZeroAndOneExclusive g,  T t,  Precision precision,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char c,  flag::guarantee::BetweenZeroAndOneExclusive g,  T t,  Precision precision,  Args&&... args){
     asciify(ITR, g, t, precision);
     asciify(ITR, c);
     asciify(ITR, f, c, args...);
@@ -926,7 +926,7 @@ void asciify(Str& ITR,  flag::concat::Start f,  const char c,  flag::guarantee::
 
 /* Concatenation with other flag types */
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  T t,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  T t,  Args&&... args){
     asciify(ITR, g, ps, psz, t);
     constexpr static const flag::StrLen strlen;
     asciify(ITR, strlen, s, sz);
@@ -934,7 +934,7 @@ void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  f
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  const char** ss,  T t,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  const char** ss,  T t,  Args&&... args){
     constexpr static const flag::StrLen strlen;
     for (auto i = 0;  i < t;  ++i){
         asciify(ITR, g, ps, psz, ss[i]);
@@ -944,7 +944,7 @@ void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  f
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  flag::prefix::Start h,  Args... args){
+void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  flag::prefix::Start g,  const char* ps,  const size_t psz,  flag::prefix::Start h,  Args&&... args){
     asciify(ITR, f, s, sz, args...);
 };
 
@@ -952,13 +952,13 @@ void asciify(Str& ITR,  flag::concat::Start f,  const char* s,  const int sz,  f
 
 /* Prefixes */
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::prefix::Start f,  const char* s,  const size_t sz,  const char* ss,  Args... args){
+void asciify(Str& ITR,  flag::prefix::Start f,  const char* s,  const size_t sz,  const char* ss,  Args&&... args){
     asciify(ITR, f, s, sz, ss);
     asciify(ITR, f, s, sz, args...);
 };
 
 template<typename Str,  typename T,  typename... Args>
-void asciify(Str& ITR,  flag::prefix::Start f,  const char* s,  const size_t sz,  const char** ss,  T n,  Args... args){
+void asciify(Str& ITR,  flag::prefix::Start f,  const char* s,  const size_t sz,  const char** ss,  T n,  Args&&... args){
     constexpr static const flag::StrLen g;
     for (auto i = 0;  i < n;  ++i){
         asciify(ITR, g, s, sz);
@@ -968,7 +968,7 @@ void asciify(Str& ITR,  flag::prefix::Start f,  const char* s,  const size_t sz,
 };
 
 template<typename Str,  typename... Args>
-void asciify(Str& ITR,  flag::prefix::Start e,  const char* s,  const size_t sz,  flag::prefix::End f,  Args... args){
+void asciify(Str& ITR,  flag::prefix::Start e,  const char* s,  const size_t sz,  flag::prefix::End f,  Args&&... args){
     asciify(ITR, args...);
 };
 
@@ -978,7 +978,7 @@ void asciify(Str& ITR,  flag::prefix::Start e,  const char* s,  const size_t sz,
 
 /* Convert to/from bases etc */
 template<typename Str,  typename Int,  typename... Args>
-void asciify(Str& ITR,  flag::to::AlphaNumeric f,  Int n,  Args... args){
+void asciify(Str& ITR,  flag::to::AlphaNumeric f,  Int n,  Args&&... args){
     size_t n_digits = 0;
     
     Int m = n;
@@ -1006,14 +1006,14 @@ void asciify(Str& ITR,  flag::to::AlphaNumeric f,  Int n,  Args... args){
 
 
 template<typename... Args>
-void asciify(char*& buf,  Args... args){
+void asciify(char*& buf,  Args&&... args){
 	// Pass pointer by reference in order to avoid "ambiguous overload" with an array (because if both an overload of an array and of a pointer exists, C++ has absolutely no clue which overload we could possibly be expecting to use)
 	_detail::asciify(buf, args...);
 }
 
 
 template<size_t sz,  typename... Args>
-void asciify(char(& buf)[sz],  Args... args){
+void asciify(char(& buf)[sz],  Args&&... args){
 	// Don't actually care about the array size (yet) - only used to avoid compiler whining about ambigious overloads.
 	char* itr = buf;
 	_detail::asciify(itr, args...);
