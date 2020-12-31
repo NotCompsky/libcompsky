@@ -2,6 +2,7 @@
 
 #include "stdinout_defines.hpp"
 #include "open.hpp"
+#include "metadata.hpp"
 #ifndef _WIN32
 # include <unistd.h>
 #endif
@@ -30,9 +31,11 @@ bool read_from_stdin(Args&&... args){
 class ReadOnlyFile {
  private:
 	const fileid_typ f_id;
+	const char* const path;
  public:
 	ReadOnlyFile(const char* const fp)
 	: f_id(open_file_for_reading(fp))
+	, path(fp)
 	{}
 	
 	~ReadOnlyFile(){
@@ -47,6 +50,14 @@ class ReadOnlyFile {
 	template<typename... Args>
 	bool read_into_buf(Args&&... args){
 		return read_from_file(this->f_id, args...);
+	}
+	
+	bool read_entirety_into_buf(char* buf) const {
+		return read_from_file(this->f_id, buf, this->size());
+	}
+	
+	std::size_t size() const {
+		return compsky::os::get_file_sz(this->path);
 	}
 };
 

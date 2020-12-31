@@ -1007,6 +1007,20 @@ void asciify(Str& ITR,  flag::to::AlphaNumeric f,  Int n,  Args&&... args){
 };
 
 
+/* OS */
+template<typename... Args>
+void asciify(char*& ITR,  const compsky::os::ReadOnlyFile& f,  Args... args){
+	f.read_entirety_into_buf(ITR);
+	ITR += f.size();
+	asciify(args...);
+}
+template<typename... Args>
+void asciify(const char*& ITR,  const compsky::os::ReadOnlyFile& f,  Args... args){
+	ITR += f.size();
+	asciify(args...);
+}
+
+
 /* dl::asio */
 
 template<typename Derived,  typename Orig>

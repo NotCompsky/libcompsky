@@ -20,6 +20,7 @@
 #include "compsky/asciify/flags.hpp"
 #include "compsky/asciify/types.hpp"
 #include "compsky/asciify/utils.hpp"
+#include <compsky/os/read.hpp>
 
 
 namespace compsky {
@@ -281,6 +282,13 @@ void asciify(Str& ITR,  const flag::prefix::Start,  const char* s,  const size_t
 /* Convert to/from bases etc */
 template<typename Str,  typename Int,  typename... Args>
 void asciify(Str& ITR,  const flag::to::AlphaNumeric,  Int n,  Args&&... args);
+
+
+/* OS */
+template<typename... Args>
+void asciify(char*& ITR,  const compsky::os::ReadOnlyFile& f,  Args... args);
+template<typename... Args>
+void asciify(const char*& ITR,  const compsky::os::ReadOnlyFile& f,  Args... args);
 
 
 /* dl::asio */

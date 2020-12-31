@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compsky/macros/likely.hpp>
 #ifdef _WIN32
 #else
 # include <sys/stat.h>
