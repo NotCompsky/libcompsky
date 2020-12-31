@@ -268,6 +268,20 @@ void asciify(Str& ITR,  const flag::concat::Start,  const char* s,  const int sz
 
 
 
+/* Replacement */
+/*template<typename Str,  typename... ReplaceArgs,  typename... Args>
+void asciify(Str& ITR,  const flag::Replace<ReplaceArgs&&...>,  ReplaceArgs&&... replace_args,  const char* s,  Args&&... args);
+
+template<typename Str,  typename... ReplaceArgs,  typename... Args>
+void asciify(Str& ITR,  const flag::Replace<ReplaceArgs&&...>,  ReplaceArgs&&... replace_args,  const std::string_view v,  Args&&... args);*/
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Replace<const char, char>,  char a,  const char b,  const char* s,  Args&&... args);
+
+template<typename Str,  typename... Args>
+void asciify(Str& ITR,  const flag::Replace<char, char>,  char a,  char b,  const std::string_view v,  Args&&... args);
+
+
+
 /* Prefixes */
 template<typename Str,  typename T,  typename... Args>
 void asciify(Str& ITR,  const flag::prefix::Start,  const char* s,  const size_t sz,  const char** ss,  T n,  Args&&... args);

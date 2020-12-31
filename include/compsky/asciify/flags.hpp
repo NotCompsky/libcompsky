@@ -18,6 +18,8 @@ namespace flag {
 		struct NullOr{};
 		struct NullOrNthChar{};
 	}
+	template<typename...Args>
+	struct Replace{};
     struct Escape{};
 	struct [[deprecated("Use Escape instead")]] Escape3{};
 	struct JSONEscape{};
