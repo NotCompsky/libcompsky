@@ -196,16 +196,21 @@ size_t dl(char* const req_str_buf,  const size_t req_str_buf_sz,  char*& dst_buf
 			const char* _http_itr = response_itr;
 			typename compsky::dl::asio::_detail::StructToDetTyp<Cookies, Cookies>::typ _cookies(cookies, req_str_buf);
 			while(true){
-				const std::string_view set_cookie = STRING_VIEW_FROM_UP_TO(14, "\r\nset-cookie: ")(_http_itr, ';');
-				printf("set_cookie == %.*s\n", (int)set_cookie.size(), set_cookie.data()); fflush(stdout);
+				// WARNING: Doesn't deal well with a mixture of set-cookies and Set-Cookies
+				const std::string_view set_cookie1 = STRING_VIEW_FROM_UP_TO(14, "\r\nset-cookie: ")(_http_itr, ';');
+				const std::string_view set_cookie2 = STRING_VIEW_FROM_UP_TO(14, "\r\nSet-Cookie: ")(_http_itr, ';');
+				const std::string_view set_cookie = (set_cookie1 == utils::nullstrview) ? set_cookie2 : set_cookie1;
 				if (set_cookie == utils::nullstrview)
 					break;
+				printf("set_cookie == %.*s\n", (int)set_cookie.size(), set_cookie.data()); fflush(stdout);
 				_cookies.append(set_cookie);
 				_http_itr = set_cookie.data() + 1;
 			}
 			printf("Following redirect\n"); fflush(stdout);
 			const std::string_view redirect_url = STRING_VIEW_FROM_UP_TO(12, "\r\nLocation: ")(response_itr, '\r');
 			std::string_view new_path;
+			if (unlikely(redirect_url.empty()))
+				return 0;
 			if (redirect_url.at(0) == '/')
 				new_path = redirect_url;
 			else
