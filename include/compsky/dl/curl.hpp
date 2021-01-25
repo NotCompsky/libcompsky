@@ -17,15 +17,15 @@ template<size_t sz>
 class CurlSList {
   public:
 	curl_slist nodes[sz];
+	std::size_t size;
 	
 	template<size_t i,  typename... Args>
-	void set_headers(){
-		static_assert(i == sz);
-	}
+	void set_headers(){}
 	
 	template<size_t i = 0,  typename... Args>
 	void set_headers(const char* header,  Args... args){
-		if constexpr(i == sz-1)
+		++this->size;
+		if constexpr(sizeof...(Args) == 0)
 			this->nodes[i].next = nullptr;
 		else
 			this->nodes[i].next = &this->nodes[i+1];
@@ -33,20 +33,28 @@ class CurlSList {
 		this->set_headers<i+1>(args...);
 	}
 	
-	CurlSList(){}
+	void append_header(const char* header){
+		this->nodes[this->size++].data = const_cast<char*>(header);
+	}
+	
+	CurlSList()
+	: size(0)
+	{}
 	
 	template<typename... Args>
 	CurlSList(Args... args)
+	: size(0)
 	{
 		this->set_headers<0>(args...);
 	}
 };
 
 
+template<std::size_t n_headers = 15>
 class Curl {
   public:
 	CURL* const obj;
-	CurlSList<10> headers;
+	CurlSList<n_headers> headers;
 	
 	template<typename... Args>
 	Curl(Args&&... args)
@@ -120,6 +128,10 @@ class Curl {
 		);
 		this->set_opt(CURLOPT_HTTPHEADER, this->headers.nodes[1]);
 		return false;
+	}
+	
+	void append_header(const char* header){
+		this->headers.append_header(header);
 	}
 };
 
