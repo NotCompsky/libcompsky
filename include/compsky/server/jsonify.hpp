@@ -137,7 +137,6 @@ namespace _r {
 	void asciify_json_response_rows_from_sql_res(MYSQL_RES* res,  MYSQL_ROW* row,  char*& itr,  const ArrOrDict f_arr_or_dict,  Args... args){
 		while(likely((*row = mysql_fetch_row(res))))
 			asciify_json_response_row(itr, *row, f_arr_or_dict, args...);
-		mysql_free_result(res);
 	}
 	
 	
