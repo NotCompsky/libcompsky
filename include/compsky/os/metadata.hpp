@@ -11,7 +11,7 @@ namespace compsky {
 namespace os {
 
 
-inline
+template<std::size_t return_on_fail=SIZE_MAX>
 std::size_t get_file_sz(const char* const fp){
   #ifdef _WIN32
 	HANDLE const f = CreateFileA(fp,  GENERIC_READ,  0,  nullptr,  OPEN_EXISTING,  FILE_ATTRIBUTE_NORMAL,  nullptr);
@@ -26,7 +26,7 @@ std::size_t get_file_sz(const char* const fp){
 	static struct stat stat_buf;
 	const auto rc3 = stat(fp, &stat_buf);
 	if (unlikely(rc3 == -1))
-		return -1; // aka std::numeric_limits<uint64_t>::max() ?
+		return return_on_fail; // aka std::numeric_limits<uint64_t>::max() ?
 	return stat_buf.st_size;
   #endif
 }
