@@ -1,5 +1,4 @@
-#ifndef LIBCOMPSKY_MYSQL_QUERY_HPP
-#define LIBCOMPSKY_MYSQL_QUERY_HPP
+#pragma once
 
 #include <cstddef> // for size_t
 #include <stdint.h> // for uintN_t
@@ -8,8 +7,8 @@
 #include <compsky/asciify/asciify.hpp> // for asciify::*
 #include <compsky/asciify/flags.hpp> // for compsky::asciify::flag::*
 
-#include <compsky/mysql/flags.hpp>
-#include <compsky/mysql/mysql.hpp>
+#include "flags.hpp"
+#include "mysql.hpp"
 
 
 // Assumes mysql/mysql.h, utils.hpp and mymysql.hpp are included in main scope of main program
@@ -390,12 +389,3 @@ Int n_results(MYSQL_RES* res){
 
 }
 } // END namespace compsky::mysql
-
-
-
-
-
-
-
-
-#endif
