@@ -35,7 +35,7 @@ template<typename... Args>
 bool write_to_file(const fileid_typ file_id,  char* buf,  Args&&... args){
 	char* itr = buf;
 	compsky::asciify::asciify(itr, args...);
-	write_n_bytes(file_id, buf,  utils::ptrdiff(itr, buf));
+	return write_n_bytes(file_id, buf,  utils::ptrdiff(itr, buf));
 }
 
 template<typename... Args>

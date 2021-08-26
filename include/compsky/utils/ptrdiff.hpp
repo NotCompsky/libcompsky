@@ -1,6 +1,9 @@
 #pragma once
 
 
+#include <cstdint>
+
+
 namespace compsky {
 namespace utils {
 
