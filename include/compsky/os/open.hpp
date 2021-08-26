@@ -25,7 +25,7 @@ fileid_typ open_file_for_writing(const char* const file_path){
   #ifdef _WIN32
 	return fopen(file_path, "wb");
   #else
-	return open(file_path, O_WRONLY);
+	return open(file_path, O_CREAT|O_WRONLY|O_TRUNC, S_IRWXU|S_IRWXG);
   #endif
 }
 
