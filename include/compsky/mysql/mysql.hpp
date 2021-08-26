@@ -54,6 +54,17 @@ struct MySQLAuth {
 		// Implements the override for MySQLAuth[i] = ?
 		return this->bufs[i];
 	}
+	
+	MySQLAuth(){}
+	
+	MySQLAuth(char* _host,  char* _path,  char* _user,  char* _pwrd,  char* _dbnm,  char* _port)
+	: host(_host)
+	, path(_path)
+	, user(_user)
+	, pwrd(_pwrd)
+	, dbnm(_dbnm)
+	, port(_port)
+	{}
 };
 
 
