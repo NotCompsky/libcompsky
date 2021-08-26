@@ -4,13 +4,19 @@
 #include "increment.hpp"
 
 
-template<typename Float,  typename StrOrStrPtr>
+template<typename Float,  typename StrOrStrPtr,  bool can_be_negative = false>
 constexpr
 Float a2f(StrOrStrPtr s){
 	uint64_t ns[2] = {0, 0};
 	unsigned indx = 0;
 	uint64_t divisor = 1;
 	while(true){
+		if constexpr (can_be_negative){
+			if(char_value(s) == '-'){
+				increment(&s);
+				return -a2f<Float>(s);
+			}
+		}
 		if(char_value(s) == '.'){
 			if(indx)
 				// If we have already encountered a decimal point
